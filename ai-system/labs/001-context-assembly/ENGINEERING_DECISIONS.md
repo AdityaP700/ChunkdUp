@@ -30,3 +30,13 @@ Policy V1
 ↓
 
 Take Top-3 by score.
+
+"it goes to the retrieval methods then from there, we go to _calculate the overlap based on that, we return the overlapped chunk and then on the basis of that we return the scored chunks and then return the top chunks"
+
+It goes to retrieve()
+For every chunk, it calculates overlap using _calculate_overlap()
+It stores (overlap, score, chunk) in a list called scored_chunks
+It sorts this list (best first)
+Finally, it returns only the top k chunks
+
+Finding: Simple keyword overlap is highly sensitive to punctuation, stop words, and exact vocabulary matches. It is useful for demonstrating the retrieval pipeline but is not robust enough for semantic retrieval.
