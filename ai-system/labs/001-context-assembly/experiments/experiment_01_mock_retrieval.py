@@ -75,6 +75,7 @@ chunks =[
 class Retriever:
     def __init__(self, chunks_list):
         self.chunks = chunks_list
+
     #measures how relevant a chunk is to the query by counting how many words
     #in common between them
     def _calculate_overlap(self, query: str,chunk_keywords:list)->int:
@@ -84,7 +85,6 @@ class Retriever:
 
     #i call retriever.retrieve(query,k)
     #it creates an empty list called scored_chunks=[]
-
     def retrieve(self, query: str = "", k: int = 10):
         """Always returns exactly k chunks by cycling through available ones."""
         if not self.chunks:
@@ -107,6 +107,7 @@ class Retriever:
 class ContextAssembler:
     def __init__(self):
         pass
+    
 #it doesnt takes any data ,it just takes the chunks
 #input when assemble() is called
     def assemble(self,chunks:list[dict])->list[dict]:

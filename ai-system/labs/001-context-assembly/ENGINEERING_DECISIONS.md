@@ -40,3 +40,7 @@ It sorts this list (best first)
 Finally, it returns only the top k chunks
 
 Finding: Simple keyword overlap is highly sensitive to punctuation, stop words, and exact vocabulary matches. It is useful for demonstrating the retrieval pipeline but is not robust enough for semantic retrieval.
+
+![alt text](image.png)
+
+- Replace the keyword-based retriever with a semantic retriever using sentence-transformers and cosine similarity.
