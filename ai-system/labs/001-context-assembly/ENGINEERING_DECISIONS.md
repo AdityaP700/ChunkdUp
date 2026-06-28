@@ -17,6 +17,16 @@ It should not care how they were retrieved.
 
 ✅ Retrieved chunks successfully loaded and inspected.
 
-## Next Step
+Question:
 
-Implement the simplest possible ContextAssembler that selects the Top-3 chunks.
+Given retrieved chunks...
+
+How should the system choose context?
+
+Answer:
+
+Policy V1
+
+↓
+
+Take Top-3 by score.
