@@ -1,76 +1,46 @@
-chunks =[
-    {
-        "id": 1,
-        "text": "Context Engineering is deciding what information reaches the LLM.",
-        "keywords": ["context", "engineering", "llm", "information"]
-    },
-    {
-        "id": 2,
+import os
+import json
+from sentence_transformers import SentenceTransformer, util
 
-        "text": "Token budgets are limited.",
-        "keywords": ["token", "budget", "limited"]
-    },
-    {
-        "id": 3,
+def load_chunks():
+    base_dir = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
+    chunks_path = os.path.join(base_dir, "data", "chunks.json")
+    with open(chunks_path, "r", encoding="utf-8") as f:
+        return json.load(f)
 
-        "text": "Retrieval returns candidate chunks.",
-        "keywords": ["retrieval", "candidate", "chunks"]
-    },
-    {
-        "id": 4,
+chunks = load_chunks()
 
-        "text": "Reranking improves the quality of selected context.",
-        "keywords": ["reranking", "quality", "context"]
-    },
-    {
-        "id": 5,
+class SemanticRetriever:
+    def __init__(self, chunks):
+        # store the chunks
+        self.chunks = chunks
+        # load embedding model
+        self.model = SentenceTransformer("all-MiniLM-L6-v2")
+        # Build a list containing the "text" from every chunk.
+        chunk_texts=[chunk["text"] for chunk in chunks]
+        self.chunk_embeddings = self.model.encode(chunk_texts)
+        # print(self.chunk_embeddings.shape)
+        retriever.chunk_embeddings.shape
 
-        "text": "Long contexts can degrade model performance.",
-        "keywords": ["context", "performance", "long"]
-    },
-    {
-        "id": 6,
+    def retrieve(self, query: str = "", k: int = 10):
+        if not self.chunks:
+            return []
+        # encode query
+        query_embedding = self.model.encode(query)
+        # compare with stored embeddings
+        cos_scores = util.cos_sim(query_embedding, self.chunk_embeddings)[0]
 
-        "text": "Irrelevant chunks should be filtered out before reaching the model.",
-        "keywords": ["irrelevant", "filter", "model"]
-    },
-    {
-        "id": 7,
+        # Zip scores with chunks
+        scored_chunks = []
+        for idx, score in enumerate(cos_scores):
+            chunk = self.chunks[idx].copy()
+            chunk["score"] = float(score)
+            scored_chunks.append(chunk)
 
-        "text": "Preserving document order can sometimes be more important than score.",
-        "keywords": ["order", "document", "score"]
-    },
-    {
-        "id": 8,
+        # Sort by score descending
+        scored_chunks.sort(key=lambda x: x["score"], reverse=True)
+        return scored_chunks[:k]
 
-        "text": "Chunking strategy affects retrieval quality significantly.",
-        "keywords": ["chunking", "retrieval", "quality"]
-    },
-    {
-        "id": 9,
-
-        "text": "Metadata filtering helps reduce noise in retrieved results.",
-        "keywords": ["metadata", "filtering", "noise"]
-    },
-    {
-        "id": 10,
-
-        "text": "Some high-scoring chunks may still be irrelevant to the query.",
-        "keywords": ["irrelevant", "query", "score"]
-    },
-    {
-        "id": 11,
-
-        "text": "Context window size is a hard constraint in most LLMs.",
-        "keywords": ["context", "window", "llm"]
-    },
-    {
-        "id": 12,
-      
-        "text": "Diversity in retrieved chunks can improve answer quality.",
-        "keywords": ["diversity", "quality", "retrieved"]
-    }
-]
 class Retriever:
     def __init__(self, chunks_list):
         self.chunks = chunks_list
@@ -92,8 +62,7 @@ class Retriever:
         #for each chunk,it calls the _calculate...it gets back a number
 
         for chunk in self.chunks:
-            #it creates a tuple (overlap,original_score,chunk)
-            overlap=self._calculate_overlap(query,chunk.get("keywords",[]))
+            #it creates a tuplelate_overlap(query,chunk.get("keywords",[]))
             #it adds this tuple to scored_chunk
             scored_chunks.append((overlap,chunk["score"],chunk))
 
@@ -101,7 +70,8 @@ class Retriever:
         scored_chunks.sort(key=lambda x:(x[0],x[1]),reverse=True)
         #it takes the top k chunks from the sorted list
         top_chunks=[chunk.copy() for _, _, chunk in scored_chunks[:k]]
-        return top_chunks
+        return top_chunks (overlap,original_score,chunk)
+
 
 class ContextAssembler:
     def __init__(self):
@@ -127,7 +97,8 @@ class ContextAssembler:
 
 question ="what is diversity in retrieval?"
 
-retriever = Retriever(chunks)
+
+retriever = SemanticRetriever(chunks)
 assembler = ContextAssembler()
 
 retrieved_chunks = retriever.retrieve(query=question,k=10)
@@ -138,3 +109,5 @@ print(f"Selected {len(final_context)} chunks for the model\n")
 
 for i, chunk in enumerate(final_context,1):
     print(f"{i}.[scores={chunk['score']}] {chunk['text']}")
+
+
