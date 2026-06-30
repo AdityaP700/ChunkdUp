@@ -69,3 +69,9 @@ Budget-aware assembly answers:
 A relevant chunk is not guaranteed to reach the model; it must compete for the available context budget.
 
 Greedily add the highest-ranked chunks until the budget is exhausted.
+
+
+#new updates :
+- i have created two prompts i.e. one basic and one expert prompt
+- the difference is that ,two of the prompts which will be orchestrated using the retrieved context chunks
+- these chunks will be monitored overally evaluated by a seperate LLM for a fair judgement

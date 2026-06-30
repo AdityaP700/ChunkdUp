@@ -1,6 +1,19 @@
 import os
 import json
+import sys
 from sentence_transformers import SentenceTransformer, util
+
+# Load .env file manually from the parent directory of experiments
+base_dir = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
+env_path = os.path.join(base_dir, ".env")
+if os.path.exists(env_path):
+    with open(env_path, "r", encoding="utf-8") as f:
+        for line in f:
+            line = line.strip()
+            if line and not line.startswith("#"):
+                parts = line.split("=", 1)
+                if len(parts) == 2:
+                    os.environ[parts[0].strip()] = parts[1].strip()
 
 def load_chunks():
     base_dir = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
@@ -41,41 +54,9 @@ class SemanticRetriever:
         scored_chunks.sort(key=lambda x: x["score"], reverse=True)
         return scored_chunks[:k]
 
-class Retriever:
-    def __init__(self, chunks_list):
-        self.chunks = chunks_list
-
-    #measures how relevant a chunk is to the query by counting how many words
-    #in common between them
-    def _calculate_overlap(self, query: str,chunk_keywords:list)->int:
-        query_words=set(query.lower().split())
-        chunk_words=set(word.lower() for word in chunk_keywords)
-        return len(query_words & chunk_words)
-
-    #i call retriever.retrieve(query,k)
-    #it creates an empty list called scored_chunks=[]
-    def retrieve(self, query: str = "", k: int = 10):
-        """Always returns exactly k chunks by cycling through available ones."""
-        if not self.chunks:
-            return []
-        scored_chunks=[]
-        #for each chunk,it calls the _calculate...it gets back a number
-
-        for chunk in self.chunks:
-            #it creates a tuplelate_overlap(query,chunk.get("keywords",[]))
-            #it adds this tuple to scored_chunk
-            scored_chunks.append((overlap,chunk["score"],chunk))
-
-        #it sorts scored_chunks
-        scored_chunks.sort(key=lambda x:(x[0],x[1]),reverse=True)
-        #it takes the top k chunks from the sorted list
-        top_chunks=[chunk.copy() for _, _, chunk in scored_chunks[:k]]
-        return top_chunks (overlap,original_score,chunk)
-
-
 class ContextAssembler:
     def __init__(self):
-        self.context_budget=120
+        self.context_budget=800
 
 #it doesnt takes any data ,it just takes the chunks
 #input when assemble() is called
@@ -106,35 +87,131 @@ class ContextAssembler:
             word_count = len(chunk_text.split())    # for readability
 
             if current_length + added_length > budget:
-                print(f"✗ Skipped Chunk {i} ({word_count} words, {added_length} chars) "
-                      f"→ Budget exceeded")
+                print(f"[Skip] Skipped Chunk {i} ({word_count} words, {added_length} chars) "
+                      f"-> Budget exceeded")
                 continue  # V3: skip and try next
 
-            # It fits → add it
+            # It fits -> add it
             selected.append(chunk)
             current_length += added_length
             remaining = budget - current_length
 
-            print(f"✓ Added Chunk {i} ({word_count} words, {added_length} chars) "
-                  f"→ Remaining Budget: {remaining} chars")
+            print(f"[Add] Added Chunk {i} ({word_count} words, {added_length} chars) "
+                  f"-> Remaining Budget: {remaining} chars")
 
         print(f"\nFinal Selection: {len(selected)} chunks "
               f"(used {current_length} / {budget} chars)\n")
 
         return selected
 
-question ="what is diversity in retrieval?"
+class PromptBuilder:
+
+    def build(self, query: str, selected_chunks: list[dict], variant: str = "basic") -> str:
+        if not selected_chunks:
+            context_str = "No relevant context found."
+        else:
+            lines = [f"{i}. {c.get('text', '').strip()}" for i, c in enumerate(selected_chunks, 1)]
+            context_str = "\n".join(lines)
+
+        if variant == "basic":
+            return f"""You are a helpful AI assistant.
+
+Answer the question using ONLY the provided context.
+You MUST respond ONLY with a valid JSON object in the following format:
+{{
+  "answer": "your answer here",
+  "confidence": <float between 0.0 and 1.0>,
+  "citations": <list of integer chunk numbers (e.g. [1, 6]) used to answer the question>
+}}
+
+Context:
+----------------
+{context_str}
+----------------
+
+Question:
+{query}
+
+Answer:"""
+
+        elif variant == "expert":
+            return f"""You are an expert AI assistant.
+
+Use ONLY the provided context.
+If the answer is not present, the "answer" field should be "I don't know."
+Always be concise and accurate.
+You MUST respond ONLY with a valid JSON object in the following format:
+{{
+  "answer": "your answer here",
+  "confidence": <float between 0.0 and 1.0>,
+  "citations": <list of integer chunk numbers (e.g. [1, 6]) used to answer the question>
+}}
+
+Context:
+----------------
+{context_str}
+----------------
+
+Question:
+{query}
+
+Answer:"""
+
+        else:
+            return self.build(query, selected_chunks, "basic")
+
+class LLMCaller:
+    """Simple wrapper for Gemini or Claude."""
+
+    def __init__(self, provider: str = "gemini"):  # "gemini" or "claude"
+        self.provider = provider.lower()
+
+        if self.provider == "gemini":
+            import google.generativeai as genai
+            genai.configure(api_key=os.getenv("GEMINI_API_KEYS"))
+            self.model = genai.GenerativeModel("gemini-2.5-flash")  # or gemini-1.5-pro
+        elif self.provider == "claude":
+            from anthropic import Anthropic
+            self.client = Anthropic(api_key=os.getenv("CLAUDE_API_KEYS"))
+        else:
+            raise ValueError("Provider must be 'gemini' or 'claude'")
+
+    def generate(self, prompt: str, max_tokens: int = 500) -> str:
+        if self.provider == "gemini":
+            response = self.model.generate_content(prompt)
+            return response.text.strip()
+        else:  # claude
+            response = self.client.messages.create(
+                model="claude-3-5-haiku-20241022",  # or latest
+                max_tokens=max_tokens,
+                messages=[{"role": "user", "content": prompt}]
+            )
+            return response.content[0].text.strip()
+question ="Should we always trust highest scoring chunks??"
 
 retriever = SemanticRetriever(chunks)
 assembler = ContextAssembler()
-
+builder=PromptBuilder()
 retrieved_chunks = retriever.retrieve(query=question,k=10)
 final_context = assembler.assemble(retrieved_chunks)
 
-print(f"Received {len(retrieved_chunks)} chunks from the retrieval")
-print(f"Selected {len(final_context)} chunks for the model\n")
+# print(f"Received {len(retrieved_chunks)} chunks from the retrieval")
+# print(f"Selected {len(final_context)} chunks for the model\n")
 
-for i, chunk in enumerate(final_context,1):
-    print(f"{i}.[scores={chunk['score']}] {chunk['text']}")
+# for i, chunk in enumerate(final_context,1):
+#     print(f"{i}.[scores={chunk['score']}] {chunk['text']}")
 
 
+prompt_a = builder.build(question, final_context, variant="basic")
+prompt_b = builder.build(question, final_context, variant="expert")
+
+print("\n=== PROMPT A (Basic) ===")
+print(prompt_a)
+print("\n=== PROMPT B (Expert) ===")
+print(prompt_b)
+
+# Run with LLM
+llm = LLMCaller(provider="gemini")   # Change to "claude" anytime
+print("\n=== LLM RESPONSE (Prompt B) ===")
+answer = llm.generate(prompt_b)
+print(answer)
