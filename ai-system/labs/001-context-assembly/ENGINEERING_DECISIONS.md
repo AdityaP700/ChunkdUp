@@ -43,4 +43,29 @@ Finding: Simple keyword overlap is highly sensitive to punctuation, stop words, 
 
 ![alt text](image.png)
 
-- Replace the keyword-based retriever with a semantic retriever using sentence-transformers and cosine similarity.
+# Result
+
+Replacing keyword matching with semantic retrieval significantly improved the relevance of retrieved chunks.
+
+# Decision
+
+Adopt semantic retrieval as the default retrieval strategy for the AI system.
+
+# Next Question
+
+Given relevant chunks, how should the Context Assembler decide which ones reach the LLM?
+
+The engineering lesson
+
+Retrieval answers:
+"What is relevant?"
+
+Budget-aware assembly answers:
+"What can I afford to send?"
+
+---
+
+## Experiment 2: Budget-Aware Selection
+A relevant chunk is not guaranteed to reach the model; it must compete for the available context budget.
+
+Greedily add the highest-ranked chunks until the budget is exhausted.

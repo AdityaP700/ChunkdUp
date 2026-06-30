@@ -20,7 +20,7 @@ class SemanticRetriever:
         chunk_texts=[chunk["text"] for chunk in chunks]
         self.chunk_embeddings = self.model.encode(chunk_texts)
         # print(self.chunk_embeddings.shape)
-        retriever.chunk_embeddings.shape
+
 
     def retrieve(self, query: str = "", k: int = 10):
         if not self.chunks:
@@ -75,13 +75,14 @@ class Retriever:
 
 class ContextAssembler:
     def __init__(self):
-        pass
+        self.context_budget=120
 
 #it doesnt takes any data ,it just takes the chunks
 #input when assemble() is called
     def assemble(self,chunks:list[dict])->list[dict]:
 
         if not chunks:
+            print("No chunks provided to assembler.")
             return []
 
         sorted_chunks=sorted(
@@ -93,10 +94,36 @@ class ContextAssembler:
             reverse=True
         )
 
-        return sorted_chunks[:3]
+        selected = []
+        current_length = 0
+        budget = self.context_budget
+
+        print(f"\n=== Context Budget: {budget} characters ===")
+
+        for i, chunk in enumerate(sorted_chunks, 1):
+            chunk_text = chunk.get("text", "")
+            added_length = len(chunk_text)          # characters
+            word_count = len(chunk_text.split())    # for readability
+
+            if current_length + added_length > budget:
+                print(f"✗ Skipped Chunk {i} ({word_count} words, {added_length} chars) "
+                      f"→ Budget exceeded")
+                continue  # V3: skip and try next
+
+            # It fits → add it
+            selected.append(chunk)
+            current_length += added_length
+            remaining = budget - current_length
+
+            print(f"✓ Added Chunk {i} ({word_count} words, {added_length} chars) "
+                  f"→ Remaining Budget: {remaining} chars")
+
+        print(f"\nFinal Selection: {len(selected)} chunks "
+              f"(used {current_length} / {budget} chars)\n")
+
+        return selected
 
 question ="what is diversity in retrieval?"
-
 
 retriever = SemanticRetriever(chunks)
 assembler = ContextAssembler()
