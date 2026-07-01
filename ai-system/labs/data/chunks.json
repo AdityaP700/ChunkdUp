@@ -1,0 +1,112 @@
+[
+    {
+        "id": 1,
+        "text": "Context Engineering is deciding what information reaches the LLM.",
+        "keywords": ["context", "engineering", "llm", "information"]
+    },
+    {
+        "id": 2,
+        "text": "Token budgets are limited.",
+        "keywords": ["token", "budget", "limited"]
+    },
+    {
+        "id": 3,
+        "text": "Retrieval returns candidate chunks.",
+        "keywords": ["retrieval", "candidate", "chunks"]
+    },
+    {
+        "id": 4,
+        "text": "Reranking improves the quality of selected context.",
+        "keywords": ["reranking", "quality", "context"]
+    },
+    {
+        "id": 5,
+        "text": "Long contexts can degrade model performance.",
+        "keywords": ["context", "performance", "long"]
+    },
+    {
+        "id": 6,
+        "text": "Irrelevant chunks should be filtered out before reaching the model.",
+        "keywords": ["irrelevant", "filter", "model"]
+    },
+    {
+        "id": 7,
+        "text": "Preserving document order can sometimes be more important than score.",
+        "keywords": ["order", "document", "score"]
+    },
+    {
+        "id": 8,
+        "text": "Chunking strategy affects retrieval quality significantly.",
+        "keywords": ["chunking", "retrieval", "quality"]
+    },
+    {
+        "id": 9,
+        "text": "Metadata filtering helps reduce noise in retrieved results.",
+        "keywords": ["metadata", "filtering", "noise"]
+    },
+    {
+        "id": 10,
+        "text": "Some high-scoring chunks may still be irrelevant to the query.",
+        "keywords": ["irrelevant", "query", "score"]
+    },
+    {
+        "id": 11,
+        "text": "Context window size is a hard constraint in most LLMs.",
+        "keywords": ["context", "window", "llm"]
+    },
+    {
+        "id": 12,
+        "text": "Diversity in retrieved chunks can improve answer quality.",
+        "keywords": ["diversity", "quality", "retrieved"]
+    },
+     {
+        "id": 13,
+        "text": "Prompt construction is the final step that turns selected context into a usable input for the LLM.",
+        "keywords": ["prompt", "construction", "context", "llm"]
+    },
+    {
+        "id": 14,
+        "text": "Budget-aware selection prevents context overflow and improves efficiency.",
+        "keywords": ["budget", "selection", "context", "efficiency"]
+    },
+    {
+        "id": 15,
+        "text": "Lost in the middle phenomenon causes models to ignore information in long contexts.",
+        "keywords": ["lost", "middle", "context", "attention"]
+    },
+    {
+        "id": 16,
+        "text": "Hybrid search combines semantic similarity with keyword matching for better recall.",
+        "keywords": ["hybrid", "search", "semantic", "keyword"]
+    },
+    {
+        "id": 17,
+        "text": "Context compression techniques remove redundant information while preserving meaning.",
+        "keywords": ["compression", "redundant", "context"]
+    },
+    {
+        "id": 18,
+        "text": "Parent-child chunking preserves hierarchical relationships in documents.",
+        "keywords": ["parent", "child", "chunking", "hierarchy"]
+    },
+    {
+        "id": 19,
+        "text": "Query rewriting can significantly improve retrieval effectiveness for complex questions.",
+        "keywords": ["query", "rewriting", "retrieval", "complex"]
+    },
+    {
+        "id": 20,
+        "text": "Evaluation of RAG systems requires separate metrics for retrieval and generation quality.",
+        "keywords": ["evaluation", "rag", "retrieval", "generation"]
+    },
+    {
+        "id": 21,
+        "text": "System prompts define the overall behavior and constraints of the LLM.",
+        "keywords": ["system", "prompt", "behavior", "constraints"]
+    },
+    {
+        "id": 22,
+        "text": "Adaptive retrieval decides when and how much context is needed based on query complexity.",
+        "keywords": ["adaptive", "retrieval", "complexity", "context"]
+    }
+]

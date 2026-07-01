@@ -1,6 +1,7 @@
 import os
 import json
 import sys
+import re
 from sentence_transformers import SentenceTransformer, util
 
 # Load .env file manually from the parent directory of experiments
@@ -16,6 +17,9 @@ if os.path.exists(env_path):
                     os.environ[parts[0].strip()] = parts[1].strip()
 
 def load_chunks():
+    #first locate the labs dir
+    #second the chunk inside the chunks.json
+    #open up in the way it will encode in utf 8
     labs_dir = os.path.dirname(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
     chunks_path = os.path.join(labs_dir, "data", "chunks.json")
     with open(chunks_path, "r", encoding="utf-8") as f:
@@ -187,6 +191,33 @@ class LLMCaller:
                 messages=[{"role": "user", "content": prompt}]
             )
             return response.content[0].text.strip()
+
+class OutputParser:
+    """it has one responsibility"""
+    """Raw string->python dictionary"""
+    def parse(self,response : str):
+        """receives a string that might be wrapped in json"""
+        #strips markdown fences ,loads json ,returns dict
+        if not response:
+            return{}
+
+        cleaned = re.sub(r'^```json\s*|\s*```$', '',response.strip(),flags=re.MULTILINE)
+
+        try:
+            return json.loads(cleaned)
+        except json.JSONDecodeError as e:
+                #this extract the largest block of text enclosed in curly braces
+                #even if that text spans across multiple lines
+                #re.DOTALL changes this behavior. It forces the dot (.)
+                # to match absolutely anything, including newlines.
+            match = re.search(r'\{.*\}', cleaned, flags=re.DOTALL)
+            if match:
+                try:
+                    return json.loads(match.group(0))
+                except json.JSONDecodeError:
+                    pass
+            raise ValueError(f"could not parse json from response:{e}")
+
 question ="Should we always trust highest scoring chunks??"
 
 retriever = SemanticRetriever(chunks)
@@ -205,13 +236,20 @@ final_context = assembler.assemble(retrieved_chunks)
 prompt_a = builder.build(question, final_context, variant="basic")
 prompt_b = builder.build(question, final_context, variant="expert")
 
-print("\n=== PROMPT A (Basic) ===")
-print(prompt_a)
-print("\n=== PROMPT B (Expert) ===")
-print(prompt_b)
+# print("\n=== PROMPT A (Basic) ===")
+# print(prompt_a)
+# print("\n=== PROMPT B (Expert) ===")
+# print(prompt_b)
 
 # Run with LLM
 llm = LLMCaller(provider="gemini")   # Change to "claude" anytime
-print("\n=== LLM RESPONSE (Prompt B) ===")
+# print("\n=== LLM RESPONSE (Prompt B) ===")
 answer = llm.generate(prompt_b)
-print(answer)
+# print(answer)
+
+parser = OutputParser()
+data = parser.parse(answer)
+
+print("\n=== PARSED DICTIONARY ===")
+print(data)
+print("Type:", type(data))

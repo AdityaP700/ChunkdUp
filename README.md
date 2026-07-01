@@ -1,4 +1,4 @@
-# ChunkdUp: My LLM Context-Engineering Learning Journey 🚀
+# ChunkdUp: My LLM Context-Engineering Learning Journey
 
 Welcome to my personal playground for learning, building, and optimizing **Context Engineering** systems for Large Language Models (LLMs). As I implement each concept step-by-step, I document my progress, experiments, results, and engineering decisions.
 
@@ -58,4 +58,4 @@ Welcome to my personal playground for learning, building, and optimizing **Conte
 
 ---
 
-*“To build is to understand.” Happy coding! 💻*
+
