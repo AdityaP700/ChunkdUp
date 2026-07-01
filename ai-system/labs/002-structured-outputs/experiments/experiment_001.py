@@ -2,6 +2,7 @@ import os
 import json
 import sys
 import re
+from typing import Dict,Any,List
 from sentence_transformers import SentenceTransformer, util
 
 # Load .env file manually from the parent directory of experiments
@@ -121,10 +122,9 @@ class PromptBuilder:
             return f"""You are a helpful AI assistant.
 
 Answer the question using ONLY the provided context.
-You MUST respond ONLY with a valid JSON object in the following format:
+Return JSON without confidence:
 {{
   "answer": "your answer here",
-  "confidence": <float between 0.0 and 1.0>,
   "citations": <list of integer chunk numbers (e.g. [1, 6]) used to answer the question>
 }}
 
@@ -144,11 +144,9 @@ Answer:"""
 Use ONLY the provided context.
 If the answer is not present, the "answer" field should be "I don't know."
 Always be concise and accurate.
-You MUST respond ONLY with a valid JSON object in the following format:
+Return only the answer in a valid JSON object:
 {{
-  "answer": "your answer here",
-  "confidence": <float between 0.0 and 1.0>,
-  "citations": <list of integer chunk numbers (e.g. [1, 6]) used to answer the question>
+  "answer": "your answer here"
 }}
 
 Context:
@@ -217,12 +215,63 @@ class OutputParser:
                 except json.JSONDecodeError:
                     pass
             raise ValueError(f"could not parse json from response:{e}")
+class OutputValidator:
+    """takes a python dict->validates schemas and types -> """
+    """validated dict or raises"""
+    def __init__(self,raise_on_fail:bool=True):
+        self.raise_on_fail=raise_on_fail
+
+    def validate(self,data:Dict[str,Any])->Dict[str,Any]:
+        checks=[
+            self._check_answer_present,
+            self._check_confidence_present,
+            self._check_confidence_is_float,
+            self._check_confidence_in_range,
+            self._check_citations_is_list
+        ]
+        for check in checks:
+            passed,msg=check(data)
+            if not passed :
+                if self.raise_on_fail:
+                    raise ValueError(f"Validation failed:{msg}")
+                return {}
+        return data
+
+    def _check_answer_present(self,data:Dict)->tuple[bool,str]:
+        if "answer" not in data:
+            return False, "missing required key 'answer'"
+        return True, ""
+
+    def _check_confidence_present(self, data: Dict) -> tuple[bool, str]:
+        if "confidence" not in data:
+            return False, "missing required key 'confidence'"
+        return True, ""
+
+    def _check_confidence_is_float(self, data: Dict) -> tuple[bool, str]:
+        if not isinstance(data.get("confidence"), (float, int)):
+            return False, f"'confidence' must be float or int, got {type(data.get('confidence')).__name__}"
+        return True, ""
+
+    def _check_confidence_in_range(self, data: Dict) -> tuple[bool, str]:
+        conf = data.get("confidence")
+        if not (0 <= conf <= 1):
+            return False, f"'confidence' must be between 0 and 1, got {conf}"
+        return True, ""
+
+    def _check_citations_is_list(self, data: Dict) -> tuple[bool, str]:
+        if "citations" in data and not isinstance(data.get("citations"), list):
+            return False, f"'citations' must be a list, got {type(data.get('citations')).__name__}"
+        return True, ""
 
 question ="Should we always trust highest scoring chunks??"
 
 retriever = SemanticRetriever(chunks)
 assembler = ContextAssembler()
 builder=PromptBuilder()
+
+# Configuration Flag (Option 1)
+ENABLE_VALIDATION = True
+
 retrieved_chunks = retriever.retrieve(query=question,k=10)
 final_context = assembler.assemble(retrieved_chunks)
 
@@ -248,8 +297,17 @@ answer = llm.generate(prompt_b)
 # print(answer)
 
 parser = OutputParser()
-data = parser.parse(answer)
+parsed_dict = parser.parse(answer)
 
 print("\n=== PARSED DICTIONARY ===")
-print(data)
-print("Type:", type(data))
+print(parsed_dict)
+
+if ENABLE_VALIDATION:
+    validator = OutputValidator(raise_on_fail=True)
+    try:
+        validated_dict = validator.validate(parsed_dict)
+        print("\n=== VALIDATION SUCCESS ===")
+        print("clean data:", validated_dict)
+    except ValueError as e:
+        print("\n=== VALIDATION FAILED ===")
+        print("bad output from llm:", e)
