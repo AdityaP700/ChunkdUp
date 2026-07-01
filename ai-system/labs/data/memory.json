@@ -1,0 +1,30 @@
+[
+    {
+        "type": "project",
+        "key": "project_name",
+        "value": "ChunkdUp",
+        "confidence": 1.0,
+        "source": "conversation"
+    },
+    {
+        "type": "environment",
+        "key": "os",
+        "value": "Windows",
+        "confidence": 1.0,
+        "source": "conversation"
+    },
+    {
+        "type": "preference",
+        "key": "response_style",
+        "value": "concise explanations",
+        "confidence": 1.0,
+        "source": "conversation"
+    },
+    {
+        "type": "tool",
+        "key": "editor",
+        "value": "VS Code",
+        "confidence": 1.0,
+        "source": "conversation"
+    }
+]
