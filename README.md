@@ -1,61 +1,38 @@
-# ChunkdUp: My LLM Context-Engineering Learning Journey
+# ChunkdUp
 
-Welcome to my personal playground for learning, building, and optimizing **Context Engineering** systems for Large Language Models (LLMs). As I implement each concept step-by-step, I document my progress, experiments, results, and engineering decisions.
+(Yes, I named it ChunkdUp purely because it sounded cool in my head. There is no deeper meaning. Don't look for one.)
 
----
+I'm building this from scratch because I actually want to understand how a machine remembers, rather than just pretending I do by calling an API.
 
-## Repository Structure
+We throw around buzzwords like "AI agents" and "RAG pipelines" at parties to sound smart, but under the hood, we're really just wrestling with the same core problems that have bothered computer scientists for decades:
 
-- `ai-system/labs/` — Active experiments, implementation code, and learning logs.
-  - `001-context-assembly/` — Lab focused on retrieval methods, budget management, and prompt construction.
-    - `experiments/` — Python scripts executing retrieval and LLM call flows.
-    - `learnings/` — Distilled reflections and key insights from each experiment.
-    - `data/` — Local chunks and mock documents.
+- *How do you shove the most useful information into a strictly limited space (a context window) without breaking things?*
 
----
+- *How do you force an inherently probabilistic, hallucination-prone system to return safe, structured data instead of philosophical ramblings?*
 
-##  Completed Labs
-### Lab 001: Context Assembly
-**Core Question:** *Given retrieved data chunks, how should an AI system decide what reaches the LLM?*
+- *When a machine learns a new fact that contradicts an old fact, how does it decide whether to update, ignore, or just awkwardly hoard it?*
 
-#### 1. Keyword Retrieval & Top-3 Assembly
-- **What We Built:**
-  - A basic keyword-overlap matching retriever (`_calculate_overlap`).
-  - A naive `ContextAssembler` that simply takes the **Top-3** highest-ranking chunks.
-- **What We Learned:**
-  - **Keyword matching is brittle:** Counting exact word matches is highly sensitive to punctuation, stop words, and vocabulary mismatch.
-  - **Fixed Top-3 is size-blind:** Selecting a static number of chunks ignores the fact that different chunks have different lengths, risking context window overflow or under-utilization.
+I don't want to just `pip install` a magical framework that sweeps these problems under the rug. I want to solve them manually, painfully, and step-by-step.
 
-#### 2. Semantic Retrieval, Budget-Aware Packing, & Structured Outputs
-- **What We Built:**
-  - **Semantic Retriever:** Upgraded keyword search to dense vector search using `SentenceTransformer` (`all-MiniLM-L6-v2`) and cosine similarity.
-  - **Budget-Aware Assembler:** Designed a dynamic chunk packing algorithm that fills a defined character budget (e.g., 800 chars) greedily without exceeding it.
-  - **Prompt Orchestration:** Built a system to configure basic/expert prompt variants and format context chunks with source numbers.
-  - **JSON Output Constraints:** Instructed the LLM to output a machine-consumable JSON schema containing the answer, a confidence score, and chunk citations.
-  - **Multi-Provider LLM Wrapper:** Unified API interactions for Google Gemini (`gemini-2.5-flash`) and Anthropic Claude (`claude-3-5-haiku-20241022`).
-- **What We Learned:**
-  - **Semantic matching is superior:** Embedding-based retrieval captures meaning rather than just matching characters.
-  - **Greedy budget-packing maximizes utility:** By prioritizing by score and checking size constraints before adding, we prevent truncation while packing as much relevant info as possible.
-  - **Structured LLM outputs are crucial:** Forcing the model to return JSON with `"citations"` (e.g., `[1, 6]`) and `"confidence"` makes it easy to integrate LLM answers programmatically and verify source ground truth.
+## The Journey So Far (The Messy Labs)
 
----
+Here is what I've figured out so far while banging my head against the keyboard:
 
-##  My Engineering Decisions
+- **[Lab 001: The Constraint Problem](learnings/lab001/leanings_001.md)**
+  How do we decide what text makes the cut when we have a strict character budget? (Spoiler: exact keyword matching is garbage. Semantic similarity and greedy budget packing is where it's at).
 
-* **Semantic > Keywords:** Adopted semantic retrieval as the default retrieval strategy.
-* **Budget-Aware > Fixed Top-K:** Budget-aware selection is the standard, ensuring robust handling of LLM context window limits.
-* **Non-Blocking Oversized Chunks:** If a highly relevant chunk is too large to fit in the remaining budget, we skip it and try to pack subsequent smaller (but still relevant) chunks instead of stopping assembly immediately.
-* **Decoupled Orchestration:** Kept retriever, assembler, and prompt builder classes separated so they can be iterated on independently.
-* **Structured Output Design:** Prompt instructions should require JSON payloads to allow deterministic downstream parsing.
+- **[Lab 002: The Trust Problem](learnings/lab002/learnings_002.md)**
+  How do we safely consume output from a machine that makes things up for fun? (Explored strict JSON validation, regex fallback parsing, and the art of intentional rejection).
 
----
+- **[Lab 003: The State Problem](learnings/lab003/learnings_003.md)**
+  How does a system gracefully evolve its memory over time without duplicating everything like a digital hoarder? (got to knew about a policy-driven orchestration engine to resolve state conflicts).
 
-##  Open Questions for Next Labs
+## What's Next?
 
-- **When should reranking happen?** (Should we retrieve a large pool `K=50`, rerank them, and then assemble the top ones?)
-- **Should we filter out low-score chunks?** (Avoiding low-quality "noise" even if we have remaining budget).
-- **How should context compression fit into the pipeline?** (Using summaries or LLM-based filtering before assembly).
+Up until now, I've been writing deterministic software to try and control probabilistic models. It's like trying to herd cats with math.
 
----
+But our next question is much harder:
 
+**"Should every extracted memory be stored at all?"**
 
+hmmmm lets give a shot!!

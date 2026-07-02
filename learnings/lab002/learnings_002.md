@@ -1,3 +1,24 @@
-Q.How can an AI system safely consume LLM outputs?
+# Lab 002: The Trust Problem (Structured Outputs)
 
-All right, so from, what I have noticed is that we, first of all, how we ensure that the AI system safely consumes the output. And how do we ensure that the, we trust the model output in a way that it's completely safe. So for that reason, we have three of the pipelines, which I have implemented on my own. First of all, to parse the output, the output might be in the JSON format or in the string format, and they have been converted. First of all, they have been parsed into the dictionary format. Once they have been parsed, then we need to validate the output to check, ensure that all of the fields are being mapped or not. Okay? Let's suppose in the output there might be a field of confidence, there might be a field of range between the citation range or anything as such specific to the, depending upon the specificity or complexity of the output. Okay? So we check those outputs first, to validate those outputs, and then by any chance, if at any time the outputs, if any of the field is missing or any of the thing is not being there, then the LLM will reject by saying that it's a failed output. That's what it is.
+## Core Objective
+How can an AI system safely and deterministically consume LLM outputs? In other words, how do we stop treating the LLM like a chatty friend and start treating it like a machine that returns actual, usable data?
+
+## 1. Prompting for Deterministic Structure
+We engineered our `PromptBuilder` to explicitly request JSON outputs rather than free-form text. By defining the exact schema we expect, we're basically forcing the LLM into a data-returning straitjacket. 
+
+## 2. Resilient Parsing
+Even with strict prompts, LLMs are rebellious and love wrapping their JSON in useless markdown fences. We built an `OutputParser` that acts as the first line of defense:
+- It uses regex to ruthlessly strip away markdown formatting.
+- If standard parsing fails, it uses aggressive regex (`re.search` with `DOTALL`) to hunt for anything resembling curly braces, salvaging whatever JSON payload it can find from the wreckage.
+
+## 3. Strict Output Validation
+Parsing JSON is only half the battle. If the structure is wrong, our app crashes anyway. We built an `OutputValidator` to act as a strict bouncer at the club:
+- **Presence Checks:** If you don't have an `answer` or `confidence`, you aren't getting in.
+- **Type Safety:** If `citations` isn't a list, get out. 
+- **Bounds Checking:** If your `confidence` is somehow `1.5`, you are clearly hallucinating.
+
+## 4. Configurable Trust
+We learned a critical production engineering principle: **Never trust the model just because it produced valid JSON.** 
+By making validation configurable (`ENABLE_VALIDATION`), we proved that a production system must intentionally reject non-compliant outputs rather than risk poisoning our downstream pipelines with hallucinations. 
+
+Basically, trust no one. Especially the AI.
