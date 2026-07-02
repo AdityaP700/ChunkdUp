@@ -81,15 +81,18 @@ class MemoryExtractor:
         return memories
 
 class MemoryManager:
-    def __init__(self,repository):
+    def __init__(self,repository,decision_engine):
         #case of a dependency injection
         #it means the manager relies on the
         # repository to do the heavy lifting of the storage
 
         self.repository=repository
+        self.engine=decision_engine
 
     def process(self, memory):
-        self.repository.add(memory)
+        existing = self.repository.find_active_by_key(memory["key"])
+        decision = self.engine.decide(existing, memory)
+        print(decision)
 
 #the data storage expert
 #it manages the CRUD
@@ -121,6 +124,18 @@ class MemoryRepository:
         memories.append(memory)
         #it could write
         self.save(memories)
+#we need this
+#the reason is simple,its that lets suppose we get diff values for same keys
+#then how we will know if there are any existing memory or not
+#the work of the manager is to manage
+#not to search
+#hence we need this implementation
+    def find_active_by_key(self, key):
+        memories = self.load()
+        for memory in memories:
+            if memory.get("key") == key and memory.get("status") == "active":
+                return memory
+        return None
 
 #it safely returns the current list of saved memories
 #allowing the AI to read its own past context

@@ -95,3 +95,20 @@ Decision Engine
 ↓
 
 Decision
+
+
+The DecisionEngine exists...
+
+...but it isn't actually being used yet.
+
+hence the new decision architecture
+
+New Memory
+      │
+Repository.get_all()
+      │
+Find matching memory
+      │
+DecisionEngine.decide()
+      │
+Execute decision
