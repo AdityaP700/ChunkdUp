@@ -156,4 +156,33 @@ so now ,instead of treating every memory the same, we'll introduce type-specific
 
 
 well experiment till "Can the system decide whether to store, ignore, or update a memory?"
- completed 
+ completed
+
+
+
+## New experiment
+whether every type of memory follow the same update policy?
+my hypothesis : No. Different memory types require different update policies.
+
+lets gooooo!!
+
+so now the game will be based upon the different policies dealing
+
+- "Given this type of memory, how should it evolve?"
+i want to change it into
+
+Conversation
+        │
+MemoryExtractor
+        │
+MemoryManager
+        │
+Policy Engine
+        │
+specific policy
+        | 
+DecisionEngine
+        │
+Repository
+
+
