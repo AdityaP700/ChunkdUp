@@ -12,6 +12,18 @@ as of now :moved from a rule-based parser to a declarative extraction engine.
 
 alright now the case is that ,we will be building a MemoryManager
 
+Conversation
+     │
+MemoryExtractor
+     │
+Candidate Memories
+     │
+MemoryManager
+     │
+MemoryRepository
+     │
+memory.json
+
 where the job would be simple :
 the candidate memory -> should i
 - store?/
@@ -26,4 +38,8 @@ alright currently i am creating a new metaData fields where there would be addit
 - confidence
 - status
 - source
-- id 
+- id
+
+Question
+"Can the system persist extracted memories?"
+- it could persist the extracted memories

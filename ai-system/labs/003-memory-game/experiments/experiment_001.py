@@ -59,7 +59,7 @@ class MemoryExtractor:
                     "type": rule["type"],
                     "key": rule["key"],
                     "value": value,
-                    "confidence": 1.0,  # regex = high conf
+                    "importance": 1.0,  # regex = high conf
                     "created_at": datetime.utcnow().isoformat() + "Z",
                     "updated_at": datetime.utcnow().isoformat() + "Z",
                     "source": "conversation",
@@ -75,15 +75,62 @@ class MemoryExtractor:
         return memories
 
 class MemoryManager:
-    def __init__(self):
-        self.memories = []
+    def __init__(self,repository):
+        #case of a dependency injection
+        #it means the manager relies on the
+        # repository to do the heavy lifting of the storage
+        self.repository=repository
 
-    def add(self, memory):
-        self.memories.append(memory)
+    def process(self, memory):
+        self.repository.add(memory)
 
+#the data storage expert
+#it manages the CRUD
+class MemoryRepository:
+    def __init__(self,path):
+        self.path=path
+    #load the memories
+    def load(self):
+        #search in the disk ,if it exits or not
+        if not os.path.exists(self.path):
+            return []
+        #if exists ,perform the read operation
+        with open(self.path,"r",encoding="utf-8") as f:
+            return json.load(f)
+
+    def save(self, memories):
+        with open(self.path, "w", encoding="utf-8") as f:
+            #we are saving the data in a targeted file
+            #where there is an indentation of 4
+            #where after a certain space the line breaks
+
+             json.dump(memories, f, indent=4)
+    #core transactional pipeline
+    #managing CRUD
+    def add(self,memory):
+        #either it could read
+        memories = self.load()
+        #or it could modify
+        memories.append(memory)
+        #it could write
+        self.save(memories)
+
+#it safely returns the current list of saved memories
+#allowing the AI to read its own past context
     def get_all(self):
-        return self.memories
+        return self.load()
 
+memory_path = os.path.join(labs_dir, "data", "memory.json")
+repo = MemoryRepository(memory_path)
+manager = MemoryManager(repo)
 extractor = MemoryExtractor()
+
 memories = extractor.extract(conversation)
-print(memories)
+
+# Process and save each memory
+for memory in memories:
+    manager.process(memory)
+
+print(f"Successfully processed {len(memories)} memories.")
+print("\nAll saved memories in repository:")
+print(json.dumps(repo.get_all(), indent=2))
