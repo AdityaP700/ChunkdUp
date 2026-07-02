@@ -1,23 +1,27 @@
-# Lab 001: The Constraint Problem
+# Lab 001: The Constraint Problem (Context Assembly)
 
-## The Big Annoying Question
-How should an AI system actually decide what information reaches the model, considering context windows aren't infinite and tokens actually cost money?
+## The Story So Far...
+We wanted to build an AI that actually knows things about our specific data. The naive approach is just to shove your entire database into the LLM prompt. 
 
-## What We Messed Around With (Experiments)
-- **Keyword Retrieval:** Counting matching words. (Terrible idea. Punctuation breaks it).
-- **Semantic Retrieval:** Actually understanding meaning via embeddings. (Much better).
-- **Top-K Assembly:** Just grabbing the top 3 results blindly. (Also a terrible idea, because chunks have different lengths and you will blow up your context window).
-- **Budget-Aware Assembly:** Packing chunks based on an actual character limit. (A surprisingly sane approach).
-- **Prompt Variants:** Trying to get the LLM to behave predictably.
+The problem? Context windows aren't infinite, and even if they were, shoving 10,000 pages of text into a prompt is incredibly expensive and mathematically guaranteed to confuse the model. We needed a gatekeeper. We needed a system to decide *exactly* what small slice of information gets the privilege of reaching the model.
 
-## The Harsh Realities (Decisions)
-- Semantic retrieval completely obliterated keyword matching. We're never looking back.
-- Budget-aware assembly is far superior to fixed Top-K. Blindly grabbing 3 chunks is a great way to either crash your pipeline or waste context space.
-- If an oversized chunk doesn't fit the remaining budget, just skip it and grab the next one. Don't halt the whole assembly process just because one chunk is too fat.
-- Prompt formatting is totally separate from retrieval. Keep your concerns separated, folks.
-- Structured JSON outputs are non-negotiable if you want LLM responses to be actually usable by a machine.
+## The Engineering Challenge: Filtering the Noise
+How do we find the right information, and how do we fit it into a strict space limit? Here is the painful evolution of our pipeline:
 
-## Stuff That Still Bothers Me (Open Questions)
-- When should reranking actually happen?
-- Should we just brutally filter out low-score chunks even if we have budget left? (Garbage in, garbage out, right?)
-- Where does compression fit into this mess?
+### 1. Keyword Retrieval (The Dumb Search)
+First, we tried counting matching words. If the user asked about "Python," we looked for chunks with the word "Python." 
+**The Reality Check:** It was a terrible idea. Punctuation broke it. Synonyms completely bypassed it. It had zero understanding of actual meaning. We threw it out and moved to **Semantic Retrieval**, using dense vector embeddings to actually match the *intent* of the query rather than just the letters.
+
+### 2. Top-K Assembly (The Blind Grab)
+Once we had semantic search working, we had to assemble the prompt. The standard industry tutorial says, "Just grab the Top 3 results!" So we tried it.
+**The Reality Check:** Also a terrible idea. Chunks have wildly different lengths. Sometimes the top 3 chunks are 50 characters each. Sometimes they are 5,000 characters each. Blindly grabbing 3 chunks is a fantastic way to either completely waste your context window or blow it up and crash your pipeline.
+
+### 3. Budget-Aware Assembly (The Tetris Approach)
+We realized we were treating text like abstract concepts instead of what it really is: physical data with a strict size limit. We built a `ContextAssembler` that acts like a greedy packer. You give it a strict character budget (e.g., 800 chars). It iterates through the semantically ranked chunks and adds them one by one. If it hits an oversized chunk that won't fit, it doesn't halt the whole process—it just skips it and grabs the next smaller one that fits perfectly. 
+
+## The Ultimate Result
+What did we actually achieve? 
+
+We built a **bulletproof context pipeline**. We successfully separated the logic of *finding* data from the logic of *packing* data. Our system now searches by actual meaning, and gracefully packs the results into a strictly constrained budget without ever crashing the LLM context window. 
+
+We conquered the constraint problem. But we soon realized that just because we fed the LLM the right data, didn't mean it would give us a usable answer... (which led us straight into the nightmare of Lab 002).
