@@ -1,7 +1,7 @@
 [
-  "User: I'm building ChunkdUp in Python.",
-  "User: I prefer concise explanations.",
-  "User: I use Windows.",
-  "User: My favorite editor is VS Code.",
+  "User: I'm building ChunkdUp in Rust.",
+  "User: I prefer detailed explanations.",
+  "User: I use Linux.",
+  "User: My favorite editor is Neovim.",
   "User: What is cosine similarity?"
 ]

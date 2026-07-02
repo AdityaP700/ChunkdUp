@@ -112,3 +112,48 @@ Find matching memory
 DecisionEngine.decide()
       │
 Execute decision
+
+
+what i built till now
+Conversation
+      │
+      ▼
+MemoryExtractor
+      │
+      ▼
+Candidate Memories
+      │
+      ▼
+DecisionEngine
+      │
+      ▼
+Decision
+      │
+      ▼
+MemoryRepository
+      │
+      ▼
+memory.json
+
+#Limitations
+our first real engineering limitation.
+
+Your current model is
+
+key
+value
+
+But your memory is richer.
+
+{
+    "key": "project_name",
+    "value": "ChunkdUp",
+    "language": "Python"
+}
+
+so now ,instead of treating every memory the same, we'll introduce type-specific policies.
+
+
+
+well experiment till "Can the system decide whether to store, ignore, or update a memory?"
+ completed 

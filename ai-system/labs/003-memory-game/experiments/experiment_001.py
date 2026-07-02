@@ -92,7 +92,18 @@ class MemoryManager:
     def process(self, memory):
         existing = self.repository.find_active_by_key(memory["key"])
         decision = self.engine.decide(existing, memory)
-        print(decision)
+
+        #now since we have the exisiting and the prev memory
+        #our job is to decide what we need to do right now
+        #either we can store ,ignore or update
+        if decision==Decision.STORE:
+            self.repository.add(memory)
+
+        elif decision == Decision.IGNORE:
+             print(f"Ignored duplicate memory: {memory['key']}")
+
+        elif decision == Decision.UPDATE:
+             self.repository.update(memory)
 
 #the data storage expert
 #it manages the CRUD
@@ -124,6 +135,21 @@ class MemoryRepository:
         memories.append(memory)
         #it could write
         self.save(memories)
+
+    #we are taking the new memory since we are updatig
+    #so the logic is
+    #for the same key ,why we cant simply update the value right??\
+    #for when its updated_at ?? we can simply tune it with the datetime()
+    #then call the method to save the memories
+    def update(self, new_memory):
+        memories = self.load()
+        for mem in memories:
+            if mem.get("key") == new_memory.get("key") and mem.get("status") == "active":
+                mem["value"] = new_memory["value"]
+                mem["updated_at"] = datetime.utcnow().isoformat() + "Z"
+                break
+        self.save(memories)
+
 #we need this
 #the reason is simple,its that lets suppose we get diff values for same keys
 #then how we will know if there are any existing memory or not
@@ -174,7 +200,8 @@ print("-----------------------------------------\n")
 
 memory_path = os.path.join(labs_dir, "data", "memory.json")
 repo = MemoryRepository(memory_path)
-manager = MemoryManager(repo)
+engine = DecisionEngine()
+manager = MemoryManager(repo, engine)
 extractor = MemoryExtractor()
 
 memories = extractor.extract(conversation)
