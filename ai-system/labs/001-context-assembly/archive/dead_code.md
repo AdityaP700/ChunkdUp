@@ -28,3 +28,11 @@
 #         #it takes the top k chunks from the sorted list
 #         top_chunks=[chunk.copy() for _, _, chunk in scored_chunks[:k]]
 #         return top_chunks (overlap,original_score,chunk)
+
+
+ #{
+#     "pattern": r"What is ([\w\s]+?)\?",
+#     "type": "question",
+#     "key": "topic_asked",
+#     "value_group": 1
+# },

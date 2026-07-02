@@ -2,6 +2,8 @@ import os
 import json
 import re
 from typing import Dict,List,Any
+import uuid
+from datetime import datetime
 labs_dir = os.path.dirname(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
 conv_path = os.path.join(labs_dir, "data", "conversation.json")
 with open(conv_path, "r", encoding="utf-8") as f:
@@ -20,12 +22,6 @@ class MemoryExtractor:
                 "meta": {"language": 2}
 
             },
-            {
-    "pattern": r"What is ([\w\s]+?)\?",
-    "type": "question",
-    "key": "topic_asked",
-    "value_group": 1
-},
             {
                 "pattern": r"I prefer ([\w\s]+?)\.",
                 "type": "preference",
@@ -51,7 +47,6 @@ class MemoryExtractor:
                 "value_group": 1
             }
         ]
-
     def extract(self, conversation: str):
         memories = []
         for rule in self.rules:
@@ -60,11 +55,15 @@ class MemoryExtractor:
             for match in matches:
                 value = match.group(rule["value_group"]).strip()
                 memory = {
+                    "id": str(uuid.uuid4()),
                     "type": rule["type"],
                     "key": rule["key"],
                     "value": value,
                     "confidence": 1.0,  # regex = high conf
-                    "source": "conversation"
+                    "created_at": datetime.utcnow().isoformat() + "Z",
+                    "updated_at": datetime.utcnow().isoformat() + "Z",
+                    "source": "conversation",
+                    "status": "active"
                 }
 
                 if "meta" in rule:
@@ -72,8 +71,18 @@ class MemoryExtractor:
                         memory[meta_key] = match.group(group_idx).strip()
 
                 memories.append(memory)
-                
+
         return memories
+
+class MemoryManager:
+    def __init__(self):
+        self.memories = []
+
+    def add(self, memory):
+        self.memories.append(memory)
+
+    def get_all(self):
+        return self.memories
 
 extractor = MemoryExtractor()
 memories = extractor.extract(conversation)
