@@ -179,23 +179,6 @@ class DecisionEngine:
             return Decision.STORE
         return policy.decide(existing_memory, new_memory)
 
-# --- TEST CASES ---
-print("\n--- Running DecisionEngine Test Cases ---")
-engine = DecisionEngine()
-
-# Case 1
-print("Case 1:", engine.decide(None, {"type": "environment", "key": "os", "value": "Windows"}).name, "== Expected: STORE")
-
-# Case 2
-print("Case 2:", engine.decide({"type": "environment", "key": "os", "value": "Windows"}, {"type": "environment", "key": "os", "value": "Windows"}).name, "== Expected: IGNORE")
-
-# Case 3
-print("Case 3:", engine.decide({"type": "environment", "key": "os", "value": "Windows"}, {"type": "environment", "key": "os", "value": "Linux"}).name, "== Expected: UPDATE")
-
-# Case 4
-print("Case 4:", engine.decide({"type": "environment", "key": "os", "value": "Windows"}, {"type": "tool", "key": "editor", "value": "VS Code"}).name, "== Expected: STORE")
-print("-----------------------------------------\n")
-
 memory_path = os.path.join(labs_dir, "data", "memory.json")
 repo = MemoryRepository(memory_path)
 engine = DecisionEngine()
