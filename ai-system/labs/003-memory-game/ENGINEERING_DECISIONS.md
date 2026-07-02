@@ -43,3 +43,55 @@ alright currently i am creating a new metaData fields where there would be addit
 Question
 "Can the system persist extracted memories?"
 - it could persist the extracted memories
+
+
+alright the next question comes
+how ,when and what polices to modify ,discard or add??
+
+New Memory
+↓
+Memory Type
+↓
+Policy
+↓
+Decision
+↓
+Repository
+
+Dreaming is a periodic maintenance job!!
+
+Conversation
+      │
+Memory Extractor
+      │
+Memory Event
+      │
+────────────────────────
+MemoryManager
+────────────────────────
+      │
+Duplicate Detector
+      │
+Conflict Detector
+      │
+Policy Engine
+      │
+Decision
+      │
+Repository
+
+
+now the case is
+Existing Memory
+
++
+
+New Memory
+
+↓
+
+Decision Engine
+
+↓
+
+Decision

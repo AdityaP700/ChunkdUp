@@ -3,6 +3,7 @@ import json
 import re
 from typing import Dict,List,Any
 import uuid
+from enum import Enum
 from datetime import datetime
 labs_dir = os.path.dirname(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
 conv_path = os.path.join(labs_dir, "data", "conversation.json")
@@ -10,6 +11,11 @@ with open(conv_path, "r", encoding="utf-8") as f:
     conversation_lines = json.load(f)
 
 conversation = "\n".join(conversation_lines)
+class Decision(Enum):
+    STORE = "store"
+    UPDATE = "update"
+    IGNORE = "ignore"
+    MERGE = "merge"
 class MemoryExtractor:
     def __init__(self):
         #rules : patterns ,types ,key,value_extractor
@@ -79,6 +85,7 @@ class MemoryManager:
         #case of a dependency injection
         #it means the manager relies on the
         # repository to do the heavy lifting of the storage
+
         self.repository=repository
 
     def process(self, memory):
@@ -119,6 +126,36 @@ class MemoryRepository:
 #allowing the AI to read its own past context
     def get_all(self):
         return self.load()
+
+class DecisionEngine:
+    def decide(self, existing_memory, new_memory):
+        if existing_memory is None:
+            return Decision.STORE
+
+        if existing_memory.get("key") == new_memory.get("key"):
+            if existing_memory.get("value") == new_memory.get("value"):
+                return Decision.IGNORE
+            else:
+                return Decision.UPDATE
+
+        return Decision.STORE
+
+# --- TEST CASES ---
+print("\n--- Running DecisionEngine Test Cases ---")
+engine = DecisionEngine()
+
+# Case 1
+print("Case 1:", engine.decide(None, {"key": "os", "value": "Windows"}).name, "== Expected: STORE")
+
+# Case 2
+print("Case 2:", engine.decide({"key": "os", "value": "Windows"}, {"key": "os", "value": "Windows"}).name, "== Expected: IGNORE")
+
+# Case 3
+print("Case 3:", engine.decide({"key": "os", "value": "Windows"}, {"key": "os", "value": "Linux"}).name, "== Expected: UPDATE")
+
+# Case 4
+print("Case 4:", engine.decide({"key": "os", "value": "Windows"}, {"key": "editor", "value": "VS Code"}).name, "== Expected: STORE")
+print("-----------------------------------------\n")
 
 memory_path = os.path.join(labs_dir, "data", "memory.json")
 repo = MemoryRepository(memory_path)
