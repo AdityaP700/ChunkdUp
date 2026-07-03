@@ -1,5 +1,4 @@
 from enum import Enum
-
 class Decision(Enum):
     STORE = "store"
     UPDATE = "update"
@@ -38,7 +37,7 @@ class ProjectPolicy(BasePolicy):
     def decide(self, existing, new):
         if existing is None:
             return Decision.STORE
-        
+            
         # If value changed, or language changed, it's an update
         if existing.get("value") == new.get("value"):
             if existing.get("language") == new.get("language"):
