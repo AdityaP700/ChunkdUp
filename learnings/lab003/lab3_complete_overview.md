@@ -16,16 +16,29 @@ But managing memory isn't just about extracting facts. Extracting facts is easy.
 ## 2. The Architecture Pipeline
 To solve this, we built a strict, decoupled pipeline. No single component knows how the whole system works; each just does its specific job.
 
-```text
-Conversation
-      │
-MemoryExtractor (Parses text, attaches metadata)
-      │
-MemoryManager (The Orchestrator)
-      │
-DecisionEngine (Routes to PolicyFactory)
-      │
-MemoryRepository (Executes CRUD operations on memory.json)
+```mermaid
+graph TD
+    User([User Conversation]) --> Extractor[Memory Extractor]
+    Extractor --> |Regex parsing & typing| Candidate[Candidate Memories]
+    
+    Candidate --> Scorer[Memory Scorer]
+    Scorer --> |Importance < 0.6| Trash1((Discarded))
+    Scorer --> |Importance >= 0.6| Manager[Memory Manager]
+    
+    Manager --> |Fetches existing state| Repo[(Memory Repository)]
+    Manager --> |Routes state conflict| Engine[Decision Engine]
+    
+    Engine --> |Strategy Pattern| Policy{Policy Factory}
+    Policy --> |Decision.STORE| Store((STORE))
+    Policy --> |Decision.UPDATE| Update((UPDATE))
+    Policy --> |Decision.MERGE| Merge((MERGE))
+    
+    Store --> Repo
+    Update --> Repo
+    Merge --> Repo
+    
+    Repo -.-> |Retrieval Request| Ranker[Memory Ranker]
+    Ranker -.-> |Composite Score Sorting| TopK([Top-K Context for LLM])
 ```
 
 ---
