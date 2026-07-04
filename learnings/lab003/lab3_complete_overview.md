@@ -96,7 +96,14 @@ We evolved `IGNORE` into `MERGE`. When a duplicate fact is detected, the Manager
 
 What used to be considered "redundant noise" is now captured as **evidence**. A memory with `frequency: 3` gives the AI high confidence that this is a deeply ingrained user preference, rather than an offhand comment.
 
+## 9. Contradiction & State Mutation (`UPDATE` Action)
+If a user contradicts a previous fact (e.g., "I use Windows", followed later by "I use Linux"), the pipeline triggers an `UPDATE`. To test this, we built a dedicated testing hierarchy (`tests/test-contradiction.py`) that revealed four core engineering truths about our mechanical update loop:
+1. **Frequency resets:** When the state mutates, the `frequency` is mechanically forced back to `1`. A new fact should not inherit the high confidence (frequency) of the old fact.
+2. **`updated_at` changes:** The update timestamp is accurately bumped to reflect the exact moment of the contradiction.
+3. **`created_at` remains:** The original timestamp when the memory key (e.g., `os`) was discovered is strictly preserved.
+4. **History is overwritten:** Currently, the system performs an in-place overwrite. The old state ("Windows") is lost. For a production system requiring audit trails, this is a dangerous design that points toward future improvements (e.g., archiving old records rather than deleting them).
+
 ---
 
-## 9. What's Next?
-We have a robust state-management pipeline with noise filtering and frequency tracking. The next frontier is moving away from brittle Regex Extractors and hardcoded Heuristic Scorers toward robust, dynamic LLM-driven components that can understand true semantic intent without sacrificing our deterministic architecture.
+## 10. What's Next?
+We have a robust state-management pipeline with noise filtering, frequency tracking, and clean state mutation. The next frontier is moving away from brittle Regex Extractors and hardcoded Heuristic Scorers toward robust, dynamic LLM-driven components that can understand true semantic intent without sacrificing our deterministic architecture.

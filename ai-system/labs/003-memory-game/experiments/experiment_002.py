@@ -176,6 +176,7 @@ class MemoryRepository:
                 for k, v in new_memory.items():
                     if k not in ["id", "created_at", "frequency"]:
                         mem[k] = v
+                mem["frequency"] = 1
                 mem["updated_at"] = datetime.now(timezone.utc).isoformat().replace("+00:00", "Z")
                 break
         self.save(memories)

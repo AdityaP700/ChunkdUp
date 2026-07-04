@@ -2,13 +2,16 @@ import os
 import json
 import sys
 #importing from the experiment_002
+import sys
+import os
+sys.path.append(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
 from experiments.experiment_002 import MemoryRepository, DecisionEngine, MemoryScorer, MemoryManager, MemoryExtractor
 
 def main():
-    labs_dir = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
+    labs_dir = os.path.dirname(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
 
     # We use a dedicated memory file for this experiment
-    memory_path = os.path.join(labs_dir, "data", "memory_repetition.json")
+    memory_path = os.path.join(labs_dir, "data", "tests", "output-repetition.json")
 
     # Ensure starting clean
     if os.path.exists(memory_path):
