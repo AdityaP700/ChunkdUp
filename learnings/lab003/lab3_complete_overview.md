@@ -1,9 +1,5 @@
 # Lab 003: The Complete Overview (The Memory Pipeline)
 
-If you need to explain Lab 3 to another engineer or in an interview, this document covers everything from the core problem down to the exact mechanical execution of the code we built.
-
----
-
 ## 1. The Core Problem: State and Amnesia
 By the end of Lab 2, our AI system was a bulletproof, deterministic machine that could query data and return strict JSON. But it had total amnesia. Every conversation was treated like the first one.
 
@@ -20,23 +16,23 @@ To solve this, we built a strict, decoupled pipeline. No single component knows 
 graph TD
     User([User Conversation]) --> Extractor[Memory Extractor]
     Extractor --> |Regex parsing & typing| Candidate[Candidate Memories]
-    
+
     Candidate --> Scorer[Memory Scorer]
     Scorer --> |Importance < 0.6| Trash1((Discarded))
     Scorer --> |Importance >= 0.6| Manager[Memory Manager]
-    
+
     Manager --> |Fetches existing state| Repo[(Memory Repository)]
     Manager --> |Routes state conflict| Engine[Decision Engine]
-    
+
     Engine --> |Strategy Pattern| Policy{Policy Factory}
     Policy --> |Decision.STORE| Store((STORE))
     Policy --> |Decision.UPDATE| Update((UPDATE))
     Policy --> |Decision.MERGE| Merge((MERGE))
-    
+
     Store --> Repo
     Update --> Repo
     Merge --> Repo
-    
+
     Repo -.-> |Retrieval Request| Ranker[Memory Ranker]
     Ranker -.-> |Composite Score Sorting| TopK([Top-K Context for LLM])
 ```
