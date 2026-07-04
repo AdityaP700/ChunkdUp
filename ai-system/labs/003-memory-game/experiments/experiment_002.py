@@ -1,5 +1,6 @@
 import os
 import json
+import math
 import re
 # from typing import Dict,List,Any
 import uuid
@@ -88,6 +89,48 @@ class MemoryScorer:
             "question": 0.3
         }
         return scores.get(memory.get("type"), 0.5)
+
+class MemoryRanker:
+    def __init__(self, scorer):
+        self.scorer = scorer
+
+    def rank(self, memories):
+        now = datetime.now(timezone.utc)
+        ranked = []
+        for mem in memories:
+            # 1. Semantic Importance
+            semantic = self.scorer.score(mem)
+            
+            # 2. Frequency (Logarithmic cap, arbitrary simple math for the test)
+            freq = mem.get("frequency", 1)
+            freq_score = math.log10(freq + 9) - 1  # 1 freq = 0 bonus. 100 freq = 1.03 bonus.
+            
+            # 3. Recency (Inverse decay based on days)
+            updated_str = mem.get("updated_at")
+            if updated_str:
+                # Handle ISO format with Z
+                updated_at = datetime.fromisoformat(updated_str.replace("Z", "+00:00"))
+                days_old = max(0, (now - updated_at).total_seconds() / 86400)
+            else:
+                days_old = 30 # fallback
+                
+            recency_score = 1.0 / (days_old + 1.0)
+            
+            # 4. Composite Score
+            composite = semantic + freq_score + recency_score
+            
+            # Injecting for debugging in the test output
+            mem["_ranking_debug"] = {
+                "semantic": round(semantic, 3),
+                "frequency_bonus": round(freq_score, 3),
+                "recency_bonus": round(recency_score, 3),
+                "composite_score": round(composite, 3),
+                "days_old": round(days_old, 1)
+            }
+            ranked.append((composite, mem))
+            
+        ranked.sort(key=lambda x: x[0], reverse=True)
+        return [item[1] for item in ranked]
 
 class MemoryManager:
     def __init__(self,repository,decision_engine,scorer):

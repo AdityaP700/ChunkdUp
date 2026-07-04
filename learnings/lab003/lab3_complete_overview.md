@@ -5,9 +5,9 @@ If you need to explain Lab 3 to another engineer or in an interview, this docume
 ---
 
 ## 1. The Core Problem: State and Amnesia
-By the end of Lab 2, our AI system was a bulletproof, deterministic machine that could query data and return strict JSON. But it had total amnesia. Every conversation was treated like the first one. 
+By the end of Lab 2, our AI system was a bulletproof, deterministic machine that could query data and return strict JSON. But it had total amnesia. Every conversation was treated like the first one.
 
-We needed memory. 
+We needed memory.
 
 But managing memory isn't just about extracting facts. Extracting facts is easy. The real engineering nightmare is **Conflict Resolution**. If a user says they use "Windows" on Monday, but on Tuesday they say they use "Linux", what do you do? If you blindly append every extracted fact to a JSON database, you create a bloated, contradictory mess. You need a system that can gracefully evolve state over time.
 
@@ -17,7 +17,7 @@ But managing memory isn't just about extracting facts. Extracting facts is easy.
 To solve this, we built a strict, decoupled pipeline. No single component knows how the whole system works; each just does its specific job.
 
 ```text
-Conversation 
+Conversation
       │
 MemoryExtractor (Parses text, attaches metadata)
       │
@@ -31,7 +31,7 @@ MemoryRepository (Executes CRUD operations on memory.json)
 ---
 
 ## 3. Step One: The Memory Extractor
-When a user types *"I am building ChunkdUp in Python"*, the `MemoryExtractor` intercepts it. 
+When a user types *"I am building ChunkdUp in Python"*, the `MemoryExtractor` intercepts it.
 
 Right now, we use a **Regex Parser**. It searches for patterns (e.g., `I'm building ([\w\d\-]+) in ([\w\d\+#]+)`) and forces the raw text into a strict schema. Most importantly, it attaches a `"type"` (e.g., `project`, `environment`, `tool`).
 
@@ -45,7 +45,7 @@ Once the memory is extracted, the `MemoryManager` asks the database (`MemoryRepo
 We did **not** use a giant `if/else` block here, and we did **not** ask an LLM to resolve the conflict. LLMs are too slow and expensive for state management, and `if/else` blocks turn into unmaintainable spaghetti code.
 
 Instead, we used the **Strategy Pattern**. Think of it like a hospital triage desk:
-1. **The Manager (Triage Nurse):** Receives the new patient (memory) and grabs their old file. 
+1. **The Manager (Triage Nurse):** Receives the new patient (memory) and grabs their old file.
 2. **The Engine (Dispatcher):** Looks at the memory `"type"` and routes it to a Specialist.
 3. **The Policies (Specialist Doctors):** We built isolated classes like `ProjectPolicy` and `EnvironmentPolicy`. The policy looks at the old and new data and makes a strict decision: `STORE`, `IGNORE`, or `UPDATE`.
 
@@ -56,15 +56,15 @@ By separating memories into buckets (`Environment > Tool > Preference > Project`
 ## 5. Step Three: The Mechanics of Resolution
 Based on what the Policy decides, here is exactly what the system does mechanically:
 
-- **Action: `STORE`** 
+- **Action: `STORE`**
   - *Trigger:* No prior memory was found.
   - *Execution:* The Manager attaches a UUID and a timestamp, and tells the Repository to write a brand new row in `memory.json`.
-- **Action: `IGNORE`** 
+- **Action: `IGNORE`**
   - *Trigger:* The old memory and the new memory are completely identical.
   - *Execution:* The Manager literally drops the new memory in the trash. The database is never touched, preventing disk-write bloat.
-- **Action: `UPDATE`** 
+- **Action: `UPDATE`**
   - *Trigger:* A matching record exists, but the facts changed (e.g., Windows -> Linux).
-  - *Execution:* The Manager does **not** create a new row. It tells the Repository to find the original record by its UUID, merge the new value into it, and bump the `updated_at` timestamp. 
+  - *Execution:* The Manager does **not** create a new row. It tells the Repository to find the original record by its UUID, merge the new value into it, and bump the `updated_at` timestamp.
 
 ---
 
@@ -85,14 +85,14 @@ If you look at the 4 test cases we built in `test_policies.py`, they prove this 
 ## 7. Adding the Memory Scorer (Filtering the Noise)
 Before a memory reaches the Decision Engine, we realized not all memories are created equal. A project memory ("I'm building ChunkdUp") is highly important, but a random question might just be noise.
 
-We introduced the `MemoryScorer`—a deterministic component inserted between the Extractor and the Decision Engine. It assigns an `importance` score (e.g., project -> 1.0, environment -> 0.8) and applies a **threshold** (e.g., 0.6). Memories below the threshold are dropped immediately, saving the repository from processing garbage. 
+We introduced the `MemoryScorer`—a deterministic component inserted between the Extractor and the Decision Engine. It assigns an `importance` score (e.g., project -> 1.0, environment -> 0.8) and applies a **threshold** (e.g., 0.6). Memories below the threshold are dropped immediately, saving the repository from processing garbage.
 
 ---
 
 ## 8. Repetition as Evidence (`MERGE` Action)
-Initially, if a user repeated a fact ("I use Linux"), our policies triggered an `IGNORE` decision. The problem? We were throwing away valuable signal. 
+Initially, if a user repeated a fact ("I use Linux"), our policies triggered an `IGNORE` decision. The problem? We were throwing away valuable signal.
 
-We evolved `IGNORE` into `MERGE`. When a duplicate fact is detected, the Manager now triggers the `MemoryRepository.merge()` operation. Instead of ignoring the fact, it finds the existing active memory and increments its `"frequency"` counter. 
+We evolved `IGNORE` into `MERGE`. When a duplicate fact is detected, the Manager now triggers the `MemoryRepository.merge()` operation. Instead of ignoring the fact, it finds the existing active memory and increments its `"frequency"` counter.
 
 What used to be considered "redundant noise" is now captured as **evidence**. A memory with `frequency: 3` gives the AI high confidence that this is a deeply ingrained user preference, rather than an offhand comment.
 
@@ -105,5 +105,19 @@ If a user contradicts a previous fact (e.g., "I use Windows", followed later by 
 
 ---
 
-## 10. What's Next?
-We have a robust state-management pipeline with noise filtering, frequency tracking, and clean state mutation. The next frontier is moving away from brittle Regex Extractors and hardcoded Heuristic Scorers toward robust, dynamic LLM-driven components that can understand true semantic intent without sacrificing our deterministic architecture.
+## 10. Memory Aging vs. Composite Ranking (Experiment D)
+A common pitfall in AI memory systems is implementing naive "Memory Aging" (e.g., deleting any memory older than 30 days).
+The problem with age-based eviction is that a foundational fact (like "My project is ChunkdUp") might not be mentioned again for 8 months, while trivial small talk is highly recent but entirely useless tomorrow.
+
+Instead of eviction, we implemented **Composite Memory Ranking**. We introduced a `MemoryRanker` component that evaluates memories *after* they are stored using a weighted formula:
+
+`Composite Score = Semantic Importance + Frequency Bonus + Recency Bonus`
+
+By injecting this into a test (`tests/test-ranking.py`), we mathematically proved that a core, highly-repeated fact from 8 months ago (`Composite: 2.324`) easily outranks a trivial, unrepeated fact from 2 minutes ago (`Composite: 1.899`).
+
+This proves that **age is just one signal**. High-frequency, high-importance old memories must survive, while low-frequency, low-importance new memories sink to the bottom.
+
+---
+
+## 11. What's Next?
+We have a robust state-management pipeline with noise filtering, frequency tracking, clean state mutation, and composite retrieval ranking. The next frontier is moving away from brittle Regex Extractors and hardcoded Heuristic Scorers toward robust, dynamic LLM-driven components that can understand true semantic intent without sacrificing our deterministic architecture.

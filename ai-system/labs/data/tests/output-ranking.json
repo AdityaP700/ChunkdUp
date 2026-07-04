@@ -1,0 +1,56 @@
+[
+    {
+        "id": "mem-a",
+        "type": "project",
+        "key": "project_name",
+        "value": "ChunkdUp",
+        "frequency": 200,
+        "created_at": "2025-11-06T17:13:50.086783Z",
+        "updated_at": "2025-11-06T17:13:50.086783Z",
+        "source": "conversation",
+        "status": "active",
+        "_ranking_debug": {
+            "semantic": 1.0,
+            "frequency_bonus": 1.32,
+            "recency_bonus": 0.004,
+            "composite_score": 2.324,
+            "days_old": 240.0
+        }
+    },
+    {
+        "id": "mem-b",
+        "type": "preference",
+        "key": "drink",
+        "value": "coffee",
+        "frequency": 1,
+        "created_at": "2026-07-04T17:11:50.086783Z",
+        "updated_at": "2026-07-04T17:11:50.086783Z",
+        "source": "conversation",
+        "status": "active",
+        "_ranking_debug": {
+            "semantic": 0.9,
+            "frequency_bonus": 0.0,
+            "recency_bonus": 0.999,
+            "composite_score": 1.899,
+            "days_old": 0.0
+        }
+    },
+    {
+        "id": "mem-c",
+        "type": "tool",
+        "key": "editor",
+        "value": "Neovim",
+        "frequency": 5,
+        "created_at": "2026-06-20T17:13:50.086783Z",
+        "updated_at": "2026-06-20T17:13:50.086783Z",
+        "source": "conversation",
+        "status": "active",
+        "_ranking_debug": {
+            "semantic": 0.7,
+            "frequency_bonus": 0.146,
+            "recency_bonus": 0.067,
+            "composite_score": 0.913,
+            "days_old": 14.0
+        }
+    }
+]
