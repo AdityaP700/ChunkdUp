@@ -24,15 +24,19 @@ Here is what I've figured out so far while banging my head against the keyboard:
 - **[Lab 002: The Trust Problem](learnings/lab002/learnings_002.md)**
   How do we safely consume output from a machine that makes things up for fun? (Explored strict JSON validation, regex fallback parsing, and the art of intentional rejection).
 
-- **[Lab 003: The State Problem](learnings/lab003/learnings_003.md)**
-  How does a system gracefully evolve its memory over time without duplicating everything like a digital hoarder? (got to knew about a policy-driven orchestration engine to resolve state conflicts).
+- **[Lab 003: The State Problem](learnings/lab003/lab3_complete_overview.md)**
+  How does a system gracefully evolve its memory over time without duplicating everything like a digital hoarder? (We built a deterministic policy-driven orchestration engine to resolve state conflicts and a composite memory ranker).
 
 ## What's Next?
 
 Up until now, I've been writing deterministic software to try and control probabilistic models. It's like trying to herd cats with math.
 
-But our next question is much harder:
+We successfully built a rule-based memory system that ranks facts based on recency, frequency, and static heuristics. But we hit the fundamental limits of deterministic rules:
+- No semantic understanding of intent (coexistence vs contradiction).
+- No query awareness (the ranker doesn't know what the user is currently asking).
+- Arbitrary scoring weights.
 
-**"Should every extracted memory be stored at all?"**
+Our next question is much harder:
+**"Can a model decide importance better than us?"**
 
-hmmmm lets give a shot!!
+We are transitioning from a deterministic scoring system to a learned, semantic scoring system. Let's give it a shot!

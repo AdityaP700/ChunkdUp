@@ -119,5 +119,27 @@ This proves that **age is just one signal**. High-frequency, high-importance old
 
 ---
 
-## 11. What's Next?
-We have a robust state-management pipeline with noise filtering, frequency tracking, clean state mutation, and composite retrieval ranking. The next frontier is moving away from brittle Regex Extractors and hardcoded Heuristic Scorers toward robust, dynamic LLM-driven components that can understand true semantic intent without sacrificing our deterministic architecture.
+## 11. The Bottlenecks of Deterministic Rules
+
+We have successfully built a pipeline that proves frequency, recency, and semantic typing *work*. But we have officially hit the ceiling of rule-based systems. There are 4 fundamental bottlenecks in this architecture:
+
+❌ **Bottleneck 1 — Weights are arbitrary**
+Our scoring formula uses `log10`, `+9`, and inverse recency. But *why*? There is no learning signal behind these weights. We have a hand-designed scoring function, not a learned ranking system.
+
+❌ **Bottleneck 2 — No query dependency**
+Right now, ranking is purely `memory ↔ system`. Real memory systems are `query ↔ memory`. If a user asks "What editor do I use?", our system might incorrectly boost the ChunkdUp project memory simply because it has high frequency. It lacks relevance to the current question.
+
+❌ **Bottleneck 3 — No semantic understanding**
+We treat the `type` (project, tool, preference) as a semantic proxy. If a user says "I switched from Neovim to VSCode", our system doesn't understand the semantic intent of "switched". It might merge or mis-rank them because it cannot distinguish between coexistence and change intent.
+
+❌ **Bottleneck 4 — No contradiction reasoning**
+When Windows mutates to Linux, it's currently an implicit overwrite. Real systems need explicit reasoning for versioning, merging, overwriting, and coexistence (e.g., learning Rust *while* knowing Python vs. replacing Python).
+
+---
+
+## 12. What's Next? (Lab 004)
+
+We stop asking: *"How do we calculate importance?"*
+We start asking: *"Can a model decide importance better than us?"*
+
+We are transitioning from a **deterministic scoring system** to a **learned, semantic scoring system**. The next frontier is replacing brittle Regex Extractors and hardcoded Heuristics with LLM-driven components that possess true semantic intent, query awareness, and contradiction reasoning.
