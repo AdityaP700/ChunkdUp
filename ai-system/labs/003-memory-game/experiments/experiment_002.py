@@ -63,6 +63,7 @@ class MemoryExtractor:
                     "type": rule["type"],
                     "key": rule["key"],
                     "value": value,
+                    "frequency": 1,
                     "created_at": datetime.now(timezone.utc).isoformat().replace("+00:00", "Z"),
                     "updated_at": datetime.now(timezone.utc).isoformat().replace("+00:00", "Z"),
                     "source": "conversation",
@@ -117,6 +118,11 @@ class MemoryManager:
         elif decision == Decision.IGNORE:
              print(f"Ignored duplicate memory: {memory['key']}")
 
+    #added a new decision ,the decision merge to increase the freq
+        elif decision == Decision.MERGE:
+             self.repository.merge(existing, memory)
+             print(f"Merged duplicate memory (increased frequency): {memory['key']}")
+
         elif decision == Decision.UPDATE:
              self.repository.update(memory)
 
@@ -168,8 +174,17 @@ class MemoryRepository:
             #just go for updating the value
             if mem.get("key") == new_memory.get("key") and mem.get("status") == "active":
                 for k, v in new_memory.items():
-                    if k not in ["id", "created_at"]:
+                    if k not in ["id", "created_at", "frequency"]:
                         mem[k] = v
+                mem["updated_at"] = datetime.now(timezone.utc).isoformat().replace("+00:00", "Z")
+                break
+        self.save(memories)
+  # we are updating the frequency based upon same key and the status
+    def merge(self, existing_memory, new_memory):
+        memories = self.load()
+        for mem in memories:
+            if mem.get("key") == existing_memory.get("key") and mem.get("status") == "active":
+                mem["frequency"] = mem.get("frequency", 1) + 1
                 mem["updated_at"] = datetime.now(timezone.utc).isoformat().replace("+00:00", "Z")
                 break
         self.save(memories)
@@ -199,19 +214,20 @@ class DecisionEngine:
             return Decision.STORE
         return policy.decide(existing_memory, new_memory)
 
-memory_path = os.path.join(labs_dir, "data", "memory.json")
-repo = MemoryRepository(memory_path)
-engine = DecisionEngine()
-scorer = MemoryScorer()
-manager = MemoryManager(repo, engine, scorer)
-extractor = MemoryExtractor()
+if __name__ == "__main__":
+    memory_path = os.path.join(labs_dir, "data", "memory.json")
+    repo = MemoryRepository(memory_path)
+    engine = DecisionEngine()
+    scorer = MemoryScorer()
+    manager = MemoryManager(repo, engine, scorer)
+    extractor = MemoryExtractor()
 
-memories = extractor.extract(conversation)
+    memories = extractor.extract(conversation)
 
-# Process and save each memory
-for memory in memories:
-    manager.process(memory)
+    # Process and save each memory
+    for memory in memories:
+        manager.process(memory)
 
-print(f"Successfully processed {len(memories)} memories.")
-print("\nAll saved memories in repository:")
-print(json.dumps(repo.get_all(), indent=2))
+    print(f"Successfully processed {len(memories)} memories.")
+    print("\nAll saved memories in repository:")
+    print(json.dumps(repo.get_all(), indent=2))

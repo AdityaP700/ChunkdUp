@@ -82,7 +82,21 @@ If you look at the 4 test cases we built in `test_policies.py`, they prove this 
 
 ---
 
-## 7. What's Next?
-We successfully built a deterministic system to manage state. But if you look at the code, there are hints of what comes next:
-1. **The Missing `MERGE`:** If a user says *"I like Python"* and later *"I like Rust"*, our current system overwrites Python. We need a `MERGE` action to combine them into an array: `["Python", "Rust"]`.
-2. **Probabilistic Filtering (Lab 004):** Right now, the system assumes every extracted fact is worth storing. But should every extracted memory be stored at all? We need a layer to filter out the noise.
+## 7. Adding the Memory Scorer (Filtering the Noise)
+Before a memory reaches the Decision Engine, we realized not all memories are created equal. A project memory ("I'm building ChunkdUp") is highly important, but a random question might just be noise.
+
+We introduced the `MemoryScorer`—a deterministic component inserted between the Extractor and the Decision Engine. It assigns an `importance` score (e.g., project -> 1.0, environment -> 0.8) and applies a **threshold** (e.g., 0.6). Memories below the threshold are dropped immediately, saving the repository from processing garbage. 
+
+---
+
+## 8. Repetition as Evidence (`MERGE` Action)
+Initially, if a user repeated a fact ("I use Linux"), our policies triggered an `IGNORE` decision. The problem? We were throwing away valuable signal. 
+
+We evolved `IGNORE` into `MERGE`. When a duplicate fact is detected, the Manager now triggers the `MemoryRepository.merge()` operation. Instead of ignoring the fact, it finds the existing active memory and increments its `"frequency"` counter. 
+
+What used to be considered "redundant noise" is now captured as **evidence**. A memory with `frequency: 3` gives the AI high confidence that this is a deeply ingrained user preference, rather than an offhand comment.
+
+---
+
+## 9. What's Next?
+We have a robust state-management pipeline with noise filtering and frequency tracking. The next frontier is moving away from brittle Regex Extractors and hardcoded Heuristic Scorers toward robust, dynamic LLM-driven components that can understand true semantic intent without sacrificing our deterministic architecture.

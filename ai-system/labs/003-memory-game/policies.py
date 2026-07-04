@@ -14,7 +14,7 @@ class EnvironmentPolicy(BasePolicy):
         if existing is None:
             return Decision.STORE
         if existing.get("value") == new.get("value"):
-            return Decision.IGNORE
+            return Decision.MERGE
         return Decision.UPDATE
 
 class PreferencePolicy(BasePolicy):
@@ -22,7 +22,7 @@ class PreferencePolicy(BasePolicy):
         if existing is None:
             return Decision.STORE
         if existing.get("value") == new.get("value"):
-            return Decision.IGNORE
+            return Decision.MERGE
         return Decision.UPDATE
 
 class ToolPolicy(BasePolicy):
@@ -30,7 +30,7 @@ class ToolPolicy(BasePolicy):
         if existing is None:
             return Decision.STORE
         if existing.get("value") == new.get("value"):
-            return Decision.IGNORE
+            return Decision.MERGE
         return Decision.UPDATE
 
 class ProjectPolicy(BasePolicy):
@@ -41,7 +41,7 @@ class ProjectPolicy(BasePolicy):
         # If value changed, or language changed, it's an update
         if existing.get("value") == new.get("value"):
             if existing.get("language") == new.get("language"):
-                return Decision.IGNORE
+                return Decision.MERGE
         return Decision.UPDATE
 
 class PolicyFactory:
