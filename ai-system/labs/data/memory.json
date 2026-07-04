@@ -1,47 +1,47 @@
 [
     {
-        "id": "a4b75045-e72a-4b06-9c5b-93ebc4b540c9",
+        "id": "3db1b438-25b9-44f4-9064-fd47bc3a619f",
         "type": "project",
         "key": "project_name",
         "value": "ChunkdUp",
-        "importance": 1.0,
-        "created_at": "2026-07-02T14:37:10.901976Z",
-        "updated_at": "2026-07-02T16:27:22.762473Z",
+        "created_at": "2026-07-04T13:15:30.611399Z",
+        "updated_at": "2026-07-04T13:15:30.611450Z",
         "source": "conversation",
         "status": "active",
-        "language": "Rust"
+        "language": "Rust",
+        "importance": 1.0
     },
     {
-        "id": "e03d4356-f61c-4dbf-b21a-4e0a8b5dd2da",
+        "id": "c057170d-d9ee-4755-a22f-83f97398084f",
         "type": "preference",
         "key": "response_style",
         "value": "detailed explanations",
-        "importance": 1.0,
-        "created_at": "2026-07-02T14:37:10.902526Z",
-        "updated_at": "2026-07-02T14:55:32.570154Z",
+        "created_at": "2026-07-04T13:15:30.611681Z",
+        "updated_at": "2026-07-04T13:15:30.611691Z",
         "source": "conversation",
-        "status": "active"
+        "status": "active",
+        "importance": 0.9
     },
     {
-        "id": "dac943cc-d89e-411a-ae2c-fa04900b13e4",
+        "id": "e2169ba5-2837-4f58-940c-8f1f4b9bdc25",
         "type": "environment",
         "key": "os",
         "value": "Linux",
-        "importance": 1.0,
-        "created_at": "2026-07-02T14:37:10.902733Z",
-        "updated_at": "2026-07-02T14:55:32.590261Z",
+        "created_at": "2026-07-04T13:15:30.611891Z",
+        "updated_at": "2026-07-04T13:15:30.611897Z",
         "source": "conversation",
-        "status": "active"
+        "status": "active",
+        "importance": 0.8
     },
     {
-        "id": "9a2a34f9-0c8e-4bfc-8619-13dc28437b02",
+        "id": "47b4cac5-f8ff-4272-89a1-7203de531373",
         "type": "tool",
         "key": "editor",
         "value": "Neovim",
-        "importance": 1.0,
-        "created_at": "2026-07-02T14:37:10.903386Z",
-        "updated_at": "2026-07-02T14:55:32.603651Z",
+        "created_at": "2026-07-04T13:15:30.612273Z",
+        "updated_at": "2026-07-04T13:15:30.612280Z",
         "source": "conversation",
-        "status": "active"
+        "status": "active",
+        "importance": 0.7
     }
 ]

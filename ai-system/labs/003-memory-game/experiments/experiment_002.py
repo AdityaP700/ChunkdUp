@@ -4,7 +4,7 @@ import re
 # from typing import Dict,List,Any
 import uuid
 from enum import Enum
-from datetime import datetime
+from datetime import datetime, timezone
 import sys
 labs_dir = os.path.dirname(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
 conv_path = os.path.join(labs_dir, "data", "conversation.json")
@@ -63,9 +63,8 @@ class MemoryExtractor:
                     "type": rule["type"],
                     "key": rule["key"],
                     "value": value,
-                    "importance": 1.0,  # regex = high conf
-                    "created_at": datetime.utcnow().isoformat() + "Z",
-                    "updated_at": datetime.utcnow().isoformat() + "Z",
+                    "created_at": datetime.now(timezone.utc).isoformat().replace("+00:00", "Z"),
+                    "updated_at": datetime.now(timezone.utc).isoformat().replace("+00:00", "Z"),
                     "source": "conversation",
                     "status": "active"
                 }
@@ -78,16 +77,34 @@ class MemoryExtractor:
 
         return memories
 
+class MemoryScorer:
+    def score(self, memory):
+        scores = {
+            "project": 1.0,
+            "preference": 0.9,
+            "environment": 0.8,
+            "tool": 0.7,
+            "question": 0.3
+        }
+        return scores.get(memory.get("type"), 0.5)
+
 class MemoryManager:
-    def __init__(self,repository,decision_engine):
+    def __init__(self,repository,decision_engine,scorer):
         #case of a dependency injection
         #it means the manager relies on the
         # repository to do the heavy lifting of the storage
 
         self.repository=repository
         self.engine=decision_engine
+        self.scorer=scorer
+        self.threshold=0.6
 
     def process(self, memory):
+        importance = self.scorer.score(memory)
+        if importance < self.threshold:
+            print(f"Discarded memory: {memory.get('value')} (type: {memory.get('type')}, score: {importance})")
+            return
+        memory["importance"] = importance
         existing = self.repository.find_active_by_key(memory["key"])
         decision = self.engine.decide(existing, memory)
 
@@ -111,11 +128,14 @@ class MemoryRepository:
     #load the memories
     def load(self):
         #search in the disk ,if it exits or not
-        if not os.path.exists(self.path):
+        if not os.path.exists(self.path) or os.path.getsize(self.path) == 0:
             return []
         #if exists ,perform the read operation
         with open(self.path,"r",encoding="utf-8") as f:
-            return json.load(f)
+            try:
+                return json.load(f)
+            except json.JSONDecodeError:
+                return []
 
     def save(self, memories):
         with open(self.path, "w", encoding="utf-8") as f:
@@ -150,7 +170,7 @@ class MemoryRepository:
                 for k, v in new_memory.items():
                     if k not in ["id", "created_at"]:
                         mem[k] = v
-                mem["updated_at"] = datetime.utcnow().isoformat() + "Z"
+                mem["updated_at"] = datetime.now(timezone.utc).isoformat().replace("+00:00", "Z")
                 break
         self.save(memories)
 
@@ -182,7 +202,8 @@ class DecisionEngine:
 memory_path = os.path.join(labs_dir, "data", "memory.json")
 repo = MemoryRepository(memory_path)
 engine = DecisionEngine()
-manager = MemoryManager(repo, engine)
+scorer = MemoryScorer()
+manager = MemoryManager(repo, engine, scorer)
 extractor = MemoryExtractor()
 
 memories = extractor.extract(conversation)
