@@ -115,3 +115,17 @@ What should actually be injected?
 That's context assembly.
 
 well now :we crossed the boundary from a memory database to a memory-aware assistant.
+
+Test - 1 :
+=== ACTUAL VALIDATED JSON ===
+{
+  "answer": "I don't know.",
+  "confidence": 1.0,
+  "citations": []
+}
+
+[PASSED]: LLM successfully prevented hallucination.
+[PASSED]: Citations are empty as expected.
+
+expected.
+Our prompt constraints are holding perfectly! Because the Memory Retriever didn't return anything relevant about databases, the LLM defaulted strictly to the I don't know fallback with empty citations.
