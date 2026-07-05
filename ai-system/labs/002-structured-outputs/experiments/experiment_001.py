@@ -263,51 +263,52 @@ class OutputValidator:
             return False, f"'citations' must be a list, got {type(data.get('citations')).__name__}"
         return True, ""
 
-question ="Should we always trust highest scoring chunks??"
+if __name__ == "__main__":
+    question ="Should we always trust highest scoring chunks??"
 
-retriever = SemanticRetriever(chunks)
-assembler = ContextAssembler()
-builder=PromptBuilder()
+    retriever = SemanticRetriever(chunks)
+    assembler = ContextAssembler()
+    builder=PromptBuilder()
 
-# Configuration Flag (Option 1)
-ENABLE_VALIDATION = True
+    # Configuration Flag (Option 1)
+    ENABLE_VALIDATION = True
 
-retrieved_chunks = retriever.retrieve(query=question,k=10)
-final_context = assembler.assemble(retrieved_chunks)
+    retrieved_chunks = retriever.retrieve(query=question,k=10)
+    final_context = assembler.assemble(retrieved_chunks)
 
-# print(f"Received {len(retrieved_chunks)} chunks from the retrieval")
-# print(f"Selected {len(final_context)} chunks for the model\n")
+    # print(f"Received {len(retrieved_chunks)} chunks from the retrieval")
+    # print(f"Selected {len(final_context)} chunks for the model\n")
 
-# for i, chunk in enumerate(final_context,1):
-#     print(f"{i}.[scores={chunk['score']}] {chunk['text']}")
+    # for i, chunk in enumerate(final_context,1):
+    #     print(f"{i}.[scores={chunk['score']}] {chunk['text']}")
 
 
-prompt_a = builder.build(question, final_context, variant="basic")
-prompt_b = builder.build(question, final_context, variant="expert")
+    prompt_a = builder.build(question, final_context, variant="basic")
+    prompt_b = builder.build(question, final_context, variant="expert")
 
-# print("\n=== PROMPT A (Basic) ===")
-# print(prompt_a)
-# print("\n=== PROMPT B (Expert) ===")
-# print(prompt_b)
+    # print("\n=== PROMPT A (Basic) ===")
+    # print(prompt_a)
+    # print("\n=== PROMPT B (Expert) ===")
+    # print(prompt_b)
 
-# Run with LLM
-llm = LLMCaller(provider="gemini")   # Change to "claude" anytime
-# print("\n=== LLM RESPONSE (Prompt B) ===")
-answer = llm.generate(prompt_b)
-# print(answer)
+    # Run with LLM
+    llm = LLMCaller(provider="gemini")   # Change to "claude" anytime
+    # print("\n=== LLM RESPONSE (Prompt B) ===")
+    answer = llm.generate(prompt_b)
+    # print(answer)
 
-parser = OutputParser()
-parsed_dict = parser.parse(answer)
+    parser = OutputParser()
+    parsed_dict = parser.parse(answer)
 
-print("\n=== PARSED DICTIONARY ===")
-print(parsed_dict)
+    print("\n=== PARSED DICTIONARY ===")
+    print(parsed_dict)
 
-if ENABLE_VALIDATION:
-    validator = OutputValidator(raise_on_fail=True)
-    try:
-        validated_dict = validator.validate(parsed_dict)
-        print("\n=== VALIDATION SUCCESS ===")
-        print("clean data:", validated_dict)
-    except ValueError as e:
-        print("\n=== VALIDATION FAILED ===")
-        print("bad output from llm:", e)
+    if ENABLE_VALIDATION:
+        validator = OutputValidator(raise_on_fail=True)
+        try:
+            validated_dict = validator.validate(parsed_dict)
+            print("\n=== VALIDATION SUCCESS ===")
+            print("clean data:", validated_dict)
+        except ValueError as e:
+            print("\n=== VALIDATION FAILED ===")
+            print("bad output from llm:", e)

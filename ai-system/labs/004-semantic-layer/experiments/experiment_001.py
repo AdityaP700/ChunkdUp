@@ -15,6 +15,17 @@ with open(conv_path, "r", encoding="utf-8") as f:
 conversation = "\n".join(conversation_lines)
 sys.path.append(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
 from policies import Decision, PolicyFactory
+# Load .env file manually from the parent directory of experiments
+labs_dir = os.path.dirname(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
+env_path = os.path.join(labs_dir, ".env")
+if os.path.exists(env_path):
+    with open(env_path, "r", encoding="utf-8") as f:
+        for line in f:
+            line = line.strip()
+            if line and not line.startswith("#"):
+                parts = line.split("=", 1)
+                if len(parts) == 2:
+                    os.environ[parts[0].strip()] = parts[1].strip()
 class MemoryExtractor:
     def __init__(self):
         #rules : patterns ,types ,key,value_extractor
@@ -267,12 +278,29 @@ if __name__ == "__main__":
     extractor = MemoryExtractor()
 
     # --- Wire up retrieval testing ---
-    # First, let's load retrieval class
+    # First, let's load retrieval class and prompt builder
     from retrieval_class import MemoryRetriever
+    from prompt_builder import PromptBuilder
+    import importlib.util
+
+    # Let's dynamically import Lab 2 classes because of the filename collision (both are experiment_001.py)
+    lab2_file = os.path.join(labs_dir, "002-structured-outputs", "experiments", "experiment_001.py")
+    spec = importlib.util.spec_from_file_location("lab2_experiment", lab2_file)
+    lab2_module = importlib.util.module_from_spec(spec)
+    sys.modules["lab2_experiment"] = lab2_module
+    spec.loader.exec_module(lab2_module)
+
+    LLMCaller = lab2_module.LLMCaller
+    OutputParser = lab2_module.OutputParser
+    OutputValidator = lab2_module.OutputValidator
+
     retriever = MemoryRetriever(repo)
+    builder = PromptBuilder()
+    llm = LLMCaller(provider="gemini")
+    parser = OutputParser()
+    validator = OutputValidator(raise_on_fail=False) # don't crash the script on fail
 
     # Inject mock memory into repository directly for the test case
-    # In a real scenario, this would come from the JSON, but for the test:
     mock_memory = [
         {"key": "editor", "value": "Neovim", "type": "tool", "status": "active"},
         {"key": "os", "value": "Linux", "type": "environment", "status": "active"},
@@ -284,21 +312,46 @@ if __name__ == "__main__":
 
     print("\n--- Test 1 ---")
     query1 = "Which editor do I use?"
-    print(f"Query: {query1}")
+    print(f"Query: {query1}\n")
     results1 = retriever.retrieve(query1, k=1)
-    if results1:
-        top_match = results1[0]
-        print(f"Expected: 1. {top_match['key']} {top_match['value']} score={top_match['retrieval_score']}")
-    else:
-        print("No results found.")
+
+    # Build prompt
+    prompt1 = builder.build(
+        query=query1,
+        contexts={
+            "memories": results1,
+            "documents": []
+        },
+        variant="expert"
+    )
+
+    print("Calling LLM...")
+    raw_response1 = llm.generate(prompt1)
+    parsed_dict1 = parser.parse(raw_response1)
+    validated_dict1 = validator.validate(parsed_dict1)
+    print("=== VALIDATED JSON (Test 1) ===")
+    print(json.dumps(validated_dict1, indent=2))
+    print("===============================\n")
 
     print("\n--- Test 2 ---")
     query2 = "What project am I building?"
-    print(f"Query: {query2}")
+    print(f"Query: {query2}\n")
     results2 = retriever.retrieve(query2, k=1)
-    if results2:
-        top_match = results2[0]
-        print(f"Expected: {top_match['value']} (score={top_match['retrieval_score']})")
-    else:
-        print("No results found.")
-    print("-------------------\n")
+
+    # Build prompt
+    prompt2 = builder.build(
+        query=query2,
+        contexts={
+            "memories": results2,
+            "documents": []
+        },
+        variant="expert"
+    )
+
+    print("Calling LLM...")
+    raw_response2 = llm.generate(prompt2)
+    parsed_dict2 = parser.parse(raw_response2)
+    validated_dict2 = validator.validate(parsed_dict2)
+    print("=== VALIDATED JSON (Test 2) ===")
+    print(json.dumps(validated_dict2, indent=2))
+    print("===============================\n")

@@ -45,3 +45,73 @@ Expected: 1. editor Neovim score=1
 --- Test 2 ---
 Query: What project am I building?
 Expected: ChunkdUp (score=1)
+
+
+
+well now once we have built the retrieval logic ,we need to decide how that information is presented to the LLMs
+
+Think of Google Search
+When you search
+"Python decorators"
+Google's retriever finds billions of candidate pages.
+Does Google just dump all the HTML into your browser?
+No.
+It builds a page like
+
+Result 1
+Title
+Snippet
+
+Result 2
+Title
+Snippet
+
+The search engine retrieved.
+
+The UI assembled.
+Exactly the same thing is happening here.
+
+here MemoryRetriever answers
+
+Which memories are relevant?
+
+Example:
+
+Query:
+Which editor do I use?
+
+↓
+
+Retrieved
+
+editor = Neovim
+
+OS = Linux
+
+Project = ChunkdUp
+
+Notice something.
+
+This is Python objects.
+
+[
+    {"key":"editor","value":"Neovim"},
+    {"key":"os","value":"Linux"},
+    {"key":"project_name","value":"ChunkdUp"}
+]
+
+The LLM cannot consume Python dictionaries.
+
+Somebody has to convert them into a prompt.
+
+That's PromptBuilder's job
+
+PromptBuilder asks
+
+Among the retrieved information...
+
+What should actually be injected?
+
+That's context assembly.
+
+well now :we crossed the boundary from a memory database to a memory-aware assistant.
