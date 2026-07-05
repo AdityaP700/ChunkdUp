@@ -27,16 +27,52 @@ Here is what I've figured out so far while banging my head against the keyboard:
 - **[Lab 003: The State Problem](learnings/lab003/lab3_complete_overview.md)**
   How does a system gracefully evolve its memory over time without duplicating everything like a digital hoarder? (We built a deterministic policy-driven orchestration engine to resolve state conflicts and a composite memory ranker).
 
+- **[Lab 004: The Semantic Memory Pipeline](learnings/lab004/learnings_004.md)**
+  How do we transition from a static memory database to a fully memory-aware assistant? (We connected the entire system—retrieving dynamic user state, formatting it as a prompt, and generating structured JSON outputs while preventing hallucinations).
+
+## The Final Architecture
+
+By stacking these labs instead of replacing them, we evolved from simple isolated experiments into a cohesive, production-ready pipeline. Here is the final architecture we built from scratch:
+
+```mermaid
+flowchart TD
+    UserQuery[User Query & Conversation]
+    
+    subgraph Lab 3: Memory Lifecycle
+        Extractor[Memory Extractor]
+        Decision[Decision Engine]
+        Repo[(Memory Repository)]
+        
+        Extractor -->|Extracts Facts| Decision
+        Decision -->|STORE/UPDATE/MERGE| Repo
+    end
+
+    UserQuery --> Extractor
+    UserQuery --> Retriever
+    
+    subgraph Lab 1 & 4: Retrieval & Context Assembly
+        Retriever[Memory & Document Retriever]
+        PromptBuilder[Prompt Builder]
+        
+        Repo -->|Active Memories| Retriever
+        Retriever -->|Top K Results| PromptBuilder
+    end
+
+    subgraph Lab 2: Structured Outputs
+        LLM[LLM Caller]
+        Parser[Output Parser]
+        Validator[Output Validator]
+        FinalOutput([Structured JSON Output])
+        
+        PromptBuilder -->|Formatted Prompt| LLM
+        LLM -->|Raw Markdown Output| Parser
+        Parser -->|Parsed Dict| Validator
+        Validator -->|Schema Validation| FinalOutput
+    end
+```
+
 ## What's Next?
 
-Up until now, I've been writing deterministic software to try and control probabilistic models. It's like trying to herd cats with math.
+This chapter of ChunkdUp is complete! We have successfully built a modular, deterministic, memory-aware infrastructure pipeline from the ground up without relying on black-box frameworks. 
 
-We successfully built a rule-based memory system that ranks facts based on recency, frequency, and static heuristics. But we hit the fundamental limits of deterministic rules:
-- No semantic understanding of intent (coexistence vs contradiction).
-- No query awareness (the ranker doesn't know what the user is currently asking).
-- Arbitrary scoring weights.
-
-Our next question is much harder:
-**"Can a model decide importance better than us?"**
-
-We are transitioning from a deterministic scoring system to a learned, semantic scoring system. Let's give it a shot!
+We will be moving forward toward new horizons and different learnings. Keep building!
