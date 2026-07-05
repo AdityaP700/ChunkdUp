@@ -1,47 +1,20 @@
 [
     {
-        "id": "3db1b438-25b9-44f4-9064-fd47bc3a619f",
-        "type": "project",
-        "key": "project_name",
-        "value": "ChunkdUp",
-        "created_at": "2026-07-04T13:15:30.611399Z",
-        "updated_at": "2026-07-04T13:15:30.611450Z",
-        "source": "conversation",
-        "status": "active",
-        "language": "Rust",
-        "importance": 1.0
-    },
-    {
-        "id": "c057170d-d9ee-4755-a22f-83f97398084f",
-        "type": "preference",
-        "key": "response_style",
-        "value": "detailed explanations",
-        "created_at": "2026-07-04T13:15:30.611681Z",
-        "updated_at": "2026-07-04T13:15:30.611691Z",
-        "source": "conversation",
-        "status": "active",
-        "importance": 0.9
-    },
-    {
-        "id": "e2169ba5-2837-4f58-940c-8f1f4b9bdc25",
-        "type": "environment",
-        "key": "os",
-        "value": "Linux",
-        "created_at": "2026-07-04T13:15:30.611891Z",
-        "updated_at": "2026-07-04T13:15:30.611897Z",
-        "source": "conversation",
-        "status": "active",
-        "importance": 0.8
-    },
-    {
-        "id": "47b4cac5-f8ff-4272-89a1-7203de531373",
-        "type": "tool",
         "key": "editor",
         "value": "Neovim",
-        "created_at": "2026-07-04T13:15:30.612273Z",
-        "updated_at": "2026-07-04T13:15:30.612280Z",
-        "source": "conversation",
-        "status": "active",
-        "importance": 0.7
+        "type": "tool",
+        "status": "active"
+    },
+    {
+        "key": "os",
+        "value": "Linux",
+        "type": "environment",
+        "status": "active"
+    },
+    {
+        "key": "project_name",
+        "value": "ChunkdUp",
+        "type": "project",
+        "status": "active"
     }
 ]
