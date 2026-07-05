@@ -129,3 +129,26 @@ Test - 1 :
 
 expected.
 Our prompt constraints are holding perfectly! Because the Memory Retriever didn't return anything relevant about databases, the LLM defaulted strictly to the I don't know fallback with empty citations.
+
+
+Current:
+
+Extractor
+↓
+
+Repository
+↓
+
+Retriever
+↓
+
+Prompt Builder
+↓
+
+LLM
+↓
+
+Parser
+↓
+
+Validator
