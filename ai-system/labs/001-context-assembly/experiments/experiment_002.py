@@ -24,16 +24,17 @@ def load_chunks():
 chunks = load_chunks()
 
 class SemanticRetriever:
+
     def __init__(self, chunks):
         # store the chunks
         self.chunks = chunks
         # load embedding model
         self.model = SentenceTransformer("all-MiniLM-L6-v2")
-        # Build a list containing the "text" from every chunk.
+
+        # Build a list containing the "text" from every chunk from chunks.json
         chunk_texts=[chunk["text"] for chunk in chunks]
         self.chunk_embeddings = self.model.encode(chunk_texts)
         # print(self.chunk_embeddings.shape)
-
 
     def retrieve(self, query: str = "", k: int = 10):
         if not self.chunks:
@@ -187,8 +188,8 @@ class LLMCaller:
                 messages=[{"role": "user", "content": prompt}]
             )
             return response.content[0].text.strip()
-question ="Should we always trust highest scoring chunks??"
 
+question ="Should we always trust highest scoring chunks??"
 retriever = SemanticRetriever(chunks)
 assembler = ContextAssembler()
 builder=PromptBuilder()

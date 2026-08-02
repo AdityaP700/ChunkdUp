@@ -4,6 +4,9 @@ import math
 import re
 # from typing import Dict,List,Any
 import uuid
+from retrieval_class import MemoryRetriever
+from prompt_builder import PromptBuilder
+import importlib.util
 from enum import Enum
 from datetime import datetime, timezone
 import sys
@@ -279,9 +282,7 @@ if __name__ == "__main__":
 
     # --- Wire up retrieval testing ---
     # First, let's load retrieval class and prompt builder
-    from retrieval_class import MemoryRetriever
-    from prompt_builder import PromptBuilder
-    import importlib.util
+
 
     # Let's dynamically import Lab 2 classes because of the filename collision (both are experiment_001.py)
     lab2_file = os.path.join(labs_dir, "002-structured-outputs", "experiments", "experiment_001.py")

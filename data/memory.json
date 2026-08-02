@@ -1,0 +1,15 @@
+[
+    {
+        "id": "f6858663-4e63-47d7-8b09-8e66f1a62f84",
+        "type": "project",
+        "key": "project_name",
+        "value": "ChunkdUp",
+        "frequency": 2,
+        "created_at": "2026-08-02T14:04:54.075281Z",
+        "updated_at": "2026-08-02T14:04:54.140685Z",
+        "source": "conversation",
+        "status": "active",
+        "language": "Python",
+        "importance": 1.0
+    }
+]
