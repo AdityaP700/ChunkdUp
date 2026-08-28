@@ -46,6 +46,12 @@ class MemoryExtractor:
                 "meta": {"language": 2}
             },
             {
+                "pattern": r"I'm working on a project called ([\w\d\-\s]+)",
+                "type": "project",
+                "key": "project_name",
+                "value_group": 1
+            },
+            {
                 "pattern": r"I prefer ([\w\s]+?)\.",
                 "type": "preference",
                 "key": "response_style",
@@ -68,6 +74,30 @@ class MemoryExtractor:
                 "type": "tool",
                 "key": "editor",
                 "value_group": 1
+            },
+            {
+                "pattern": r"I work at ([\w\s]+)",
+                "type": "employment",
+                "key": "company",
+                "value_group": 1
+            },
+            {
+                "pattern": r"I'm a ([\w\s]+)",
+                "type": "role",
+                "key": "role",
+                "value_group": 1
+            },
+            {
+                "pattern": r"My favorite ([\w\s]+) is ([\w\s]+)",
+                "type": "preference",
+                "key": "favorite_{1}",
+                "value_group": 2
+            },
+            {
+                "pattern": r"I'm learning ([\w\d\+#\s]+)",
+                "type": "learning",
+                "key": "learning",
+                "value_group": 1
             }
         ]
 
@@ -77,10 +107,16 @@ class MemoryExtractor:
             matches = re.finditer(rule["pattern"], conversation, re.IGNORECASE)
             for match in matches:
                 value = match.group(rule["value_group"]).strip()
+                key = rule["key"]
+                for i in range(1, len(match.groups()) + 1):
+                    placeholder = f"{{{i}}}"
+                    if placeholder in key:
+                        key = key.replace(placeholder, match.group(i).strip().lower().replace(" ", "_"))
+
                 memory = {
                     "id": str(uuid.uuid4()),
                     "type": rule["type"],
-                    "key": rule["key"],
+                    "key": key,
                     "value": value,
                     "frequency": 1,
                     "created_at": datetime.now(timezone.utc).isoformat().replace("+00:00", "Z"),
@@ -104,9 +140,12 @@ class MemoryScorer:
             "preference": 0.9,
             "environment": 0.8,
             "tool": 0.7,
+            "employment": 0.9,
+            "role": 0.8,
+            "learning": 0.8,
             "question": 0.3
         }
-        return scores.get(memory.get("type"), 0.5)
+        return scores.get(memory.get("type"), 0.7)
 
 
 class MemoryRanker:

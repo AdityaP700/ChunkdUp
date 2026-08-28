@@ -1,0 +1,119 @@
+{
+  "version": "1.0",
+  "scenarios": [
+    {
+      "id": "001",
+      "conversation": ["I use Python for backend development"],
+      "expected_decision": "STORE",
+      "expected_key": "programming_language",
+      "expected_value": "Python",
+      "reason": "New, important fact about user's tech stack"
+    },
+    {
+      "id": "002",
+      "conversation": ["I use Python", "I use Python"],
+      "expected_decision": "MERGE",
+      "expected_key": "programming_language",
+      "expected_value": "Python",
+      "expected_frequency": 2,
+      "reason": "Repeated statement should increment frequency"
+    },
+    {
+      "id": "003",
+      "conversation": ["I use Python", "I now use Go"],
+      "expected_decision": "UPDATE",
+      "expected_key": "programming_language",
+      "expected_value": "Go",
+      "reason": "Changed from Python to Go"
+    },
+    {
+      "id": "004",
+      "conversation": ["Python is fast"],
+      "expected_decision": "IGNORE",
+      "expected_key": null,
+      "expected_value": null,
+      "reason": "Opinion, not a fact about the user"
+    },
+    {
+      "id": "005",
+      "conversation": ["I'm building a web app called ChunkdUp"],
+      "expected_decision": "STORE",
+      "expected_key": "project_name",
+      "expected_value": "ChunkdUp",
+      "reason": "Project information should be stored"
+    },
+    {
+      "id": "006",
+      "conversation": ["I'm building ChunkdUp", "I'm building ChunkdUp in Python"],
+      "expected_decision": "UPDATE",
+      "expected_key": "project_name",
+      "expected_value": "ChunkdUp in Python",
+      "reason": "Added context to existing memory"
+    },
+    {
+      "id": "007",
+      "conversation": ["I prefer Neovim"],
+      "expected_decision": "STORE",
+      "expected_key": "editor",
+      "expected_value": "Neovim",
+      "reason": "User preference"
+    },
+    {
+      "id": "008",
+      "conversation": ["It's raining outside"],
+      "expected_decision": "IGNORE",
+      "expected_key": null,
+      "expected_value": null,
+      "reason": "Temporary fact, not memory-worthy"
+    },
+    {
+      "id": "009",
+      "conversation": ["I use Python", "I use Python", "I use Python", "I use Python"],
+      "expected_decision": "MERGE",
+      "expected_key": "programming_language",
+      "expected_value": "Python",
+      "expected_frequency": 4,
+      "reason": "Multiple repeats should accumulate frequency"
+    },
+    {
+      "id": "010",
+      "conversation": ["I work at Google"],
+      "expected_decision": "STORE",
+      "expected_key": "company",
+      "expected_value": "Google",
+      "reason": "Employment information"
+    },
+    {
+      "id": "011",
+      "conversation": ["I'm a software engineer"],
+      "expected_decision": "STORE",
+      "expected_key": "role",
+      "expected_value": "software engineer",
+      "reason": "Role information"
+    },
+    {
+      "id": "012",
+      "conversation": ["My favorite language is Python"],
+      "expected_decision": "STORE",
+      "expected_key": "favorite_language",
+      "expected_value": "Python",
+      "reason": "User favorite preference"
+    },
+    {
+      "id": "013",
+      "conversation": ["I'm working on a project called X"],
+      "expected_decision": "STORE",
+      "expected_key": "project_name",
+      "expected_value": "X",
+      "reason": "Project information"
+    },
+    {
+      "id": "014",
+      "conversation": ["I'm learning Rust"],
+      "expected_decision": "STORE",
+      "expected_key": "learning",
+      "expected_value": "Rust",
+      "reason": "Learning topic information"
+    }
+  ]
+}

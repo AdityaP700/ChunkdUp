@@ -1,0 +1,371 @@
+{
+  "timestamp": "2026-08-29T00:55:42.975783",
+  "total_scenarios": 14,
+  "results": [
+    {
+      "scenario_id": "001",
+      "input": [
+        "I use Python for backend development"
+      ],
+      "expected": {
+        "decision": "STORE",
+        "key": "programming_language",
+        "value": "Python",
+        "frequency": 1
+      },
+      "actual": {
+        "decision": "STORE",
+        "memory_found": true,
+        "memory_value": "Python",
+        "frequency": 1
+      },
+      "correct": {
+        "decision": true,
+        "value": true
+      },
+      "reason": "New, important fact about user's tech stack"
+    },
+    {
+      "scenario_id": "002",
+      "input": [
+        "I use Python",
+        "I use Python"
+      ],
+      "expected": {
+        "decision": "MERGE",
+        "key": "programming_language",
+        "value": "Python",
+        "frequency": 2
+      },
+      "actual": {
+        "decision": "MERGE",
+        "memory_found": true,
+        "memory_value": "Python",
+        "frequency": 3
+      },
+      "correct": {
+        "decision": true,
+        "value": true
+      },
+      "reason": "Repeated statement should increment frequency"
+    },
+    {
+      "scenario_id": "003",
+      "input": [
+        "I use Python",
+        "I now use Go"
+      ],
+      "expected": {
+        "decision": "UPDATE",
+        "key": "programming_language",
+        "value": "Go",
+        "frequency": 1
+      },
+      "actual": {
+        "decision": "MERGE",
+        "memory_found": true,
+        "memory_value": "Python",
+        "frequency": 2
+      },
+      "correct": {
+        "decision": false,
+        "value": false
+      },
+      "reason": "Changed from Python to Go"
+    },
+    {
+      "scenario_id": "004",
+      "input": [
+        "Python is fast"
+      ],
+      "expected": {
+        "decision": "IGNORE",
+        "key": null,
+        "value": null,
+        "frequency": 1
+      },
+      "actual": {
+        "decision": "IGNORE",
+        "memory_found": false,
+        "memory_value": null,
+        "frequency": 0
+      },
+      "correct": {
+        "decision": true,
+        "value": true
+      },
+      "reason": "Opinion, not a fact about the user"
+    },
+    {
+      "scenario_id": "005",
+      "input": [
+        "I'm building a web app called ChunkdUp"
+      ],
+      "expected": {
+        "decision": "STORE",
+        "key": "project_name",
+        "value": "ChunkdUp",
+        "frequency": 1
+      },
+      "actual": {
+        "decision": "IGNORE",
+        "memory_found": false,
+        "memory_value": null,
+        "frequency": 0
+      },
+      "correct": {
+        "decision": false,
+        "value": true
+      },
+      "reason": "Project information should be stored"
+    },
+    {
+      "scenario_id": "006",
+      "input": [
+        "I'm building ChunkdUp",
+        "I'm building ChunkdUp in Python"
+      ],
+      "expected": {
+        "decision": "UPDATE",
+        "key": "project_name",
+        "value": "ChunkdUp in Python",
+        "frequency": 1
+      },
+      "actual": {
+        "decision": "STORE",
+        "memory_found": true,
+        "memory_value": "ChunkdUp",
+        "frequency": 1
+      },
+      "correct": {
+        "decision": false,
+        "value": false
+      },
+      "reason": "Added context to existing memory"
+    },
+    {
+      "scenario_id": "007",
+      "input": [
+        "I prefer Neovim"
+      ],
+      "expected": {
+        "decision": "STORE",
+        "key": "editor",
+        "value": "Neovim",
+        "frequency": 1
+      },
+      "actual": {
+        "decision": "IGNORE",
+        "memory_found": false,
+        "memory_value": null,
+        "frequency": 0
+      },
+      "correct": {
+        "decision": false,
+        "value": true
+      },
+      "reason": "User preference"
+    },
+    {
+      "scenario_id": "008",
+      "input": [
+        "It's raining outside"
+      ],
+      "expected": {
+        "decision": "IGNORE",
+        "key": null,
+        "value": null,
+        "frequency": 1
+      },
+      "actual": {
+        "decision": "IGNORE",
+        "memory_found": false,
+        "memory_value": null,
+        "frequency": 0
+      },
+      "correct": {
+        "decision": true,
+        "value": true
+      },
+      "reason": "Temporary fact, not memory-worthy"
+    },
+    {
+      "scenario_id": "009",
+      "input": [
+        "I use Python",
+        "I use Python",
+        "I use Python",
+        "I use Python"
+      ],
+      "expected": {
+        "decision": "MERGE",
+        "key": "programming_language",
+        "value": "Python",
+        "frequency": 4
+      },
+      "actual": {
+        "decision": "MERGE",
+        "memory_found": true,
+        "memory_value": "Python",
+        "frequency": 10
+      },
+      "correct": {
+        "decision": true,
+        "value": true
+      },
+      "reason": "Multiple repeats should accumulate frequency"
+    },
+    {
+      "scenario_id": "010",
+      "input": [
+        "I work at Google"
+      ],
+      "expected": {
+        "decision": "STORE",
+        "key": "company",
+        "value": "Google",
+        "frequency": 1
+      },
+      "actual": {
+        "decision": "STORE",
+        "memory_found": true,
+        "memory_value": "Google",
+        "frequency": 1
+      },
+      "correct": {
+        "decision": true,
+        "value": true
+      },
+      "reason": "Employment information"
+    },
+    {
+      "scenario_id": "011",
+      "input": [
+        "I'm a software engineer"
+      ],
+      "expected": {
+        "decision": "STORE",
+        "key": "role",
+        "value": "software engineer",
+        "frequency": 1
+      },
+      "actual": {
+        "decision": "STORE",
+        "memory_found": true,
+        "memory_value": "software engineer",
+        "frequency": 1
+      },
+      "correct": {
+        "decision": true,
+        "value": true
+      },
+      "reason": "Role information"
+    },
+    {
+      "scenario_id": "012",
+      "input": [
+        "My favorite language is Python"
+      ],
+      "expected": {
+        "decision": "STORE",
+        "key": "favorite_language",
+        "value": "Python",
+        "frequency": 1
+      },
+      "actual": {
+        "decision": "STORE",
+        "memory_found": true,
+        "memory_value": "Python",
+        "frequency": 1
+      },
+      "correct": {
+        "decision": true,
+        "value": true
+      },
+      "reason": "User favorite preference"
+    },
+    {
+      "scenario_id": "013",
+      "input": [
+        "I'm working on a project called X"
+      ],
+      "expected": {
+        "decision": "STORE",
+        "key": "project_name",
+        "value": "X",
+        "frequency": 1
+      },
+      "actual": {
+        "decision": "STORE",
+        "memory_found": true,
+        "memory_value": "X",
+        "frequency": 1
+      },
+      "correct": {
+        "decision": true,
+        "value": true
+      },
+      "reason": "Project information"
+    },
+    {
+      "scenario_id": "014",
+      "input": [
+        "I'm learning Rust"
+      ],
+      "expected": {
+        "decision": "STORE",
+        "key": "learning",
+        "value": "Rust",
+        "frequency": 1
+      },
+      "actual": {
+        "decision": "STORE",
+        "memory_found": true,
+        "memory_value": "Rust",
+        "frequency": 1
+      },
+      "correct": {
+        "decision": true,
+        "value": true
+      },
+      "reason": "Learning topic information"
+    }
+  ],
+  "metrics": {
+    "accuracy": {
+      "decision": 71.43,
+      "value": 85.71
+    },
+    "by_decision": {
+      "STORE": {
+        "total": 8,
+        "correct": 6
+      },
+      "MERGE": {
+        "total": 2,
+        "correct": 2
+      },
+      "UPDATE": {
+        "total": 2,
+        "correct": 0
+      },
+      "IGNORE": {
+        "total": 2,
+        "correct": 2
+      }
+    },
+    "confusion_matrix": {
+      "STORE\u2192STORE": 6,
+      "MERGE\u2192MERGE": 2,
+      "UPDATE\u2192MERGE": 1,
+      "IGNORE\u2192IGNORE": 2,
+      "STORE\u2192IGNORE": 2,
+      "UPDATE\u2192STORE": 1
+    },
+    "summary": {
+      "total": 14,
+      "correct_decisions": 10,
+      "incorrect_decisions": 4
+    }
+  }
+}
