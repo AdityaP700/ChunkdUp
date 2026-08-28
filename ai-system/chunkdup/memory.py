@@ -179,20 +179,71 @@ class MemoryExtractor:
 
 
 class MemoryScorer:
-    """Scores memories based on type importance."""
+    """Scores memories based on type importance, frequency, and recency."""
 
-    def score(self, memory: Dict[str, Any]) -> float:
-        scores = {
+    def __init__(
+        self,
+        type_weight: float = 0.5,
+        freq_weight: float = 0.3,
+        recency_weight: float = 0.2,
+        type_weights: Optional[Dict[str, float]] = None
+    ):
+        self.type_weight = type_weight
+        self.freq_weight = freq_weight
+        self.recency_weight = recency_weight
+
+        self.type_weights = type_weights or {
             "project": 1.0,
             "preference": 0.9,
             "environment": 0.8,
             "tool": 0.7,
             "employment": 0.9,
-            "role": 0.8,
+            "role": 0.85,
             "learning": 0.8,
-            "question": 0.3
+            "favorite": 0.75,
+            "company": 0.9,
+            "os": 0.8,
+            "editor": 0.7,
+            "question": 0.3,
         }
-        return scores.get(memory.get("type"), 0.7)
+
+    def score(self, memory: Dict[str, Any]) -> float:
+        """
+        Calculate composite importance score.
+        
+        Factors:
+        - Type importance (what kind of memory)
+        - Frequency (how often mentioned)
+        - Recency (how recent)
+        """
+        # 1. Type importance (0.3 - 1.0)
+        type_score = self.type_weights.get(memory.get("type"), 0.5)
+
+        # 2. Frequency (log scale: 1->0, 10->0.5, 100->1.0)
+        freq = memory.get("frequency", 1)
+        freq_score = min(1.0, math.log10(freq + 1) / 2)
+
+        # 3. Recency (1 / (days_old + 1))
+        updated_at = memory.get("updated_at")
+        if updated_at:
+            if isinstance(updated_at, str):
+                try:
+                    updated_at = datetime.fromisoformat(updated_at.replace("Z", "+00:00"))
+                except Exception:
+                    updated_at = datetime.now(timezone.utc)
+            days_old = max(0, (datetime.now(timezone.utc) - updated_at).days)
+        else:
+            days_old = 30
+        recency_score = 1.0 / (days_old + 1.0)
+
+        # 4. Composite
+        composite = (
+            (type_score * self.type_weight) +
+            (freq_score * self.freq_weight) +
+            (recency_score * self.recency_weight)
+        )
+
+        return min(1.0, composite)
 
 
 class MemoryRanker:
@@ -245,11 +296,11 @@ class DecisionEngine:
 class MemoryManager:
     """Manages memory persistence pipeline based on scores and policy decisions."""
 
-    def __init__(self, repository: MemoryRepository, decision_engine: DecisionEngine, scorer: MemoryScorer):
+    def __init__(self, repository: MemoryRepository, decision_engine: DecisionEngine, scorer: MemoryScorer, threshold: float = 0.5):
         self.repository = repository
         self.engine = decision_engine
         self.scorer = scorer
-        self.threshold = 0.6
+        self.threshold = threshold
 
     def process(self, memory: Dict[str, Any]) -> Decision:
         importance = self.scorer.score(memory)
