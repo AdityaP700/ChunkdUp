@@ -1,9 +1,11 @@
 {
-  "version": "1.0",
+  "version": "2.0",
   "scenarios": [
     {
       "id": "001",
-      "conversation": ["I use Python for backend development"],
+      "conversation": [
+        "I use Python for backend development"
+      ],
       "expected_decision": "STORE",
       "expected_key": "programming_language",
       "expected_value": "Python",
@@ -11,7 +13,10 @@
     },
     {
       "id": "002",
-      "conversation": ["I use Python", "I use Python"],
+      "conversation": [
+        "I use Python",
+        "I use Python"
+      ],
       "expected_decision": "MERGE",
       "expected_key": "programming_language",
       "expected_value": "Python",
@@ -20,7 +25,10 @@
     },
     {
       "id": "003",
-      "conversation": ["I use Python", "I now use Go"],
+      "conversation": [
+        "I use Python",
+        "I now use Go"
+      ],
       "expected_decision": "UPDATE",
       "expected_key": "programming_language",
       "expected_value": "Go",
@@ -28,7 +36,9 @@
     },
     {
       "id": "004",
-      "conversation": ["Python is fast"],
+      "conversation": [
+        "Python is fast"
+      ],
       "expected_decision": "IGNORE",
       "expected_key": null,
       "expected_value": null,
@@ -36,7 +46,9 @@
     },
     {
       "id": "005",
-      "conversation": ["I'm building a web app called ChunkdUp"],
+      "conversation": [
+        "I'm building a web app called ChunkdUp"
+      ],
       "expected_decision": "STORE",
       "expected_key": "project_name",
       "expected_value": "ChunkdUp",
@@ -44,7 +56,10 @@
     },
     {
       "id": "006",
-      "conversation": ["I'm building ChunkdUp", "I'm building ChunkdUp in Python"],
+      "conversation": [
+        "I'm building ChunkdUp",
+        "I'm building ChunkdUp in Python"
+      ],
       "expected_decision": "UPDATE",
       "expected_key": "project_name",
       "expected_value": "ChunkdUp in Python",
@@ -52,7 +67,9 @@
     },
     {
       "id": "007",
-      "conversation": ["I prefer Neovim"],
+      "conversation": [
+        "I prefer Neovim"
+      ],
       "expected_decision": "STORE",
       "expected_key": "editor",
       "expected_value": "Neovim",
@@ -60,7 +77,9 @@
     },
     {
       "id": "008",
-      "conversation": ["It's raining outside"],
+      "conversation": [
+        "It's raining outside"
+      ],
       "expected_decision": "IGNORE",
       "expected_key": null,
       "expected_value": null,
@@ -68,7 +87,12 @@
     },
     {
       "id": "009",
-      "conversation": ["I use Python", "I use Python", "I use Python", "I use Python"],
+      "conversation": [
+        "I use Python",
+        "I use Python",
+        "I use Python",
+        "I use Python"
+      ],
       "expected_decision": "MERGE",
       "expected_key": "programming_language",
       "expected_value": "Python",
@@ -77,7 +101,9 @@
     },
     {
       "id": "010",
-      "conversation": ["I work at Google"],
+      "conversation": [
+        "I work at Google"
+      ],
       "expected_decision": "STORE",
       "expected_key": "company",
       "expected_value": "Google",
@@ -85,7 +111,9 @@
     },
     {
       "id": "011",
-      "conversation": ["I'm a software engineer"],
+      "conversation": [
+        "I'm a software engineer"
+      ],
       "expected_decision": "STORE",
       "expected_key": "role",
       "expected_value": "software engineer",
@@ -93,7 +121,9 @@
     },
     {
       "id": "012",
-      "conversation": ["My favorite language is Python"],
+      "conversation": [
+        "My favorite language is Python"
+      ],
       "expected_decision": "STORE",
       "expected_key": "favorite_language",
       "expected_value": "Python",
@@ -101,7 +131,9 @@
     },
     {
       "id": "013",
-      "conversation": ["I'm working on a project called X"],
+      "conversation": [
+        "I'm working on a project called X"
+      ],
       "expected_decision": "STORE",
       "expected_key": "project_name",
       "expected_value": "X",
@@ -109,11 +141,386 @@
     },
     {
       "id": "014",
-      "conversation": ["I'm learning Rust"],
+      "conversation": [
+        "I'm learning Rust"
+      ],
       "expected_decision": "STORE",
       "expected_key": "learning",
       "expected_value": "Rust",
       "reason": "Learning topic information"
+    },
+    {
+      "id": "015",
+      "conversation": [
+        "I use Mac"
+      ],
+      "expected_decision": "STORE",
+      "expected_key": "os",
+      "expected_value": "Mac",
+      "reason": "Operating system environment"
+    },
+    {
+      "id": "016",
+      "conversation": [
+        "I use Linux",
+        "I now use Windows"
+      ],
+      "expected_decision": "UPDATE",
+      "expected_key": "os",
+      "expected_value": "Windows",
+      "reason": "OS update from Linux to Windows"
+    },
+    {
+      "id": "017",
+      "conversation": [
+        "My favorite framework is React"
+      ],
+      "expected_decision": "STORE",
+      "expected_key": "favorite_framework",
+      "expected_value": "React",
+      "reason": "User framework preference"
+    },
+    {
+      "id": "018",
+      "conversation": [
+        "My favorite database is PostgreSQL"
+      ],
+      "expected_decision": "STORE",
+      "expected_key": "favorite_database",
+      "expected_value": "PostgreSQL",
+      "reason": "User database preference"
+    },
+    {
+      "id": "019",
+      "conversation": [
+        "I work at Netflix"
+      ],
+      "expected_decision": "STORE",
+      "expected_key": "company",
+      "expected_value": "Netflix",
+      "reason": "Employment company"
+    },
+    {
+      "id": "020",
+      "conversation": [
+        "I work at Amazon",
+        "I now work at Meta"
+      ],
+      "expected_decision": "UPDATE",
+      "expected_key": "company",
+      "expected_value": "Meta",
+      "reason": "Employment change from Amazon to Meta"
+    },
+    {
+      "id": "021",
+      "conversation": [
+        "I'm a DevOps engineer"
+      ],
+      "expected_decision": "STORE",
+      "expected_key": "role",
+      "expected_value": "DevOps engineer",
+      "reason": "Professional role"
+    },
+    {
+      "id": "022",
+      "conversation": [
+        "I'm a backend developer",
+        "I'm now a Lead Architect"
+      ],
+      "expected_decision": "UPDATE",
+      "expected_key": "role",
+      "expected_value": "Lead Architect",
+      "reason": "Role promotion/change"
+    },
+    {
+      "id": "023",
+      "conversation": [
+        "I'm learning Kubernetes"
+      ],
+      "expected_decision": "STORE",
+      "expected_key": "learning",
+      "expected_value": "Kubernetes",
+      "reason": "Learning topic"
+    },
+    {
+      "id": "024",
+      "conversation": [
+        "I'm learning PyTorch"
+      ],
+      "expected_decision": "STORE",
+      "expected_key": "learning",
+      "expected_value": "PyTorch",
+      "reason": "Learning framework topic"
+    },
+    {
+      "id": "025",
+      "conversation": [
+        "What time is it in Tokyo?"
+      ],
+      "expected_decision": "IGNORE",
+      "expected_key": null,
+      "expected_value": null,
+      "reason": "Question input, not personal fact"
+    },
+    {
+      "id": "026",
+      "conversation": [
+        "Paris is the capital of France"
+      ],
+      "expected_decision": "IGNORE",
+      "expected_key": null,
+      "expected_value": null,
+      "reason": "General trivia fact, not personal user memory"
+    },
+    {
+      "id": "027",
+      "conversation": [
+        "I prefer concise responses."
+      ],
+      "expected_decision": "STORE",
+      "expected_key": "response_style",
+      "expected_value": "concise responses",
+      "reason": "User output format preference"
+    },
+    {
+      "id": "028",
+      "conversation": [
+        "My favorite editor is VS Code."
+      ],
+      "expected_decision": "STORE",
+      "expected_key": "editor",
+      "expected_value": "VS Code",
+      "reason": "User editor tool preference"
+    },
+    {
+      "id": "029",
+      "conversation": [
+        "I'm working on a project called Aegis"
+      ],
+      "expected_decision": "STORE",
+      "expected_key": "project_name",
+      "expected_value": "Aegis",
+      "reason": "Project name extraction"
+    },
+    {
+      "id": "030",
+      "conversation": [
+        "I'm learning TypeScript"
+      ],
+      "expected_decision": "STORE",
+      "expected_key": "learning",
+      "expected_value": "TypeScript",
+      "reason": "Learning language topic"
+    },
+    {
+      "id": "031",
+      "conversation": [
+        "I use TypeScript"
+      ],
+      "expected_decision": "STORE",
+      "expected_key": "programming_language",
+      "expected_value": "TypeScript",
+      "reason": "Active language in stack"
+    },
+    {
+      "id": "032",
+      "conversation": [
+        "I use Docker"
+      ],
+      "expected_decision": "STORE",
+      "expected_key": "environment",
+      "expected_value": "Docker",
+      "reason": "Tool/environment infrastructure"
+    },
+    {
+      "id": "033",
+      "conversation": [
+        "I use AWS"
+      ],
+      "expected_decision": "STORE",
+      "expected_key": "cloud_provider",
+      "expected_value": "AWS",
+      "reason": "Cloud provider infrastructure"
+    },
+    {
+      "id": "034",
+      "conversation": [
+        "I work at Apple"
+      ],
+      "expected_decision": "STORE",
+      "expected_key": "company",
+      "expected_value": "Apple",
+      "reason": "Company employment"
+    },
+    {
+      "id": "035",
+      "conversation": [
+        "I'm a Machine Learning Engineer"
+      ],
+      "expected_decision": "STORE",
+      "expected_key": "role",
+      "expected_value": "Machine Learning Engineer",
+      "reason": "Job role title"
+    },
+    {
+      "id": "036",
+      "conversation": [
+        "My favorite color is Blue"
+      ],
+      "expected_decision": "STORE",
+      "expected_key": "favorite_color",
+      "expected_value": "Blue",
+      "reason": "Personal color preference"
+    },
+    {
+      "id": "037",
+      "conversation": [
+        "I'm building a CLI tool called FastLog"
+      ],
+      "expected_decision": "STORE",
+      "expected_key": "project_name",
+      "expected_value": "FastLog",
+      "reason": "Project creation statement"
+    },
+    {
+      "id": "038",
+      "conversation": [
+        "I use Java",
+        "I use Java"
+      ],
+      "expected_decision": "MERGE",
+      "expected_key": "programming_language",
+      "expected_value": "Java",
+      "expected_frequency": 2,
+      "reason": "Duplicate language assertion merge"
+    },
+    {
+      "id": "039",
+      "conversation": [
+        "I use Rust",
+        "I now use C++"
+      ],
+      "expected_decision": "UPDATE",
+      "expected_key": "programming_language",
+      "expected_value": "C++",
+      "reason": "Language preference transition to C++"
+    },
+    {
+      "id": "040",
+      "conversation": [
+        "The Earth revolves around the Sun"
+      ],
+      "expected_decision": "IGNORE",
+      "expected_key": null,
+      "expected_value": null,
+      "reason": "Scientific general knowledge"
+    },
+    {
+      "id": "041",
+      "conversation": [
+        "Hi, I'm a Data Scientist.",
+        "I work at Stripe.",
+        "I'm learning Julia"
+      ],
+      "expected_decision": "STORE",
+      "expected_key": "learning",
+      "expected_value": "Julia",
+      "reason": "Multi-turn conversation flow ending with learning topic assertion"
+    },
+    {
+      "id": "042",
+      "conversation": [
+        "I work at Microsoft",
+        "Can you help me format JSON?",
+        "I now work at OpenAI"
+      ],
+      "expected_decision": "UPDATE",
+      "expected_key": "company",
+      "expected_value": "OpenAI",
+      "reason": "Multi-turn update of company with context noise in between"
+    },
+    {
+      "id": "043",
+      "conversation": [
+        "I use Linux",
+        "I love open source software",
+        "I use Linux"
+      ],
+      "expected_decision": "MERGE",
+      "expected_key": "os",
+      "expected_value": "Linux",
+      "expected_frequency": 2,
+      "reason": "Multi-turn repeated OS claim"
+    },
+    {
+      "id": "044",
+      "conversation": [
+        "I'm learning GraphQL"
+      ],
+      "expected_decision": "STORE",
+      "expected_key": "learning",
+      "expected_value": "GraphQL",
+      "reason": "Learning API tech"
+    },
+    {
+      "id": "045",
+      "conversation": [
+        "My favorite food is Pizza"
+      ],
+      "expected_decision": "STORE",
+      "expected_key": "favorite_food",
+      "expected_value": "Pizza",
+      "reason": "User favorite food preference"
+    },
+    {
+      "id": "046",
+      "conversation": [
+        "I'm a Product Manager"
+      ],
+      "expected_decision": "STORE",
+      "expected_key": "role",
+      "expected_value": "Product Manager",
+      "reason": "Product role title"
+    },
+    {
+      "id": "047",
+      "conversation": [
+        "How do I declare a variable in Python?"
+      ],
+      "expected_decision": "IGNORE",
+      "expected_key": null,
+      "expected_value": null,
+      "reason": "User programming query"
+    },
+    {
+      "id": "048",
+      "conversation": [
+        "I prefer dark mode."
+      ],
+      "expected_decision": "STORE",
+      "expected_key": "preference",
+      "expected_value": "dark mode",
+      "reason": "UI theme preference"
+    },
+    {
+      "id": "049",
+      "conversation": [
+        "I'm working on a project called Nexus"
+      ],
+      "expected_decision": "STORE",
+      "expected_key": "project_name",
+      "expected_value": "Nexus",
+      "reason": "Project creation assertion"
+    },
+    {
+      "id": "050",
+      "conversation": [
+        "I work at GitHub"
+      ],
+      "expected_decision": "STORE",
+      "expected_key": "company",
+      "expected_value": "GitHub",
+      "reason": "Company employment assertion"
     }
   ]
 }

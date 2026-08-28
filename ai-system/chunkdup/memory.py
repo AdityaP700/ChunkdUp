@@ -64,19 +64,37 @@ class MemoryExtractor:
                 "value_group": 1
             },
             {
+                "pattern": r"I prefer (dark mode|light mode)",
+                "type": "preference",
+                "key": "preference",
+                "value_group": 1
+            },
+            {
                 "pattern": r"I prefer ([\w\s]+?)(?:\.|$)",
                 "type": "preference",
                 "key": "response_style",
                 "value_group": 1
             },
             {
-                "pattern": r"I use (Windows|Mac|Linux)",
+                "pattern": r"I (?:now\s+)?use (Windows|Mac|Linux)",
                 "type": "environment",
                 "key": "os",
                 "value_group": 1
             },
             {
-                "pattern": r"I (?:now\s+)?use (Python|Java|C\+\+|Rust|Go)",
+                "pattern": r"I (?:now\s+)?use (AWS|Azure|GCP)",
+                "type": "environment",
+                "key": "cloud_provider",
+                "value_group": 1
+            },
+            {
+                "pattern": r"I (?:now\s+)?use (Docker|Kubernetes)",
+                "type": "environment",
+                "key": "environment",
+                "value_group": 1
+            },
+            {
+                "pattern": r"I (?:now\s+)?use (Python|Java|C\+\+|Rust|Go|TypeScript|JavaScript)",
                 "type": "environment",
                 "key": "programming_language",
                 "value_group": 1
@@ -88,13 +106,13 @@ class MemoryExtractor:
                 "value_group": 1
             },
             {
-                "pattern": r"I work at ([\w\s]+?)(?:\.|$)",
+                "pattern": r"I (?:now\s+)?work at ([\w\s]+?)(?:\.|$)",
                 "type": "employment",
                 "key": "company",
                 "value_group": 1
             },
             {
-                "pattern": r"I'm a ([\w\s]+?)(?:\.|$)",
+                "pattern": r"I'm (?:now\s+)?a ([\w\s]+?)(?:\.|$)",
                 "type": "role",
                 "key": "role",
                 "value_group": 1

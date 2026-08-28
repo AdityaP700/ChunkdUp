@@ -1,6 +1,6 @@
 {
-  "timestamp": "2026-08-29T01:04:43.202592",
-  "total_scenarios": 14,
+  "timestamp": "2026-08-29T01:09:15.875391",
+  "total_scenarios": 50,
   "results": [
     {
       "scenario_id": "001",
@@ -329,6 +329,845 @@
         "value": true
       },
       "reason": "Learning topic information"
+    },
+    {
+      "scenario_id": "015",
+      "input": [
+        "I use Mac"
+      ],
+      "expected": {
+        "decision": "STORE",
+        "key": "os",
+        "value": "Mac",
+        "frequency": 1
+      },
+      "actual": {
+        "decision": "STORE",
+        "memory_found": true,
+        "memory_value": "Mac",
+        "frequency": 1
+      },
+      "correct": {
+        "decision": true,
+        "value": true
+      },
+      "reason": "Operating system environment"
+    },
+    {
+      "scenario_id": "016",
+      "input": [
+        "I use Linux",
+        "I now use Windows"
+      ],
+      "expected": {
+        "decision": "UPDATE",
+        "key": "os",
+        "value": "Windows",
+        "frequency": 1
+      },
+      "actual": {
+        "decision": "UPDATE",
+        "memory_found": true,
+        "memory_value": "Windows",
+        "frequency": 1
+      },
+      "correct": {
+        "decision": true,
+        "value": true
+      },
+      "reason": "OS update from Linux to Windows"
+    },
+    {
+      "scenario_id": "017",
+      "input": [
+        "My favorite framework is React"
+      ],
+      "expected": {
+        "decision": "STORE",
+        "key": "favorite_framework",
+        "value": "React",
+        "frequency": 1
+      },
+      "actual": {
+        "decision": "STORE",
+        "memory_found": true,
+        "memory_value": "React",
+        "frequency": 1
+      },
+      "correct": {
+        "decision": true,
+        "value": true
+      },
+      "reason": "User framework preference"
+    },
+    {
+      "scenario_id": "018",
+      "input": [
+        "My favorite database is PostgreSQL"
+      ],
+      "expected": {
+        "decision": "STORE",
+        "key": "favorite_database",
+        "value": "PostgreSQL",
+        "frequency": 1
+      },
+      "actual": {
+        "decision": "STORE",
+        "memory_found": true,
+        "memory_value": "PostgreSQL",
+        "frequency": 1
+      },
+      "correct": {
+        "decision": true,
+        "value": true
+      },
+      "reason": "User database preference"
+    },
+    {
+      "scenario_id": "019",
+      "input": [
+        "I work at Netflix"
+      ],
+      "expected": {
+        "decision": "STORE",
+        "key": "company",
+        "value": "Netflix",
+        "frequency": 1
+      },
+      "actual": {
+        "decision": "STORE",
+        "memory_found": true,
+        "memory_value": "Netflix",
+        "frequency": 1
+      },
+      "correct": {
+        "decision": true,
+        "value": true
+      },
+      "reason": "Employment company"
+    },
+    {
+      "scenario_id": "020",
+      "input": [
+        "I work at Amazon",
+        "I now work at Meta"
+      ],
+      "expected": {
+        "decision": "UPDATE",
+        "key": "company",
+        "value": "Meta",
+        "frequency": 1
+      },
+      "actual": {
+        "decision": "UPDATE",
+        "memory_found": true,
+        "memory_value": "Meta",
+        "frequency": 1
+      },
+      "correct": {
+        "decision": true,
+        "value": true
+      },
+      "reason": "Employment change from Amazon to Meta"
+    },
+    {
+      "scenario_id": "021",
+      "input": [
+        "I'm a DevOps engineer"
+      ],
+      "expected": {
+        "decision": "STORE",
+        "key": "role",
+        "value": "DevOps engineer",
+        "frequency": 1
+      },
+      "actual": {
+        "decision": "STORE",
+        "memory_found": true,
+        "memory_value": "DevOps engineer",
+        "frequency": 1
+      },
+      "correct": {
+        "decision": true,
+        "value": true
+      },
+      "reason": "Professional role"
+    },
+    {
+      "scenario_id": "022",
+      "input": [
+        "I'm a backend developer",
+        "I'm now a Lead Architect"
+      ],
+      "expected": {
+        "decision": "UPDATE",
+        "key": "role",
+        "value": "Lead Architect",
+        "frequency": 1
+      },
+      "actual": {
+        "decision": "UPDATE",
+        "memory_found": true,
+        "memory_value": "Lead Architect",
+        "frequency": 1
+      },
+      "correct": {
+        "decision": true,
+        "value": true
+      },
+      "reason": "Role promotion/change"
+    },
+    {
+      "scenario_id": "023",
+      "input": [
+        "I'm learning Kubernetes"
+      ],
+      "expected": {
+        "decision": "STORE",
+        "key": "learning",
+        "value": "Kubernetes",
+        "frequency": 1
+      },
+      "actual": {
+        "decision": "STORE",
+        "memory_found": true,
+        "memory_value": "Kubernetes",
+        "frequency": 1
+      },
+      "correct": {
+        "decision": true,
+        "value": true
+      },
+      "reason": "Learning topic"
+    },
+    {
+      "scenario_id": "024",
+      "input": [
+        "I'm learning PyTorch"
+      ],
+      "expected": {
+        "decision": "STORE",
+        "key": "learning",
+        "value": "PyTorch",
+        "frequency": 1
+      },
+      "actual": {
+        "decision": "STORE",
+        "memory_found": true,
+        "memory_value": "PyTorch",
+        "frequency": 1
+      },
+      "correct": {
+        "decision": true,
+        "value": true
+      },
+      "reason": "Learning framework topic"
+    },
+    {
+      "scenario_id": "025",
+      "input": [
+        "What time is it in Tokyo?"
+      ],
+      "expected": {
+        "decision": "IGNORE",
+        "key": null,
+        "value": null,
+        "frequency": 1
+      },
+      "actual": {
+        "decision": "IGNORE",
+        "memory_found": false,
+        "memory_value": null,
+        "frequency": 0
+      },
+      "correct": {
+        "decision": true,
+        "value": true
+      },
+      "reason": "Question input, not personal fact"
+    },
+    {
+      "scenario_id": "026",
+      "input": [
+        "Paris is the capital of France"
+      ],
+      "expected": {
+        "decision": "IGNORE",
+        "key": null,
+        "value": null,
+        "frequency": 1
+      },
+      "actual": {
+        "decision": "IGNORE",
+        "memory_found": false,
+        "memory_value": null,
+        "frequency": 0
+      },
+      "correct": {
+        "decision": true,
+        "value": true
+      },
+      "reason": "General trivia fact, not personal user memory"
+    },
+    {
+      "scenario_id": "027",
+      "input": [
+        "I prefer concise responses."
+      ],
+      "expected": {
+        "decision": "STORE",
+        "key": "response_style",
+        "value": "concise responses",
+        "frequency": 1
+      },
+      "actual": {
+        "decision": "STORE",
+        "memory_found": true,
+        "memory_value": "concise responses",
+        "frequency": 1
+      },
+      "correct": {
+        "decision": true,
+        "value": true
+      },
+      "reason": "User output format preference"
+    },
+    {
+      "scenario_id": "028",
+      "input": [
+        "My favorite editor is VS Code."
+      ],
+      "expected": {
+        "decision": "STORE",
+        "key": "editor",
+        "value": "VS Code",
+        "frequency": 1
+      },
+      "actual": {
+        "decision": "STORE",
+        "memory_found": true,
+        "memory_value": "VS Code",
+        "frequency": 1
+      },
+      "correct": {
+        "decision": true,
+        "value": true
+      },
+      "reason": "User editor tool preference"
+    },
+    {
+      "scenario_id": "029",
+      "input": [
+        "I'm working on a project called Aegis"
+      ],
+      "expected": {
+        "decision": "STORE",
+        "key": "project_name",
+        "value": "Aegis",
+        "frequency": 1
+      },
+      "actual": {
+        "decision": "STORE",
+        "memory_found": true,
+        "memory_value": "Aegis",
+        "frequency": 1
+      },
+      "correct": {
+        "decision": true,
+        "value": true
+      },
+      "reason": "Project name extraction"
+    },
+    {
+      "scenario_id": "030",
+      "input": [
+        "I'm learning TypeScript"
+      ],
+      "expected": {
+        "decision": "STORE",
+        "key": "learning",
+        "value": "TypeScript",
+        "frequency": 1
+      },
+      "actual": {
+        "decision": "STORE",
+        "memory_found": true,
+        "memory_value": "TypeScript",
+        "frequency": 1
+      },
+      "correct": {
+        "decision": true,
+        "value": true
+      },
+      "reason": "Learning language topic"
+    },
+    {
+      "scenario_id": "031",
+      "input": [
+        "I use TypeScript"
+      ],
+      "expected": {
+        "decision": "STORE",
+        "key": "programming_language",
+        "value": "TypeScript",
+        "frequency": 1
+      },
+      "actual": {
+        "decision": "STORE",
+        "memory_found": true,
+        "memory_value": "TypeScript",
+        "frequency": 1
+      },
+      "correct": {
+        "decision": true,
+        "value": true
+      },
+      "reason": "Active language in stack"
+    },
+    {
+      "scenario_id": "032",
+      "input": [
+        "I use Docker"
+      ],
+      "expected": {
+        "decision": "STORE",
+        "key": "environment",
+        "value": "Docker",
+        "frequency": 1
+      },
+      "actual": {
+        "decision": "STORE",
+        "memory_found": true,
+        "memory_value": "Docker",
+        "frequency": 1
+      },
+      "correct": {
+        "decision": true,
+        "value": true
+      },
+      "reason": "Tool/environment infrastructure"
+    },
+    {
+      "scenario_id": "033",
+      "input": [
+        "I use AWS"
+      ],
+      "expected": {
+        "decision": "STORE",
+        "key": "cloud_provider",
+        "value": "AWS",
+        "frequency": 1
+      },
+      "actual": {
+        "decision": "STORE",
+        "memory_found": true,
+        "memory_value": "AWS",
+        "frequency": 1
+      },
+      "correct": {
+        "decision": true,
+        "value": true
+      },
+      "reason": "Cloud provider infrastructure"
+    },
+    {
+      "scenario_id": "034",
+      "input": [
+        "I work at Apple"
+      ],
+      "expected": {
+        "decision": "STORE",
+        "key": "company",
+        "value": "Apple",
+        "frequency": 1
+      },
+      "actual": {
+        "decision": "STORE",
+        "memory_found": true,
+        "memory_value": "Apple",
+        "frequency": 1
+      },
+      "correct": {
+        "decision": true,
+        "value": true
+      },
+      "reason": "Company employment"
+    },
+    {
+      "scenario_id": "035",
+      "input": [
+        "I'm a Machine Learning Engineer"
+      ],
+      "expected": {
+        "decision": "STORE",
+        "key": "role",
+        "value": "Machine Learning Engineer",
+        "frequency": 1
+      },
+      "actual": {
+        "decision": "STORE",
+        "memory_found": true,
+        "memory_value": "Machine Learning Engineer",
+        "frequency": 1
+      },
+      "correct": {
+        "decision": true,
+        "value": true
+      },
+      "reason": "Job role title"
+    },
+    {
+      "scenario_id": "036",
+      "input": [
+        "My favorite color is Blue"
+      ],
+      "expected": {
+        "decision": "STORE",
+        "key": "favorite_color",
+        "value": "Blue",
+        "frequency": 1
+      },
+      "actual": {
+        "decision": "STORE",
+        "memory_found": true,
+        "memory_value": "Blue",
+        "frequency": 1
+      },
+      "correct": {
+        "decision": true,
+        "value": true
+      },
+      "reason": "Personal color preference"
+    },
+    {
+      "scenario_id": "037",
+      "input": [
+        "I'm building a CLI tool called FastLog"
+      ],
+      "expected": {
+        "decision": "STORE",
+        "key": "project_name",
+        "value": "FastLog",
+        "frequency": 1
+      },
+      "actual": {
+        "decision": "STORE",
+        "memory_found": true,
+        "memory_value": "FastLog",
+        "frequency": 1
+      },
+      "correct": {
+        "decision": true,
+        "value": true
+      },
+      "reason": "Project creation statement"
+    },
+    {
+      "scenario_id": "038",
+      "input": [
+        "I use Java",
+        "I use Java"
+      ],
+      "expected": {
+        "decision": "MERGE",
+        "key": "programming_language",
+        "value": "Java",
+        "frequency": 2
+      },
+      "actual": {
+        "decision": "MERGE",
+        "memory_found": true,
+        "memory_value": "Java",
+        "frequency": 2
+      },
+      "correct": {
+        "decision": true,
+        "value": true
+      },
+      "reason": "Duplicate language assertion merge"
+    },
+    {
+      "scenario_id": "039",
+      "input": [
+        "I use Rust",
+        "I now use C++"
+      ],
+      "expected": {
+        "decision": "UPDATE",
+        "key": "programming_language",
+        "value": "C++",
+        "frequency": 1
+      },
+      "actual": {
+        "decision": "UPDATE",
+        "memory_found": true,
+        "memory_value": "C++",
+        "frequency": 1
+      },
+      "correct": {
+        "decision": true,
+        "value": true
+      },
+      "reason": "Language preference transition to C++"
+    },
+    {
+      "scenario_id": "040",
+      "input": [
+        "The Earth revolves around the Sun"
+      ],
+      "expected": {
+        "decision": "IGNORE",
+        "key": null,
+        "value": null,
+        "frequency": 1
+      },
+      "actual": {
+        "decision": "IGNORE",
+        "memory_found": false,
+        "memory_value": null,
+        "frequency": 0
+      },
+      "correct": {
+        "decision": true,
+        "value": true
+      },
+      "reason": "Scientific general knowledge"
+    },
+    {
+      "scenario_id": "041",
+      "input": [
+        "Hi, I'm a Data Scientist.",
+        "I work at Stripe.",
+        "I'm learning Julia"
+      ],
+      "expected": {
+        "decision": "STORE",
+        "key": "learning",
+        "value": "Julia",
+        "frequency": 1
+      },
+      "actual": {
+        "decision": "STORE",
+        "memory_found": true,
+        "memory_value": "Julia",
+        "frequency": 1
+      },
+      "correct": {
+        "decision": true,
+        "value": true
+      },
+      "reason": "Multi-turn conversation flow ending with learning topic assertion"
+    },
+    {
+      "scenario_id": "042",
+      "input": [
+        "I work at Microsoft",
+        "Can you help me format JSON?",
+        "I now work at OpenAI"
+      ],
+      "expected": {
+        "decision": "UPDATE",
+        "key": "company",
+        "value": "OpenAI",
+        "frequency": 1
+      },
+      "actual": {
+        "decision": "UPDATE",
+        "memory_found": true,
+        "memory_value": "OpenAI",
+        "frequency": 1
+      },
+      "correct": {
+        "decision": true,
+        "value": true
+      },
+      "reason": "Multi-turn update of company with context noise in between"
+    },
+    {
+      "scenario_id": "043",
+      "input": [
+        "I use Linux",
+        "I love open source software",
+        "I use Linux"
+      ],
+      "expected": {
+        "decision": "MERGE",
+        "key": "os",
+        "value": "Linux",
+        "frequency": 2
+      },
+      "actual": {
+        "decision": "MERGE",
+        "memory_found": true,
+        "memory_value": "Linux",
+        "frequency": 2
+      },
+      "correct": {
+        "decision": true,
+        "value": true
+      },
+      "reason": "Multi-turn repeated OS claim"
+    },
+    {
+      "scenario_id": "044",
+      "input": [
+        "I'm learning GraphQL"
+      ],
+      "expected": {
+        "decision": "STORE",
+        "key": "learning",
+        "value": "GraphQL",
+        "frequency": 1
+      },
+      "actual": {
+        "decision": "STORE",
+        "memory_found": true,
+        "memory_value": "GraphQL",
+        "frequency": 1
+      },
+      "correct": {
+        "decision": true,
+        "value": true
+      },
+      "reason": "Learning API tech"
+    },
+    {
+      "scenario_id": "045",
+      "input": [
+        "My favorite food is Pizza"
+      ],
+      "expected": {
+        "decision": "STORE",
+        "key": "favorite_food",
+        "value": "Pizza",
+        "frequency": 1
+      },
+      "actual": {
+        "decision": "STORE",
+        "memory_found": true,
+        "memory_value": "Pizza",
+        "frequency": 1
+      },
+      "correct": {
+        "decision": true,
+        "value": true
+      },
+      "reason": "User favorite food preference"
+    },
+    {
+      "scenario_id": "046",
+      "input": [
+        "I'm a Product Manager"
+      ],
+      "expected": {
+        "decision": "STORE",
+        "key": "role",
+        "value": "Product Manager",
+        "frequency": 1
+      },
+      "actual": {
+        "decision": "STORE",
+        "memory_found": true,
+        "memory_value": "Product Manager",
+        "frequency": 1
+      },
+      "correct": {
+        "decision": true,
+        "value": true
+      },
+      "reason": "Product role title"
+    },
+    {
+      "scenario_id": "047",
+      "input": [
+        "How do I declare a variable in Python?"
+      ],
+      "expected": {
+        "decision": "IGNORE",
+        "key": null,
+        "value": null,
+        "frequency": 1
+      },
+      "actual": {
+        "decision": "IGNORE",
+        "memory_found": false,
+        "memory_value": null,
+        "frequency": 0
+      },
+      "correct": {
+        "decision": true,
+        "value": true
+      },
+      "reason": "User programming query"
+    },
+    {
+      "scenario_id": "048",
+      "input": [
+        "I prefer dark mode."
+      ],
+      "expected": {
+        "decision": "STORE",
+        "key": "preference",
+        "value": "dark mode",
+        "frequency": 1
+      },
+      "actual": {
+        "decision": "STORE",
+        "memory_found": true,
+        "memory_value": "dark mode",
+        "frequency": 1
+      },
+      "correct": {
+        "decision": true,
+        "value": true
+      },
+      "reason": "UI theme preference"
+    },
+    {
+      "scenario_id": "049",
+      "input": [
+        "I'm working on a project called Nexus"
+      ],
+      "expected": {
+        "decision": "STORE",
+        "key": "project_name",
+        "value": "Nexus",
+        "frequency": 1
+      },
+      "actual": {
+        "decision": "STORE",
+        "memory_found": true,
+        "memory_value": "Nexus",
+        "frequency": 1
+      },
+      "correct": {
+        "decision": true,
+        "value": true
+      },
+      "reason": "Project creation assertion"
+    },
+    {
+      "scenario_id": "050",
+      "input": [
+        "I work at GitHub"
+      ],
+      "expected": {
+        "decision": "STORE",
+        "key": "company",
+        "value": "GitHub",
+        "frequency": 1
+      },
+      "actual": {
+        "decision": "STORE",
+        "memory_found": true,
+        "memory_value": "GitHub",
+        "frequency": 1
+      },
+      "correct": {
+        "decision": true,
+        "value": true
+      },
+      "reason": "Company employment assertion"
     }
   ],
   "metrics": {
@@ -338,31 +1177,31 @@
     },
     "by_decision": {
       "STORE": {
-        "total": 8,
-        "correct": 8
+        "total": 33,
+        "correct": 33
       },
       "MERGE": {
-        "total": 2,
-        "correct": 2
+        "total": 4,
+        "correct": 4
       },
       "UPDATE": {
-        "total": 2,
-        "correct": 2
+        "total": 7,
+        "correct": 7
       },
       "IGNORE": {
-        "total": 2,
-        "correct": 2
+        "total": 6,
+        "correct": 6
       }
     },
     "confusion_matrix": {
-      "STORE\u2192STORE": 8,
-      "MERGE\u2192MERGE": 2,
-      "UPDATE\u2192UPDATE": 2,
-      "IGNORE\u2192IGNORE": 2
+      "STORE\u2192STORE": 33,
+      "MERGE\u2192MERGE": 4,
+      "UPDATE\u2192UPDATE": 7,
+      "IGNORE\u2192IGNORE": 6
     },
     "summary": {
-      "total": 14,
-      "correct_decisions": 14,
+      "total": 50,
+      "correct_decisions": 50,
       "incorrect_decisions": 0
     }
   }
