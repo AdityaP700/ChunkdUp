@@ -8,7 +8,8 @@ import importlib.util
 from datetime import datetime, timezone
 from typing import List, Dict, Any, Optional
 import logging
-
+from .repository import MemoryRepository
+from .in_memory_repository import InMemoryRepository
 # Configure logging
 logging.basicConfig(level=logging.INFO)
 logger = logging.getLogger(__name__)
@@ -210,16 +211,16 @@ class MemoryManager:
             return
 
         memory["importance"] = importance
-        existing = self.repository.find_active_by_key(memory["key"])
+        existing = self.repository.get_by_key(memory["key"])
         decision = self.engine.decide(existing, memory)
 
         if decision == Decision.STORE:
-            self.repository.add(memory)
+            self.repository.save(memory)
             logger.info(f"Stored new memory: {memory['key']} = {memory['value']}")
         elif decision == Decision.IGNORE:
             logger.info(f"Ignored duplicate memory: {memory['key']}")
         elif decision == Decision.MERGE:
-            self.repository.merge(existing, memory)
+            self.repository.merge(memory["key"], memory)
             logger.info(f"Merged duplicate memory (increased frequency): {memory['key']}")
         elif decision == Decision.UPDATE:
             self.repository.update(memory)
@@ -236,7 +237,7 @@ class Memory:
     """
 
     def __init__(self, data_dir: Optional[str] = None, llm_provider: str = "gemini",
-                 labs_dir: Optional[str] = None):
+                 labs_dir: Optional[str] = None,repository : Optional[MemoryRepository] = None):
         """
         Initialize the Memory system with all internal components.
 
@@ -273,7 +274,7 @@ class Memory:
         self.memory_path = os.path.join(data_dir, "memory.json")
 
         # Initialize all internal components
-        self.repository = MemoryRepository(self.memory_path)
+        self.repository = repository or InMemoryRepository()
         self.decision_engine = DecisionEngine()
         self.scorer = MemoryScorer()
         self.manager = MemoryManager(self.repository, self.decision_engine, self.scorer)
