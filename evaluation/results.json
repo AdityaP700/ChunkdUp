@@ -1,5 +1,5 @@
 {
-  "timestamp": "2026-08-29T00:55:42.975783",
+  "timestamp": "2026-08-29T01:04:43.202592",
   "total_scenarios": 14,
   "results": [
     {
@@ -41,7 +41,7 @@
         "decision": "MERGE",
         "memory_found": true,
         "memory_value": "Python",
-        "frequency": 3
+        "frequency": 2
       },
       "correct": {
         "decision": true,
@@ -62,14 +62,14 @@
         "frequency": 1
       },
       "actual": {
-        "decision": "MERGE",
+        "decision": "UPDATE",
         "memory_found": true,
-        "memory_value": "Python",
-        "frequency": 2
+        "memory_value": "Go",
+        "frequency": 1
       },
       "correct": {
-        "decision": false,
-        "value": false
+        "decision": true,
+        "value": true
       },
       "reason": "Changed from Python to Go"
     },
@@ -108,13 +108,13 @@
         "frequency": 1
       },
       "actual": {
-        "decision": "IGNORE",
-        "memory_found": false,
-        "memory_value": null,
-        "frequency": 0
+        "decision": "STORE",
+        "memory_found": true,
+        "memory_value": "ChunkdUp",
+        "frequency": 1
       },
       "correct": {
-        "decision": false,
+        "decision": true,
         "value": true
       },
       "reason": "Project information should be stored"
@@ -132,14 +132,14 @@
         "frequency": 1
       },
       "actual": {
-        "decision": "STORE",
+        "decision": "UPDATE",
         "memory_found": true,
-        "memory_value": "ChunkdUp",
+        "memory_value": "ChunkdUp in Python",
         "frequency": 1
       },
       "correct": {
-        "decision": false,
-        "value": false
+        "decision": true,
+        "value": true
       },
       "reason": "Added context to existing memory"
     },
@@ -155,13 +155,13 @@
         "frequency": 1
       },
       "actual": {
-        "decision": "IGNORE",
-        "memory_found": false,
-        "memory_value": null,
-        "frequency": 0
+        "decision": "STORE",
+        "memory_found": true,
+        "memory_value": "Neovim",
+        "frequency": 1
       },
       "correct": {
-        "decision": false,
+        "decision": true,
         "value": true
       },
       "reason": "User preference"
@@ -207,7 +207,7 @@
         "decision": "MERGE",
         "memory_found": true,
         "memory_value": "Python",
-        "frequency": 10
+        "frequency": 4
       },
       "correct": {
         "decision": true,
@@ -333,13 +333,13 @@
   ],
   "metrics": {
     "accuracy": {
-      "decision": 71.43,
-      "value": 85.71
+      "decision": 100.0,
+      "value": 100.0
     },
     "by_decision": {
       "STORE": {
         "total": 8,
-        "correct": 6
+        "correct": 8
       },
       "MERGE": {
         "total": 2,
@@ -347,7 +347,7 @@
       },
       "UPDATE": {
         "total": 2,
-        "correct": 0
+        "correct": 2
       },
       "IGNORE": {
         "total": 2,
@@ -355,17 +355,15 @@
       }
     },
     "confusion_matrix": {
-      "STORE\u2192STORE": 6,
+      "STORE\u2192STORE": 8,
       "MERGE\u2192MERGE": 2,
-      "UPDATE\u2192MERGE": 1,
-      "IGNORE\u2192IGNORE": 2,
-      "STORE\u2192IGNORE": 2,
-      "UPDATE\u2192STORE": 1
+      "UPDATE\u2192UPDATE": 2,
+      "IGNORE\u2192IGNORE": 2
     },
     "summary": {
       "total": 14,
-      "correct_decisions": 10,
-      "incorrect_decisions": 4
+      "correct_decisions": 14,
+      "incorrect_decisions": 0
     }
   }
 }

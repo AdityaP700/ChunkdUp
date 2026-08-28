@@ -31,8 +31,11 @@ class MemoryEvaluator:
         self.memory.clear()
 
         # Process each conversation line
+        step_decisions = []
         for line in scenario["conversation"]:
-            self.memory.remember(line)
+            res = self.memory.remember(line)
+            for m in res.get("memories", []):
+                step_decisions.append(m)
 
         # Get actual results
         all_memories = self.memory.get_all()
@@ -41,7 +44,8 @@ class MemoryEvaluator:
         actual_decision = self._determine_decision(
             all_memories,
             scenario.get("expected_key"),
-            scenario.get("expected_value")
+            scenario.get("expected_value"),
+            step_decisions=step_decisions
         )
 
         # Check if expected memory exists
@@ -80,13 +84,25 @@ class MemoryEvaluator:
         self,
         memories: List[Dict],
         expected_key: Optional[str],
-        expected_value: Optional[str] = None
+        expected_value: Optional[str] = None,
+        step_decisions: Optional[List[Dict]] = None
     ) -> str:
-        """Infer what decision was made based on memory state."""
+        """Infer what decision was made based on step decisions and memory state."""
+        if step_decisions and expected_key:
+            # Check decisions for expected key in reverse order (most recent action)
+            for step in reversed(step_decisions):
+                if step.get("key") == expected_key:
+                    return step.get("decision", "STORE")
+
+        if step_decisions:
+            non_ignore = [s for s in step_decisions if s.get("decision") != "IGNORE"]
+            if not non_ignore:
+                return "IGNORE"
+            return non_ignore[-1].get("decision", "STORE")
+
         if not memories:
             return "IGNORE"
 
-        # Check if expected key exists
         if expected_key:
             for m in memories:
                 if m.get("key") == expected_key:
@@ -94,11 +110,7 @@ class MemoryEvaluator:
                         return "MERGE"
                     return "STORE"
 
-        # Check if any memory exists
-        if memories:
-            return "STORE"
-
-        return "IGNORE"
+        return "STORE"
 
     def _find_memory(self, memories: List[Dict], key: Optional[str]) -> Optional[Dict]:
         """Find a memory by key."""

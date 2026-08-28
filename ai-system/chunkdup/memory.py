@@ -27,23 +27,29 @@ try:
     from .policies import Decision, PolicyFactory
     from .prompt_builder import PromptBuilder
     from .retrieval_class import MemoryRetriever
+    from .spacy_extractor import SpacyExtractor
+    from .llm_extractor import LLMExtractor
 except ImportError:
     from policies import Decision, PolicyFactory
     from prompt_builder import PromptBuilder
     from retrieval_class import MemoryRetriever
+    from spacy_extractor import SpacyExtractor
+    from llm_extractor import LLMExtractor
 
 
 class MemoryExtractor:
-    """Extracts structured memories from text using pattern rules."""
+    """Extracts structured memories from text using pattern rules, spaCy NER, and LLM fallback."""
 
-    def __init__(self):
+    def __init__(self, llm_caller=None):
+        self.spacy_extractor = SpacyExtractor()
+        self.llm_extractor = LLMExtractor(llm_caller=llm_caller)
+
         self.rules = [
             {
-                "pattern": r"I'm building ([\w\d\-]+) in ([\w\d\+#]+)",
+                "pattern": r"I'm building (?:a\s+[\w\s]+?\s+called\s+)?([\w\d\-\s]+)",
                 "type": "project",
                 "key": "project_name",
-                "value_group": 1,
-                "meta": {"language": 2}
+                "value_group": 1
             },
             {
                 "pattern": r"I'm working on a project called ([\w\d\-\s]+)",
@@ -52,7 +58,13 @@ class MemoryExtractor:
                 "value_group": 1
             },
             {
-                "pattern": r"I prefer ([\w\s]+?)\.",
+                "pattern": r"I prefer (Neovim|Vim|VS Code|VSCode|Emacs|Sublime)(?:\.|$)",
+                "type": "tool",
+                "key": "editor",
+                "value_group": 1
+            },
+            {
+                "pattern": r"I prefer ([\w\s]+?)(?:\.|$)",
                 "type": "preference",
                 "key": "response_style",
                 "value_group": 1
@@ -64,37 +76,37 @@ class MemoryExtractor:
                 "value_group": 1
             },
             {
-                "pattern": r"I use (Python|Java|C\+\+|Rust|Go)",
+                "pattern": r"I (?:now\s+)?use (Python|Java|C\+\+|Rust|Go)",
                 "type": "environment",
                 "key": "programming_language",
                 "value_group": 1
             },
             {
-                "pattern": r"My favorite editor is ([\w\s]+?)\.",
+                "pattern": r"My favorite editor is ([\w\s]+?)(?:\.|$)",
                 "type": "tool",
                 "key": "editor",
                 "value_group": 1
             },
             {
-                "pattern": r"I work at ([\w\s]+)",
+                "pattern": r"I work at ([\w\s]+?)(?:\.|$)",
                 "type": "employment",
                 "key": "company",
                 "value_group": 1
             },
             {
-                "pattern": r"I'm a ([\w\s]+)",
+                "pattern": r"I'm a ([\w\s]+?)(?:\.|$)",
                 "type": "role",
                 "key": "role",
                 "value_group": 1
             },
             {
-                "pattern": r"My favorite ([\w\s]+) is ([\w\s]+)",
+                "pattern": r"My favorite ([\w\s]+) is ([\w\s]+?)(?:\.|$)",
                 "type": "preference",
                 "key": "favorite_{1}",
                 "value_group": 2
             },
             {
-                "pattern": r"I'm learning ([\w\d\+#\s]+)",
+                "pattern": r"I'm learning ([\w\d\+#\s]+?)(?:\.|$)",
                 "type": "learning",
                 "key": "learning",
                 "value_group": 1
@@ -102,6 +114,22 @@ class MemoryExtractor:
         ]
 
     def extract(self, conversation: str) -> List[Dict[str, Any]]:
+        # Tier 1: Pattern Rule Extraction
+        memories = self._extract_with_rules(conversation)
+        if memories:
+            return memories
+
+        # Tier 2: spaCy NER Extraction
+        if self.spacy_extractor.is_available():
+            memories = self.spacy_extractor.extract(conversation)
+            if memories:
+                return memories
+
+        # Tier 3: LLM Fallback Extraction
+        memories = self.llm_extractor.extract(conversation)
+        return memories
+
+    def _extract_with_rules(self, conversation: str) -> List[Dict[str, Any]]:
         memories = []
         for rule in self.rules:
             matches = re.finditer(rule["pattern"], conversation, re.IGNORECASE)
@@ -110,7 +138,7 @@ class MemoryExtractor:
                 key = rule["key"]
                 for i in range(1, len(match.groups()) + 1):
                     placeholder = f"{{{i}}}"
-                    if placeholder in key:
+                    if placeholder in key and match.group(i):
                         key = key.replace(placeholder, match.group(i).strip().lower().replace(" ", "_"))
 
                 memory = {
@@ -121,12 +149,13 @@ class MemoryExtractor:
                     "frequency": 1,
                     "created_at": datetime.now(timezone.utc).isoformat().replace("+00:00", "Z"),
                     "updated_at": datetime.now(timezone.utc).isoformat().replace("+00:00", "Z"),
-                    "source": "conversation",
+                    "source": "pattern_rule",
                     "status": "active"
                 }
                 if "meta" in rule:
                     for meta_key, group_idx in rule["meta"].items():
-                        memory[meta_key] = match.group(group_idx).strip()
+                        if match.group(group_idx):
+                            memory[meta_key] = match.group(group_idx).strip()
                 memories.append(memory)
         return memories
 
@@ -204,11 +233,11 @@ class MemoryManager:
         self.scorer = scorer
         self.threshold = 0.6
 
-    def process(self, memory: Dict[str, Any]) -> None:
+    def process(self, memory: Dict[str, Any]) -> Decision:
         importance = self.scorer.score(memory)
         if importance < self.threshold:
             logger.info(f"Discarded memory: {memory.get('value')} (type: {memory.get('type')}, score: {importance})")
-            return
+            return Decision.IGNORE
 
         memory["importance"] = importance
         existing = self.repository.get_by_key(memory["key"])
@@ -228,6 +257,8 @@ class MemoryManager:
         elif decision == Decision.UPDATE:
             self.repository.update(memory)
             logger.info(f"Updated memory: {memory['key']} = {memory['value']}")
+
+        return decision
 
     def get_all_memories(self) -> List[Dict[str, Any]]:
         return self.repository.get_all()
@@ -445,20 +476,26 @@ class Memory:
         lines.append(text)
         self._save_conversation(lines)
 
-        # Extract memories
-        conversation_text = self._get_conversation_text()
-        extracted = self.extractor.extract(conversation_text)
+        # Extract memories from current input text
+        extracted = self.extractor.extract(text)
 
         results = []
         for mem in extracted:
             existing = self.repository.get_by_key(mem["key"])
             if existing:
                 mem["id"] = existing.get("id", mem["id"])
-            self.manager.process(mem)
+            decision = self.manager.process(mem)
             results.append({
-                "decision": "processed",
+                "decision": decision.value.upper(),
                 "key": mem.get("key"),
                 "value": mem.get("value")
+            })
+
+        if not results:
+            results.append({
+                "decision": "IGNORE",
+                "key": None,
+                "value": None
             })
 
         return {"memories": results, "count": len(results)}
