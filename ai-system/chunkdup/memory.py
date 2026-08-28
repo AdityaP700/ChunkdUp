@@ -1,3 +1,8 @@
+# ai-system/chunkdup/memory.py
+"""
+Core Memory management class and supporting modules for ChunkdUp SDK.
+"""
+
 import os
 import json
 import math
@@ -6,28 +11,31 @@ import uuid
 import sys
 import importlib.util
 from datetime import datetime, timezone
-from typing import List, Dict, Any, Optional
+from typing import List, Dict, Any, Optional, Union
 import logging
+
 from .repository import MemoryRepository
 from .in_memory_repository import InMemoryRepository
+from .types import MemoryDict, SearchResult, RememberResult, UpdateResult, DeleteResult, StatsDict
+
 # Configure logging
 logging.basicConfig(level=logging.INFO)
 logger = logging.getLogger(__name__)
 
-# Import the local modules (policies, prompt_builder, retrieval_class)
-# These should be in the same directory or available in sys.path
+# Import local modules
 try:
     from .policies import Decision, PolicyFactory
     from .prompt_builder import PromptBuilder
     from .retrieval_class import MemoryRetriever
 except ImportError:
-    # Fallback for when running as a standalone script
     from policies import Decision, PolicyFactory
     from prompt_builder import PromptBuilder
     from retrieval_class import MemoryRetriever
 
 
 class MemoryExtractor:
+    """Extracts structured memories from text using pattern rules."""
+
     def __init__(self):
         self.rules = [
             {
@@ -88,6 +96,8 @@ class MemoryExtractor:
 
 
 class MemoryScorer:
+    """Scores memories based on type importance."""
+
     def score(self, memory: Dict[str, Any]) -> float:
         scores = {
             "project": 1.0,
@@ -100,6 +110,8 @@ class MemoryScorer:
 
 
 class MemoryRanker:
+    """Ranks memories by composite score (semantic, frequency, recency)."""
+
     def __init__(self, scorer: MemoryScorer):
         self.scorer = scorer
 
@@ -134,62 +146,9 @@ class MemoryRanker:
         return [item[1] for item in ranked]
 
 
-class MemoryRepository:
-    def __init__(self, path: str):
-        self.path = path
-
-    def load(self) -> List[Dict[str, Any]]:
-        if not os.path.exists(self.path) or os.path.getsize(self.path) == 0:
-            return []
-        with open(self.path, "r", encoding="utf-8") as f:
-            try:
-                return json.load(f)
-            except json.JSONDecodeError:
-                return []
-
-    def save(self, memories: List[Dict[str, Any]]) -> None:
-        os.makedirs(os.path.dirname(self.path), exist_ok=True)
-        with open(self.path, "w", encoding="utf-8") as f:
-            json.dump(memories, f, indent=4)
-
-    def add(self, memory: Dict[str, Any]) -> None:
-        memories = self.load()
-        memories.append(memory)
-        self.save(memories)
-
-    def update(self, new_memory: Dict[str, Any]) -> None:
-        memories = self.load()
-        for mem in memories:
-            if mem.get("key") == new_memory.get("key") and mem.get("status") == "active":
-                for k, v in new_memory.items():
-                    if k not in ["id", "created_at", "frequency"]:
-                        mem[k] = v
-                mem["frequency"] = 1
-                mem["updated_at"] = datetime.now(timezone.utc).isoformat().replace("+00:00", "Z")
-                break
-        self.save(memories)
-
-    def merge(self, existing_memory: Dict[str, Any], new_memory: Dict[str, Any]) -> None:
-        memories = self.load()
-        for mem in memories:
-            if mem.get("key") == existing_memory.get("key") and mem.get("status") == "active":
-                mem["frequency"] = mem.get("frequency", 1) + 1
-                mem["updated_at"] = datetime.now(timezone.utc).isoformat().replace("+00:00", "Z")
-                break
-        self.save(memories)
-
-    def find_active_by_key(self, key: str) -> Optional[Dict[str, Any]]:
-        memories = self.load()
-        for memory in memories:
-            if memory.get("key") == key and memory.get("status") == "active":
-                return memory
-        return None
-
-    def get_all(self) -> List[Dict[str, Any]]:
-        return self.load()
-
-
 class DecisionEngine:
+    """Evaluates policy decisions for existing vs new memories."""
+
     def decide(self, existing_memory: Optional[Dict[str, Any]], new_memory: Dict[str, Any]) -> Decision:
         policy = PolicyFactory.get(new_memory["type"])
         if not policy:
@@ -198,6 +157,8 @@ class DecisionEngine:
 
 
 class MemoryManager:
+    """Manages memory persistence pipeline based on scores and policy decisions."""
+
     def __init__(self, repository: MemoryRepository, decision_engine: DecisionEngine, scorer: MemoryScorer):
         self.repository = repository
         self.engine = decision_engine
@@ -212,6 +173,9 @@ class MemoryManager:
 
         memory["importance"] = importance
         existing = self.repository.get_by_key(memory["key"])
+        if existing:
+            memory["id"] = existing.get("id", memory.get("id"))
+
         decision = self.engine.decide(existing, memory)
 
         if decision == Decision.STORE:
@@ -232,20 +196,50 @@ class MemoryManager:
 
 class Memory:
     """
-    Main entry point for memory operations.
-    Users only need to interact with this class.
+    ChunkdUp — Persistent memory for AI agents.
+
+    Usage:
+        memory = Memory(store="memory")
+        memory.remember("I use Python")
+        results = memory.retrieve("What language?")
     """
 
-    def __init__(self, data_dir: Optional[str] = None, llm_provider: str = "gemini",
-                 labs_dir: Optional[str] = None,repository : Optional[MemoryRepository] = None):
+    def __init__(
+        self,
+        store: str = "memory",
+        connection_url: Optional[str] = None,
+        data_dir: Optional[str] = None,
+        llm_provider: str = "gemini",
+        labs_dir: Optional[str] = None,
+        repository: Optional[MemoryRepository] = None,
+        **kwargs
+    ):
         """
-        Initialize the Memory system with all internal components.
+        Initialize the Memory system.
 
         Args:
-            data_dir: Directory to store memory data (defaults to ./data)
+            store: Storage backend ("memory" or "postgres")
+            connection_url: PostgreSQL connection string (required for "postgres")
+            data_dir: Directory to store conversation/file data (defaults to ./data)
             llm_provider: LLM provider to use ("gemini", "openai", etc.)
             labs_dir: Path to the labs directory containing LLM implementations
+            repository: Custom MemoryRepository instance
         """
+        self._store_type = store
+
+        # Initialize repository based on store configuration
+        if repository is not None:
+            self.repository = repository
+        elif store == "memory":
+            self.repository = InMemoryRepository()
+        elif store == "postgres":
+            if not connection_url:
+                raise ValueError("connection_url required for postgres store")
+            from .postgres_repository import PostgresRepository
+            self.repository = PostgresRepository(connection_url)
+        else:
+            raise ValueError(f"Unknown store: {store}")
+
         # Set up paths
         if data_dir is None:
             self.base_dir = os.getcwd()
@@ -256,16 +250,16 @@ class Memory:
 
         # Find labs directory for LLM imports
         if labs_dir is None:
-            # Try to find labs directory relative to this file
             current_dir = os.path.dirname(os.path.abspath(__file__))
-            # Go up to find the root (where labs/ is located)
             root_dir = current_dir
             while root_dir and not os.path.exists(os.path.join(root_dir, "labs")):
-                root_dir = os.path.dirname(root_dir)
-            if root_dir:
+                parent = os.path.dirname(root_dir)
+                if parent == root_dir:
+                    break
+                root_dir = parent
+            if root_dir and os.path.exists(os.path.join(root_dir, "labs")):
                 self.labs_dir = os.path.join(root_dir, "labs")
             else:
-                # Fallback: assume labs is in the parent directory
                 self.labs_dir = os.path.join(os.path.dirname(os.path.dirname(current_dir)), "labs")
         else:
             self.labs_dir = labs_dir
@@ -273,21 +267,15 @@ class Memory:
         # Memory storage path
         self.memory_path = os.path.join(data_dir, "memory.json")
 
-        # Initialize all internal components
-        self.repository = repository or InMemoryRepository()
+        # Initialize internal components
         self.decision_engine = DecisionEngine()
         self.scorer = MemoryScorer()
         self.manager = MemoryManager(self.repository, self.decision_engine, self.scorer)
         self.extractor = MemoryExtractor()
-
-        # Use the imported MemoryRetriever and PromptBuilder
         self.retriever = MemoryRetriever(self.repository)
         self.prompt_builder = PromptBuilder()
 
         # Lazy-load LLM components
-        #A restaurant menu - you don't cook
-        # all dishes upfront,
-        # you cook them when a customer orders.
         self._llm = None
         self._parser = None
         self._validator = None
@@ -297,61 +285,72 @@ class Memory:
         # Initialize conversation storage
         self.conversation_path = os.path.join(data_dir, "conversation.json")
         self._initialize_conversation()
-    #Conversations are stored persistently on disk
-    #Even if your program crashes, the conversation history is saved
-    #You can restart your program and continue from where you left off
-    def _initialize_conversation(self):
+
+        logger.info(f"Memory initialized with store: {store}")
+
+    # ──────────────────────────────────────────────────────
+    # Conversation Storage Helpers
+    # ──────────────────────────────────────────────────────
+
+    def _initialize_conversation(self) -> None:
         """Initialize conversation file if it doesn't exist."""
         if not os.path.exists(self.conversation_path):
-            with open(self.conversation_path, "w", encoding="utf-8") as f:
-                json.dump([], f)
+            try:
+                with open(self.conversation_path, "w", encoding="utf-8") as f:
+                    json.dump([], f)
+            except Exception as e:
+                logger.warning(f"Could not create conversation file: {e}")
 
     def _load_conversation(self) -> List[str]:
         """Load conversation lines from file."""
         if not os.path.exists(self.conversation_path):
             return []
-        with open(self.conversation_path, "r", encoding="utf-8") as f:
-            try:
+        try:
+            with open(self.conversation_path, "r", encoding="utf-8") as f:
                 return json.load(f)
-            except json.JSONDecodeError:
-                return []
+        except (json.JSONDecodeError, OSError):
+            return []
 
     def _save_conversation(self, lines: List[str]) -> None:
         """Save conversation lines to file."""
-        os.makedirs(os.path.dirname(self.conversation_path), exist_ok=True)
-        with open(self.conversation_path, "w", encoding="utf-8") as f:
-            json.dump(lines, f, indent=4)
+        try:
+            os.makedirs(os.path.dirname(self.conversation_path), exist_ok=True)
+            with open(self.conversation_path, "w", encoding="utf-8") as f:
+                json.dump(lines, f, indent=4)
+        except Exception as e:
+            logger.warning(f"Could not save conversation: {e}")
 
     def _get_conversation_text(self) -> str:
         """Get full conversation as a single string."""
         lines = self._load_conversation()
         return "\n".join(lines)
 
-    def _load_llm_components(self):
-        """Load LLM components from lab2 implementation."""
+    # ──────────────────────────────────────────────────────
+    # LLM Helpers
+    # ──────────────────────────────────────────────────────
+
+    def _load_llm_components(self) -> bool:
+        """Load LLM components from lab2 implementation if available."""
         if self._llm_loaded:
             return True
 
         try:
-            # Try to import from lab2 experiment file
             lab2_path = os.path.join(self.labs_dir, "002-structured-outputs", "experiments", "experiment_001.py")
-
             if not os.path.exists(lab2_path):
                 logger.warning(f"Lab2 experiment file not found at: {lab2_path}")
                 return False
 
-            # Use importlib to load the lab2 module
             spec = importlib.util.spec_from_file_location("lab2_experiment", lab2_path)
+            if not spec or not spec.loader:
+                return False
             lab2_module = importlib.util.module_from_spec(spec)
             sys.modules["lab2_experiment"] = lab2_module
             spec.loader.exec_module(lab2_module)
 
-            # Get the classes from the module
             self.LLMCaller = lab2_module.LLMCaller
             self.OutputParser = lab2_module.OutputParser
             self.OutputValidator = lab2_module.OutputValidator
 
-            # Initialize instances
             self._llm = self.LLMCaller(provider=self._llm_provider)
             self._parser = self.OutputParser()
             self._validator = self.OutputValidator(raise_on_fail=False)
@@ -359,7 +358,6 @@ class Memory:
             self._llm_loaded = True
             logger.info("LLM components loaded successfully")
             return True
-
         except Exception as e:
             logger.warning(f"Could not initialize LLM components: {e}")
             self._llm_loaded = False
@@ -369,99 +367,218 @@ class Memory:
             return False
 
     def _get_llm(self):
-        """Get LLM instance, loading if necessary."""
         if not self._llm_loaded:
             self._load_llm_components()
         return self._llm
 
     def _get_parser(self):
-        """Get parser instance, loading if necessary."""
         if not self._llm_loaded:
             self._load_llm_components()
         return self._parser
 
     def _get_validator(self):
-        """Get validator instance, loading if necessary."""
         if not self._llm_loaded:
             self._load_llm_components()
         return self._validator
 
-    def add_conversation_line(self, text: str) -> None:
+    # ──────────────────────────────────────────────────────
+    # Core Operations
+    # ──────────────────────────────────────────────────────
+
+    def remember(self, text: str) -> Dict[str, Any]:
         """
-        Add a conversation line and extract memories from it.
+        Store a memory from conversation text.
 
         Args:
-            text: The conversation text to process
+            text: The conversation text to remember
+
+        Returns:
+            Dict with memory details and processed count
+
+        Example:
+            >>> memory.remember("I use Python")
+            {"memories": [{"decision": "processed", "key": "programming_language", "value": "Python"}], "count": 1}
         """
-        # Save to conversation history
+        logger.info(f"Remembering: {text[:50]}...")
+
+        # Add to conversation history
         lines = self._load_conversation()
         lines.append(text)
         self._save_conversation(lines)
 
-        # Extract memories from full conversation
+        # Extract memories
         conversation_text = self._get_conversation_text()
-        extracted_memories = self.extractor.extract(conversation_text)
+        extracted = self.extractor.extract(conversation_text)
 
-        # Process each extracted memory
-        for memory in extracted_memories:
-            self.manager.process(memory)
+        results = []
+        for mem in extracted:
+            existing = self.repository.get_by_key(mem["key"])
+            if existing:
+                mem["id"] = existing.get("id", mem["id"])
+            self.manager.process(mem)
+            results.append({
+                "decision": "processed",
+                "key": mem.get("key"),
+                "value": mem.get("value")
+            })
 
-    def add(self, text: str) -> None:
-        """
-        Alias for add_conversation_line.
-        """
-        self.add_conversation_line(text)
+        return {"memories": results, "count": len(results)}
 
-    def add_conversation(self, conversation: List[str]) -> None:
+    def retrieve(self, query: str, limit: int = 5) -> List[Dict[str, Any]]:
         """
-        Add multiple conversation lines at once.
+        Retrieve memories matching a query.
 
         Args:
-            conversation: List of conversation lines
-        """
-        for line in conversation:
-            self.add_conversation_line(line)
-
-    def query(self, question: str, k: int = 3, use_llm: bool = True) -> Dict[str, Any]:
-        """
-        Query the memory system.
-
-        Args:
-            question: The question to ask
-            k: Number of memories to retrieve
-            use_llm: Whether to use LLM for answer generation
+            query: Search query
+            limit: Maximum number of results
 
         Returns:
-            Dict containing answer, retrieved memories, and raw response
-        """
-        # Retrieve relevant memories
-        memories = self.retriever.retrieve(question, k=k)
+            List of matching memories
 
-        # Build prompt
+        Example:
+            >>> memory.retrieve("What language?")
+            [{"key": "programming_language", "value": "Python", ...}]
+        """
+        logger.info(f"Retrieving: {query}")
+        return self.retriever.retrieve(query, k=limit)
+
+    def update(self, key: str, new_value: str) -> Dict[str, Any]:
+        """
+        Update a memory by key.
+
+        Args:
+            key: The memory key to update
+            new_value: The new value
+
+        Returns:
+            Dict with update result
+
+        Raises:
+            ValueError: If memory with key is not found
+
+        Example:
+            >>> memory.update("programming_language", "I now use Go")
+            {"decision": "UPDATE", "key": "programming_language", "value": "Go"}
+        """
+        logger.info(f"Updating {key} -> {new_value[:50]}...")
+
+        existing = self.repository.get_by_key(key)
+        if not existing:
+            raise ValueError(f"Memory with key '{key}' not found")
+
+        updated = dict(existing)
+        updated["value"] = new_value
+        updated["updated_at"] = datetime.now(timezone.utc).isoformat().replace("+00:00", "Z")
+
+        self.repository.update(updated)
+        return {"decision": "UPDATE", "key": key, "value": new_value}
+
+    def delete(self, memory_id: str) -> Dict[str, Any]:
+        """
+        Delete a memory by ID.
+
+        Args:
+            memory_id: The memory ID to delete
+
+        Returns:
+            Dict with deletion result
+
+        Example:
+            >>> memory.delete("abc-123")
+            {"success": True, "id": "abc-123"}
+        """
+        logger.info(f"Deleting memory: {memory_id}")
+        self.repository.delete(memory_id)
+        return {"success": True, "id": memory_id}
+
+    def search(self, query: str, limit: int = 5, semantic: bool = True) -> List[Dict[str, Any]]:
+        """
+        Search memories with optional semantic search.
+
+        Args:
+            query: Search query
+            limit: Maximum results
+            semantic: Use semantic search if available
+
+        Returns:
+            List of matching memories
+        """
+        logger.info(f"Searching: {query}")
+        return self.retriever.retrieve(query, k=limit)
+
+    # ──────────────────────────────────────────────────────
+    # Utility Operations
+    # ──────────────────────────────────────────────────────
+
+    def get_all(self) -> List[Dict[str, Any]]:
+        """Get all active memories."""
+        return self.repository.get_all()
+
+    def get_history(self, key: str) -> List[Dict[str, Any]]:
+        """
+        Get history of a memory by key.
+        Requires repository supporting get_history.
+        """
+        if hasattr(self.repository, "get_history"):
+            return getattr(self.repository, "get_history")(key)
+        return []
+
+    def get_stats(self) -> Dict[str, Any]:
+        """Get memory statistics."""
+        all_memories = self.get_all()
+        return {
+            "total_memories": len(all_memories),
+            "store_type": self._store_type,
+            "keys": [m.get("key") for m in all_memories],
+            "active_memories": len(all_memories),
+            "conversation_lines": len(self._load_conversation())
+        }
+
+    def clear(self) -> None:
+        """Clear all memories and conversation history."""
+        self.repository.clear()
+        self._save_conversation([])
+        logger.info("Memory cleared")
+
+    # ──────────────────────────────────────────────────────
+    # Legacy & Compatibility Aliases
+    # ──────────────────────────────────────────────────────
+
+    def add(self, text: str) -> None:
+        """Alias for remember()."""
+        self.remember(text)
+
+    def add_conversation_line(self, text: str) -> None:
+        """Alias for remember()."""
+        self.remember(text)
+
+    def add_conversation(self, conversation: List[str]) -> None:
+        """Add multiple conversation lines."""
+        for line in conversation:
+            self.remember(line)
+
+    def query(self, question: str, k: int = 3, use_llm: bool = True) -> Dict[str, Any]:
+        """Query system with answer generation."""
+        memories = self.retriever.retrieve(question, k=k)
         prompt = self.prompt_builder.build(
             query=question,
             contexts={"memories": memories, "documents": []},
             variant="expert"
         )
-
         result = {
             "question": question,
             "memories_used": memories,
             "prompt": prompt,
             "use_llm": use_llm
         }
-
-        # Get LLM response if requested and available
         if use_llm:
             llm = self._get_llm()
             if llm:
                 try:
                     raw_response = llm.generate(prompt)
                     result["raw_response"] = raw_response
-
                     parser = self._get_parser()
                     validator = self._get_validator()
-
                     if parser and validator:
                         parsed = parser.parse(raw_response)
                         validated = validator.validate(parsed)
@@ -492,99 +609,40 @@ class Memory:
         return result
 
     def _simple_answer(self, question: str, memories: List[Dict[str, Any]]) -> str:
-        """Simple fallback answer when LLM is not available."""
         if not memories:
             return "I don't have any relevant memories about that."
-
         question_lower = question.lower()
         answers = []
-
         for mem in memories:
             key = mem.get("key", "").lower()
             value = mem.get("value", "")
-
             if key in question_lower or question_lower in key:
                 answers.append(f"Your {mem['key']} is {value}")
             else:
                 answers.append(f"Found memory: {mem['key']} = {value}")
-
-        if answers:
-            return "\n".join(answers[:3])
-        else:
-            return "I found some memories but they don't directly answer your question."
+        return "\n".join(answers[:3]) if answers else "I found some memories but they don't directly answer your question."
 
     def get_all_memories(self) -> List[Dict[str, Any]]:
-        """Get all stored memories."""
-        return self.manager.get_all_memories()
+        """Alias for get_all()."""
+        return self.get_all()
 
     def get_conversation_history(self) -> List[str]:
-        """Get the conversation history."""
+        """Get conversation lines."""
         return self._load_conversation()
 
     def get_memories_by_type(self, memory_type: str) -> List[Dict[str, Any]]:
         """Get memories filtered by type."""
-        all_memories = self.get_all_memories()
-        return [m for m in all_memories if m.get("type") == memory_type]
-
-    def clear(self) -> None:
-        """Clear all data (memories and conversation)."""
-        self.repository.save([])
-        logger.info("Cleared all memories")
-        self._save_conversation([])
-        logger.info("Cleared conversation history")
+        return [m for m in self.get_all() if m.get("type") == memory_type]
 
     def reset(self) -> None:
         """Alias for clear()."""
         self.clear()
 
     def delete_memory(self, memory_id: str) -> bool:
-        """
-        Delete a specific memory by ID (mark as inactive).
-
-        Args:
-            memory_id: The ID of the memory to delete
-
-        Returns:
-            bool: True if deleted, False if not found
-        """
-        memories = self.repository.load()
-        for mem in memories:
-            if mem.get("id") == memory_id:
-                mem["status"] = "inactive"
-                mem["updated_at"] = datetime.now(timezone.utc).isoformat().replace("+00:00", "Z")
-                self.repository.save(memories)
-                logger.info(f"Deleted memory: {mem.get('key')} = {mem.get('value')}")
-                return True
-        return False
+        """Legacy delete memory method returning boolean."""
+        self.delete(memory_id)
+        return True
 
     def get_statistics(self) -> Dict[str, Any]:
-        """Get statistics about the memory system."""
-        memories = self.get_all_memories()
-        active_memories = [m for m in memories if m.get("status") == "active"]
-
-        stats = {
-            "total_memories": len(memories),
-            "active_memories": len(active_memories),
-            "memories_by_type": {},
-            "conversation_lines": len(self._load_conversation())
-        }
-
-        for mem in active_memories:
-            mem_type = mem.get("type", "unknown")
-            stats["memories_by_type"][mem_type] = stats["memories_by_type"].get(mem_type, 0) + 1
-
-        return stats
-
-
-# For backward compatibility, expose individual components
-__all__ = [
-    "Memory",
-    "MemoryExtractor",
-    "MemoryScorer",
-    "MemoryRanker",
-    "MemoryRepository",
-    "MemoryManager",
-    "DecisionEngine",
-    "PromptBuilder",
-    "MemoryRetriever"
-]
+        """Legacy alias for get_stats()."""
+        return self.get_stats()

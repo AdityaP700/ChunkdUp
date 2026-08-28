@@ -1,5 +1,5 @@
 """
-ChunkDup - A memory management system for AI applications.
+ChunkdUp — Persistent memory for AI agents.
 """
 
 from .memory import (
@@ -13,8 +13,16 @@ from .memory import (
     PromptBuilder,
     MemoryRetriever
 )
+from .async_memory import AsyncMemory
+from .types import (
+    MemoryDict,
+    SearchResult,
+    RememberResult,
+    UpdateResult,
+    DeleteResult,
+    StatsDict
+)
 
-# Try to import policies, but handle case where they might not be in the package
 try:
     from .policies import (
         Decision,
@@ -36,10 +44,17 @@ except ImportError:
         PolicyFactory
     )
 
-__version__ = "1.0.0"
+__version__ = "0.2.0"
 
 __all__ = [
     "Memory",
+    "AsyncMemory",
+    "MemoryDict",
+    "SearchResult",
+    "RememberResult",
+    "UpdateResult",
+    "DeleteResult",
+    "StatsDict",
     "MemoryExtractor",
     "MemoryScorer",
     "MemoryRanker",
