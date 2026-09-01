@@ -14,6 +14,7 @@ from .memory import (
     MemoryRetriever
 )
 from .async_memory import AsyncMemory
+from .embeddings import EmbeddingGenerator
 from .in_memory_repository import InMemoryRepository
 from .postgres_repository import PostgresRepository
 from .types import (
@@ -69,6 +70,7 @@ __all__ = [
     "PostgresRepository",
     "Decision",
     "BasePolicy",
+    "EmbeddingGenerator"
     "EnvironmentPolicy",
     "PreferencePolicy",
     "ToolPolicy",

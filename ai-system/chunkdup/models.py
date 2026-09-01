@@ -18,16 +18,19 @@ class MemoryModel(Base):
     frequency = Column(Integer, default=1)
     importance = Column(Float, default=0.0)
     status = Column(String(20), default="active")
-    version = Column(Integer, default=1)  # Optimistic locking
+    version = Column(Integer, default=1)
     created_at = Column(DateTime(timezone=True), default=lambda: datetime.now(timezone.utc))
     updated_at = Column(DateTime(timezone=True), default=lambda: datetime.now(timezone.utc), onupdate=lambda: datetime.now(timezone.utc))
-    meta_data = Column("metadata", JSON, default={})
-    embedding = Column(Vector(384), nullable=True)  # pgvector
+    metadata_ = Column("metadata",JSON)
+
+    embedding = Column(Vector(384), nullable=True)  # 384-dimensional embeddings
 
     __table_args__ = (
         Index('idx_memories_key_status', 'key', 'status'),
         Index('idx_memories_created', 'created_at'),
         Index('idx_memories_version', 'version'),
+        # ← NEW: HNSW index for fast vector search
+        Index('idx_memories_embedding', 'embedding', postgresql_using='hnsw', postgresql_ops={'embedding': 'vector_cosine_ops'}),
     )
 
 class MemoryHistoryModel(Base):

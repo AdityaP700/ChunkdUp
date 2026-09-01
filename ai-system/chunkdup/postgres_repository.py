@@ -4,6 +4,7 @@ from sqlalchemy import create_engine, select, update, delete, text
 from sqlalchemy.orm import sessionmaker, Session
 from sqlalchemy.exc import SQLAlchemyError, IntegrityError
 from datetime import datetime, timezone
+from .embeddings import EmbeddingGenerator
 import uuid
 import os
 
@@ -33,6 +34,13 @@ class PostgresRepository(MemoryRepository):
 
         # Create tables (if not exists)
         self._init_db()
+        self._embedding_generator = None
+    @property
+    def embedding_generator(self):
+        """Lazy load embedding generator."""
+        if self._embedding_generator is None:
+            self._embedding_generator = EmbeddingGenerator()
+        return self._embedding_generator
 
     def _init_db(self):
         """Initialize database schema and enable pgvector extension."""
@@ -57,11 +65,14 @@ class PostgresRepository(MemoryRepository):
             "version": model.version,
             "created_at": model.created_at.isoformat() if model.created_at else None,
             "updated_at": model.updated_at.isoformat() if model.updated_at else None,
-            "metadata": model.meta_data or {},
+            "metadata": model.metadata_ or {},
         }
 
     def save(self, memory: Dict[str, Any]) -> None:
         """Store a new memory."""
+        embedding = None
+        if memory.get("value"):
+            embedding = self.embedding_generator.generate(memory["value"])
         with self.SessionLocal() as session:
             db_memory = MemoryModel(
                 id=memory.get("id", uuid.uuid4()),
@@ -72,7 +83,8 @@ class PostgresRepository(MemoryRepository):
                 importance=memory.get("importance", 0.0),
                 status=memory.get("status", "active"),
                 version=1,
-                meta_data=memory.get("metadata", {}),
+                metadata_=memory.get("metadata", {}),
+                embedding=embedding,
             )
             session.add(db_memory)
 
@@ -104,6 +116,9 @@ class PostgresRepository(MemoryRepository):
         memory_id = memory.get("id")
         if not memory_id:
             raise ValueError("Memory ID required for update")
+        embedding = None
+        if memory.get("value"):
+            embedding = self.embedding_generator.generate(memory["value"])
 
         expected_version = memory.get("version", 1)
 
@@ -124,7 +139,8 @@ class PostgresRepository(MemoryRepository):
                     status=memory.get("status", "active"),
                     version=MemoryModel.version + 1,
                     updated_at=datetime.now(timezone.utc),
-                    meta_data=memory.get("metadata", {})
+                    metadata_=memory.get("metadata", {}),
+                    embedding=embedding,
                 )
             )
 
@@ -248,3 +264,76 @@ class PostgresRepository(MemoryRepository):
                 }
                 for r in results
             ]
+
+    def search_semantic(self, query: str, limit: int = 5) -> List[Dict[str, Any]]:
+        """
+        Search memories by semantic similarity using pgvector.
+
+        Args:
+            query: Search query
+            limit: Maximum number of results
+
+        Returns:
+            List of memories sorted by similarity (highest first)
+        """
+        # Generate query embedding
+        query_embedding = self.embedding_generator.generate(query)
+        if query_embedding is None:
+            return []
+
+        with self.SessionLocal() as session:
+            # Use pgvector's cosine_distance operator (<->)
+            results = session.execute(
+                select(MemoryModel)
+                .where(MemoryModel.status == "active")
+                .where(MemoryModel.embedding.is_not(None))
+                .order_by(MemoryModel.embedding.cosine_distance(query_embedding))
+                .limit(limit)
+            ).scalars().all()
+
+            return [self._to_dict(r) for r in results]
+
+    def search_hybrid(self, query: str, limit: int = 5) -> List[Dict[str, Any]]:
+        """
+        Hybrid search: combines keyword and semantic search.
+
+        Uses Reciprocal Rank Fusion (RRF) to combine results.
+        """
+        # 1. Keyword search (get 2x results for fusion)
+        keyword_results = self.search(query, limit=limit * 2)
+
+        # 2. Semantic search (get 2x results for fusion)
+        semantic_results = self.search_semantic(query, limit=limit * 2)
+
+        # 3. Reciprocal Rank Fusion
+        return self._rrf(keyword_results, semantic_results, limit)
+
+    def _rrf(self, results_a: List[Dict], results_b: List[Dict], limit: int) -> List[Dict]:
+        """
+        Reciprocal Rank Fusion.
+
+        Combines two ranked lists using RRF formula:
+        score = sum(1 / (k + rank)) for each result in each list
+        """
+        k = 60  # Standard RRF constant
+        scores = {}
+        metadata = {}
+
+        # Score results from list A
+        for rank, result in enumerate(results_a):
+            memory_id = result["id"]
+            scores[memory_id] = scores.get(memory_id, 0) + 1 / (k + rank + 1)
+            metadata[memory_id] = result
+
+        # Score results from list B
+        for rank, result in enumerate(results_b):
+            memory_id = result["id"]
+            scores[memory_id] = scores.get(memory_id, 0) + 1 / (k + rank + 1)
+            if memory_id not in metadata:
+                metadata[memory_id] = result
+
+        # Sort by score (highest first)
+        sorted_ids = sorted(scores.keys(), key=lambda x: scores[x], reverse=True)
+
+        # Return top results
+        return [metadata[memory_id] for memory_id in sorted_ids[:limit]]

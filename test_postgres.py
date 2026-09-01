@@ -1,29 +1,61 @@
-# test_postgres.py
+# test_semantic.py
+import os
+from dotenv import load_dotenv
 from chunkdup import Memory
 from chunkdup.postgres_repository import PostgresRepository
+load_dotenv()
+def test_semantic_search():
+    print("🧪 Testing Semantic Search...")
 
-def test_postgres():
     # Connect to PostgreSQL
-    repo = PostgresRepository("postgresql://postgres:aditya123@localhost:5433/chunkdup")
-    memory = Memory(store="postgres", repository=repo)  # or just pass connection_url
+    DATABASE_URL = os.environ["DATABASE_URL"]
+    repo = PostgresRepository(DATABASE_URL)
+    memory = Memory(store="postgres", repository=repo)
 
-    # Add memories
+    # Clear existing memories
+    memory.clear()
+
+    # Add diverse memories
+    print("\n📝 Adding memories...")
     memory.remember("I use Python for backend development")
+    memory.remember("I use Go for microservices")
+    memory.remember("I'm building a web app called ChunkdUp")
+    memory.remember("My favorite editor is Neovim")
     memory.remember("I work at Google as a software engineer")
-    memory.remember("I use Python")
-    memory.remember("I now use Go")
+    memory.remember("I prefer dark mode for my IDE")
 
-    # Retrieve
-    results = memory.retrieve("What language?")
-    print("Retrieved:", results)
+    # Test 1: Keyword Search
+    print("\n🔍 Keyword Search: 'Python'")
+    keyword_results = repo.search("Python", limit=5)
+    for r in keyword_results:
+        print(f"  {r['key']}: {r['value']} (freq: {r['frequency']})")
 
-    # Get all
-    all_memories = memory.get_all()
-    print("All memories:", all_memories)
+    # Test 2: Semantic Search
+    print("\n🧠 Semantic Search: 'What programming languages do I use?'")
+    semantic_results = repo.search_semantic("What programming languages do I use?", limit=5)
+    for r in semantic_results:
+        print(f"  {r['key']}: {r['value']} (freq: {r['frequency']})")
 
-    # Get history
-    history = memory.get_history("programming_language")
-    print("History:", history)
+    # Test 3: Semantic Search (different phrasing)
+    print("\n🧠 Semantic Search: 'What is my tech stack?'")
+    semantic_results = repo.search_semantic("What is my tech stack?", limit=5)
+    for r in semantic_results:
+        print(f"  {r['key']}: {r['value']} (freq: {r['frequency']})")
+
+    # Test 4: Hybrid Search
+    print("\n🔀 Hybrid Search: 'What am I working on?'")
+    hybrid_results = repo.search_hybrid("What am I working on?", limit=5)
+    for r in hybrid_results:
+        print(f"  {r['key']}: {r['value']} (freq: {r['frequency']})")
+
+    # Test 5: Edge Case - No Results
+    print("\n🧠 Semantic Search: 'What is the weather?' (should return nothing or low relevance)")
+    semantic_results = repo.search_semantic("What is the weather?", limit=5)
+    if not semantic_results:
+        print("  ✅ No results (correct - no weather memories)")
+    else:
+        for r in semantic_results:
+            print(f"  {r['key']}: {r['value']}")
 
 if __name__ == "__main__":
-    test_postgres()
+    test_semantic_search()

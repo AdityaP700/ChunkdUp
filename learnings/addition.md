@@ -57,4 +57,8 @@ Custom NER	Domain-specific	Need training data
 │                                                                     │
 │  Total cost: $0.005/100 requests                                  │
 │                                                                     │
-│  If pure LLM: $0.10/100 requests (20x more)     
+│  If pure LLM: $0.10/100 requests (20x more)
+
+ HNSW is a fast graph-based algorithm used for approximate nearest neighbor search in high-dimensional vector databases.
+
+It cuts search time from a slow linear scan (O(N)) to a fast logarithmic scale (\(O(\log N)\)). Popular tools like Pinecone and Qdrant use it for AI recommendations and semantic search.
