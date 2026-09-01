@@ -2,7 +2,6 @@
 """
 spaCy Named Entity Recognition & Linguistic Extractor for ChunkdUp.
 """
-
 import uuid
 import logging
 from datetime import datetime, timezone

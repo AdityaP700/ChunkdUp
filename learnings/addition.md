@@ -1,0 +1,60 @@
+Why These Three Factors?
+Factor	Why It Matters	How It's Measured
+Type	Projects matter more than questions	Predefined weights
+Frequency	Repeated info is more important	Count of mentions
+Recency	New info is more relevant	Days since update
+Why Not Other Factors?
+Factor	Why Not Included	When It Would Be Relevant
+Semantic Similarity	Not needed for scoring	For retrieval (different use case)
+User Feedback	Not implemented yet	Future: learning from corrections
+Contradiction	Not implemented yet	Future: detecting lies/errors
+Confidence	Extractor provides this	Already in extraction
+Source	All from same source	Multi-source not needed
+
+
+Real-World Examples
+Credit Score (FICO):
+Payment history: 35%
+Amounts owed: 30%
+Length of credit: 15%
+Credit mix: 10%
+New credit: 10%
+
+Amazon Product Ranking:
+Sales rank: 40%
+Reviews: 30%
+Relevancy: 20%
+Price: 10%
+
+Google PageRank:
+Backlinks: 50%
+Authority: 30%
+Freshness: 20%
+
+Pattern: All scoring systems have weighted factors.
+
+Why We Use spaCy
+Option	Pros	Cons
+spaCy	Free, fast, works offline	Less accurate than LLM
+Stanford NER	Very accurate	Slow, memory-heavy
+LLM	Most accurate	Expensive, slow
+Custom NER	Domain-specific	Need training data
+
+────────────────────────────────────────────────────────────────────┐
+│                    REAL-WORLD USAGE                                │
+├─────────────────────────────────────────────────────────────────────┤
+│                                                                     │
+│  100 requests total                                                │
+│       ↓                                                           │
+│  85 requests → Rules (85%)                                        │
+│  10 requests → NER (10%)                                          │
+│  5 requests → LLM (5%)                                            │
+│                                                                     │
+│  Cost per 100 requests:                                            │
+│  → Rules: $0                                                      │
+│  → NER: $0                                                        │
+│  → LLM: $0.005 (5 requests × $0.001)                             │
+│                                                                     │
+│  Total cost: $0.005/100 requests                                  │
+│                                                                     │
+│  If pure LLM: $0.10/100 requests (20x more)     

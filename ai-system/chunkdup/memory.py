@@ -13,6 +13,7 @@ import importlib.util
 from datetime import datetime, timezone
 from typing import List, Dict, Any, Optional, Union
 import logging
+from .postgres_repository import PostgresRepository
 
 from .repository import MemoryRepository
 from .in_memory_repository import InMemoryRepository
@@ -210,7 +211,7 @@ class MemoryScorer:
     def score(self, memory: Dict[str, Any]) -> float:
         """
         Calculate composite importance score.
-        
+
         Factors:
         - Type importance (what kind of memory)
         - Frequency (how often mentioned)
