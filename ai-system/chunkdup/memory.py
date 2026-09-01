@@ -312,7 +312,8 @@ class MemoryManager:
         memory["importance"] = importance
         existing = self.repository.get_by_key(memory["key"])
         if existing:
-            memory["id"] = existing.get("id", memory.get("id"))
+            memory["version"] = existing["version"]  
+            memory["id"] = existing["id"]
 
         decision = self.engine.decide(existing, memory)
 
