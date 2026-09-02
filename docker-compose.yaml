@@ -1,0 +1,45 @@
+# docker-compose.yaml (Updated for Windows)
+services:
+  postgres:
+    image: pgvector/pgvector:pg16
+    container_name: chunkdup-postgres
+    environment:
+      POSTGRES_DB: chunkdup
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: aditya123
+    ports:
+      - "5432:5432"
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U postgres"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
+  app:
+    build: .
+    container_name: chunkdup-app
+    environment:
+      DATABASE_URL: postgresql://postgres:aditya123@postgres:5432/chunkdup
+      PYTHONPATH: /app/ai-system
+      PYTHONDONTWRITEBYTECODE: 1
+      PYTHONUNBUFFERED: 1
+    depends_on:
+      postgres:
+        condition: service_healthy
+    volumes:
+      - ./ai-system:/app/ai-system
+      - ./evaluation:/app/evaluation
+      - ./examples:/app/examples
+    command: >
+      sh -c "
+        echo 'Waiting for Postgres...' &&
+        sleep 3 &&
+        echo 'Testing ChunkdUp...' &&
+        python -c 'from chunkdup import Memory; print(\"✅ ChunkdUp loaded successfully!\")' &&
+        tail -f /dev/null
+      "
+
+volumes:
+  postgres_data:

@@ -1,3 +1,0 @@
-sentence-transformers
-google-generativeai
-anthropic

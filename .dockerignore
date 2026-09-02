@@ -1,0 +1,100 @@
+# .dockerignore (Expanded)
+
+# Python
+__pycache__/
+*.pyc
+*.pyo
+*.pyd
+.Python
+*.so
+*.egg
+*.egg-info/
+dist/
+build/
+*.whl
+.venv/
+venv/
+ENV/
+env/
+# .dockerignore (Add this)
+labs/
+# Version control
+.git/
+.gitignore
+.gitattributes
+.git/
+
+# IDE
+.vscode/
+.idea/
+*.swp
+*.swo
+*~
+
+# Data files
+data/
+*.json
+*.db
+*.sqlite
+*.csv
+*.parquet
+
+# Labs (heavy)
+labs/
+002-structured-outputs/
+003-memory-generation/
+004-semantic-retrieval/
+002-*/
+003-*/
+004-*/
+005-*/
+
+# Evaluation outputs
+evaluation/results/
+evaluation/*.json
+!evaluation/scenarios.json
+
+# Docker
+Dockerfile
+docker-compose.yaml
+.dockerignore
+
+# Logs
+logs/
+*.log
+
+# OS files
+.DS_Store
+Thumbs.db
+
+# Misc
+*.md
+!README.md
+*.txt
+!requirements.txt
+!pyproject.toml
+docs/
+examples/__pycache__/
+
+# Notebooks
+*.ipynb
+.ipynb_checkpoints/
+
+# Test files
+tests/__pycache__/
+.pytest_cache/
+.coverage
+htmlcov/
+
+# System
+*.swp
+*.swo
+*.lock
+~*
+ai-system/labs
+ai-system/labs/
+ai-system\labs
+labs/
+data/
+learnings/
+evaluation/results/

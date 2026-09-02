@@ -43,13 +43,19 @@ class MemoryRetriever:
             if cached_results is not None:
                 return cached_results[:k]
 
-        # 2. Candidate pool calculation (Generous candidate pool = min 10)
+        # 2. Fix 2: Fast Path for Exact Lookup (e.g. single/two word queries like "Python")
+        if len(query.strip().split()) <= 2 and hasattr(self.repository, "get_by_key"):
+            exact = self.repository.get_by_key(query.strip().lower())
+            if exact:
+                return [exact]
+
+        # 3. Candidate pool calculation (Generous candidate pool = min 10)
         candidate_k = self.adaptive_k_selector.select_candidate_k(target_k=k)
 
-        # 3. Query Rewriting (normalize abbreviations without stripping critical intent)
+        # 4. Query Rewriting (normalize abbreviations without stripping critical intent)
         search_query = self.rewriter.rewrite(query) if self.rewriter else query
 
-        # 4. Candidate Generation via Hybrid Search (pgvector + keyword)
+        # 5. Candidate Generation via Hybrid Search (pgvector + keyword)
         keyword_candidates = self.repository.search(search_query, limit=candidate_k) if hasattr(self.repository, "search") else []
         semantic_candidates = self.repository.search_semantic(search_query, limit=candidate_k, threshold=threshold) if hasattr(self.repository, "search_semantic") else []
 
@@ -87,17 +93,17 @@ class MemoryRetriever:
         if not keyword_candidates and not semantic_candidates:
             return []
 
-        # 5. RRF Fusion + Type Boost
-        candidates = self.hybrid_engine.combine(keyword_candidates, semantic_candidates, limit=candidate_k)
+        # 6. RRF Fusion + Intent Type Boost
+        candidates = self.hybrid_engine.combine(query, keyword_candidates, semantic_candidates, limit=candidate_k)
 
-        # 6. Pluggable Reranking (Cross-Encoder / LLM / Heuristic)
+        # 7. Pluggable Reranking (Cross-Encoder / LLM / Heuristic)
         reranked_results = self.reranker.rerank(search_query, candidates, limit=candidate_k)
 
-        # 7. Adaptive K Selection
+        # 8. Adaptive K Selection
         final_k = self.adaptive_k_selector.select_k(search_query, reranked_results, target_k=k)
         final_results = reranked_results[:final_k]
 
-        # 8. Store in Cache
+        # 9. Store in Cache
         if self.cache:
             self.cache.set(query, final_results)
 
