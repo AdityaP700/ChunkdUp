@@ -36,42 +36,68 @@ class MemoryRetriever:
         memory_copy["contextual_text"] = self.contextual_builder.build_contextual_text(memory_copy)
         return memory_copy
 
-    def retrieve(self, query: str, k: int = 5) -> List[Dict[str, Any]]:
+    def retrieve(self, query: str, k: int = 5, threshold: float = 0.15) -> List[Dict[str, Any]]:
         # 1. Cache hit lookup
         if self.cache:
             cached_results = self.cache.get(query)
             if cached_results is not None:
                 return cached_results[:k]
 
-        # 2. Query Rewriting (normalize abbreviations, clean filler words)
+        # 2. Candidate pool calculation (Generous candidate pool = min 10)
+        candidate_k = self.adaptive_k_selector.select_candidate_k(target_k=k)
+
+        # 3. Query Rewriting (normalize abbreviations without stripping critical intent)
         search_query = self.rewriter.rewrite(query) if self.rewriter else query
 
-        # 3. Candidate Generation via Hybrid Search (pgvector + keyword)
-        keyword_candidates = self.repository.search(search_query, limit=k * 3) if hasattr(self.repository, "search") else []
-        semantic_candidates = self.repository.search_semantic(search_query, limit=k * 3) if hasattr(self.repository, "search_semantic") else []
+        # 4. Candidate Generation via Hybrid Search (pgvector + keyword)
+        keyword_candidates = self.repository.search(search_query, limit=candidate_k) if hasattr(self.repository, "search") else []
+        semantic_candidates = self.repository.search_semantic(search_query, limit=candidate_k, threshold=threshold) if hasattr(self.repository, "search_semantic") else []
 
-        # If repo doesn't support vector search directly (e.g. basic memory repo), fallback to get_all match
+        # If repo doesn't support vector search directly (e.g. basic memory repo), perform contextual token match
         if not keyword_candidates and not semantic_candidates and hasattr(self.repository, "get_all"):
             all_memories = self.repository.get_all()
             active_mems = [m for m in all_memories if m.get("status") == "active"]
             q_words = set(search_query.lower().split())
+            
+            matched = []
             for m in active_mems:
-                c_text = m.get("contextual_text", f"{m.get('key')} {m.get('value')} {m.get('type')}")
-                overlap = len(set(c_text.lower().split()) & q_words)
-                m["_score"] = float(overlap)
-            keyword_candidates = sorted(active_mems, key=lambda x: x.get("_score", 0), reverse=True)[:k*3]
+                c_text = m.get("contextual_text", f"{m.get('key')} {m.get('value')} {m.get('type')} {m.get('conversation_topic', '')}")
+                c_words = set(c_text.lower().split())
+                overlap = len(c_words & q_words)
+                
+                # Check for direct value/key containment or multi-word match
+                val_str = str(m.get("value", "")).lower()
+                key_str = str(m.get("key", "")).lower()
+                type_str = str(m.get("type", "")).lower()
+                
+                is_hit = overlap > 0 or any(w in val_str or w in key_str or w in type_str for w in q_words)
+                if is_hit:
+                    score = float(overlap) + (2.0 if val_str in search_query.lower() or search_query.lower() in val_str else 0.5)
+                    m_copy = dict(m)
+                    m_copy["_score"] = score
+                    matched.append(m_copy)
 
-        # 4. RRF Fusion + Type Boost
-        candidates = self.hybrid_engine.combine(keyword_candidates, semantic_candidates, limit=k * 3)
+            matched.sort(key=lambda x: x.get("_score", 0), reverse=True)
+            keyword_candidates = matched[:candidate_k]
 
-        # 5. Pluggable Reranking (Cross-Encoder / LLM / Heuristic)
-        reranked_results = self.reranker.rerank(search_query, candidates, limit=k * 2)
+        # Filter out low relevance candidates (Similarity Threshold Enforcement)
+        keyword_candidates = [r for r in keyword_candidates if r.get("_score", 1.0) >= threshold]
+        semantic_candidates = [r for r in semantic_candidates if r.get("_similarity", 1.0) >= threshold]
 
-        # 6. Adaptive K Selection
+        if not keyword_candidates and not semantic_candidates:
+            return []
+
+        # 5. RRF Fusion + Type Boost
+        candidates = self.hybrid_engine.combine(keyword_candidates, semantic_candidates, limit=candidate_k)
+
+        # 6. Pluggable Reranking (Cross-Encoder / LLM / Heuristic)
+        reranked_results = self.reranker.rerank(search_query, candidates, limit=candidate_k)
+
+        # 7. Adaptive K Selection
         final_k = self.adaptive_k_selector.select_k(search_query, reranked_results, target_k=k)
         final_results = reranked_results[:final_k]
 
-        # 7. Store in Cache
+        # 8. Store in Cache
         if self.cache:
             self.cache.set(query, final_results)
 
