@@ -1,43 +1,78 @@
-from .repository import MemoryRepository
+from typing import List, Dict, Any, Optional
+from .retrieval import (
+    ContextualRetriever,
+    HybridSearchEngine,
+    PluggableReranker,
+    AdaptiveKSelector,
+    RetrievalCache,
+    QueryRewriter
+)
+
 class MemoryRetriever:
-    def __init__(self, repository:MemoryRepository):
+    """
+    Orchestrates Contextual Indexing, Query Rewriting, Hybrid RRF Search,
+    Pluggable Reranking, Adaptive K Selection, and TTL Caching.
+    """
+    def __init__(
+        self,
+        repository,
+        reranker_mode: str = "heuristic",
+        enable_cache: bool = True,
+        enable_rewriter: bool = True
+    ):
         self.repository = repository
+        self.contextual_builder = ContextualRetriever()
+        self.hybrid_engine = HybridSearchEngine()
+        self.reranker = PluggableReranker(mode=reranker_mode)
+        self.adaptive_k_selector = AdaptiveKSelector()
+        self.cache = RetrievalCache() if enable_cache else None
+        self.rewriter = QueryRewriter() if enable_rewriter else None
 
-    # our job is to retrieve ,hence
-    # retrieve the top k elements ,lets say 3
-    def retrieve(self, query: str, k: int = 3):
-        # our job is to load active memories
-        # active in the sense which are there
-        # in the codebase
-        # memories = self.repository.get_all()
-        # active = [
-        #     m for m in memories
-        #     if m.get("status") == "active"
-        # ]
+    def index_memory(self, memory: Dict[str, Any]) -> Dict[str, Any]:
+        """
+        Enriches memory with Anthropic-style contextual prefix before persistent save.
+        """
+        memory_copy = dict(memory)
+        memory_copy["contextual_text"] = self.contextual_builder.build_contextual_text(memory_copy)
+        return memory_copy
 
-        # # now the thing is once we got the active
-        # # memories then how come we know the
-        # # keyword overlap or not
-        # query_words = set(query.lower().split())
+    def retrieve(self, query: str, k: int = 5) -> List[Dict[str, Any]]:
+        # 1. Cache hit lookup
+        if self.cache:
+            cached_results = self.cache.get(query)
+            if cached_results is not None:
+                return cached_results[:k]
 
-        # for memory in active:
-        #     # combine value, key, and type for a broader abstraction search
-        #     val = str(memory.get("value", "")).lower()
-        #     key = str(memory.get("key", "")).lower()
-        #     m_type = str(memory.get("type", "")).lower()
+        # 2. Query Rewriting (normalize abbreviations, clean filler words)
+        search_query = self.rewriter.rewrite(query) if self.rewriter else query
 
-        #     combined_text = f"{val} {key} {m_type}"
-        #     memory_words = set(combined_text.split())
+        # 3. Candidate Generation via Hybrid Search (pgvector + keyword)
+        keyword_candidates = self.repository.search(search_query, limit=k * 3) if hasattr(self.repository, "search") else []
+        semantic_candidates = self.repository.search_semantic(search_query, limit=k * 3) if hasattr(self.repository, "search_semantic") else []
 
-        #     # use & for set intersection, not &&
-        #     overlap = len(memory_words & query_words)
-        #     memory["retrieval_score"] = overlap
+        # If repo doesn't support vector search directly (e.g. basic memory repo), fallback to get_all match
+        if not keyword_candidates and not semantic_candidates and hasattr(self.repository, "get_all"):
+            all_memories = self.repository.get_all()
+            active_mems = [m for m in all_memories if m.get("status") == "active"]
+            q_words = set(search_query.lower().split())
+            for m in active_mems:
+                c_text = m.get("contextual_text", f"{m.get('key')} {m.get('value')} {m.get('type')}")
+                overlap = len(set(c_text.lower().split()) & q_words)
+                m["_score"] = float(overlap)
+            keyword_candidates = sorted(active_mems, key=lambda x: x.get("_score", 0), reverse=True)[:k*3]
 
-        # # filter out zero score memories if desired, but we'll just sort them
-        # ranked = sorted(
-        #     active,
-        #     key=lambda x: x.get("retrieval_score", 0),
-        #     reverse=True
-        # )
-        results = self.repository.search(query)
-        return results[:k]
+        # 4. RRF Fusion + Type Boost
+        candidates = self.hybrid_engine.combine(keyword_candidates, semantic_candidates, limit=k * 3)
+
+        # 5. Pluggable Reranking (Cross-Encoder / LLM / Heuristic)
+        reranked_results = self.reranker.rerank(search_query, candidates, limit=k * 2)
+
+        # 6. Adaptive K Selection
+        final_k = self.adaptive_k_selector.select_k(search_query, reranked_results, target_k=k)
+        final_results = reranked_results[:final_k]
+
+        # 7. Store in Cache
+        if self.cache:
+            self.cache.set(query, final_results)
+
+        return final_results

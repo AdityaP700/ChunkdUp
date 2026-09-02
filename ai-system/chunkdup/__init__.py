@@ -16,7 +16,10 @@ from .memory import (
 from .async_memory import AsyncMemory
 from .embeddings import EmbeddingGenerator
 from .in_memory_repository import InMemoryRepository
-from .postgres_repository import PostgresRepository
+try:
+    from .postgres_repository import PostgresRepository
+except ImportError:
+    PostgresRepository = None
 from .types import (
     MemoryDict,
     SearchResult,

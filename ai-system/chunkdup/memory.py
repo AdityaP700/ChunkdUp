@@ -13,7 +13,10 @@ import importlib.util
 from datetime import datetime, timezone
 from typing import List, Dict, Any, Optional, Union
 import logging
-from .postgres_repository import PostgresRepository
+try:
+    from .postgres_repository import PostgresRepository
+except ImportError:
+    PostgresRepository = None
 
 from .repository import MemoryRepository
 from .in_memory_repository import InMemoryRepository
@@ -312,8 +315,8 @@ class MemoryManager:
         memory["importance"] = importance
         existing = self.repository.get_by_key(memory["key"])
         if existing:
-            memory["version"] = existing["version"]  
-            memory["id"] = existing["id"]
+            memory["version"] = existing.get("version", 1)  
+            memory["id"] = existing.get("id", memory["id"])
 
         decision = self.engine.decide(existing, memory)
 

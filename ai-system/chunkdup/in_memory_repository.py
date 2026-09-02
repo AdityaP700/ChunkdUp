@@ -53,7 +53,7 @@ class InMemoryRepository(MemoryRepository):
     def get_all(self) -> List[Dict[str, Any]]:
         return [m for m in self._memories.values() if m.get("status") == "active"]
 
-    def search(self, query: str) -> List[Dict[str, Any]]:
+    def search(self, query: str, limit: Optional[int] = None) -> List[Dict[str, Any]]:
         query_words = set(query.lower().split())
         results = []
 
@@ -61,10 +61,13 @@ class InMemoryRepository(MemoryRepository):
             if memory.get("status") != "active":
                 continue
 
-            combined = f"{memory['key']} {memory['value']}".lower()
+            contextual = memory.get("contextual_text", "")
+            combined = f"{memory['key']} {memory['value']} {memory.get('type', '')} {contextual}".lower()
             if any(word in combined for word in query_words):
                 results.append(memory)
 
+        if limit:
+            return results[:limit]
         return results
 
     def merge(self, key: str, memory: Dict[str, Any]) -> None:

@@ -62,3 +62,48 @@ Custom NER	Domain-specific	Need training data
  HNSW is a fast graph-based algorithm used for approximate nearest neighbor search in high-dimensional vector databases.
 
 It cuts search time from a slow linear scan (O(N)) to a fast logarithmic scale (\(O(\log N)\)). Popular tools like Pinecone and Qdrant use it for AI recommendations and semantic search.
+
+
+
+What Leading AI Companies Actually Do
+Anthropic: Contextual Retrieval
+Anthropic's approach directly addresses the problem you identified — chunks losing context. Their solution:
+
+Contextual Embeddings: Before embedding a chunk, they prepend chunk-specific explanatory context. For example, instead of embedding just "Python is my primary language", they embed "This chunk is from a conversation about programming languages. Python is my primary language."
+
+Contextual BM25: Same contextual prefix applied to BM25 indexing.
+
+Results: 49% reduction in retrieval failure (5.7% → 2.9%). Combined with reranking: 67% reduction.
+
+Why it matters for you: Your Option D (Hybrid Rerank) is the foundation. Contextual retrieval is the next layer you could add.
+
+OpenAI: Multi-Stage RAG
+OpenAI's ML engineers use:
+
+Hybrid search: BM25 + dense embeddings
+
+Cross-encoder reranking: Small model to filter top-10 docs
+
+Adaptive k: Small k for high-confidence queries, larger for ambiguous
+
+Caching: Hot docs in Redis, cold docs in vector DB
+
+Eval loop: Automated hallucination detection + feedback retraining
+
+Key quote: "RAG at scale isn't about bigger DBs. It's about precision, caching, and adaptive retrieval."
+
+DeepSeek: LLM-Based Reranking
+DeepSeek's approach emphasizes:
+
+InsertRank: LLMs reason over BM25 scores to improve listwise reranking. With DeepSeek-R1, InsertRank achieves 37.5 on the BRIGHT benchmark.
+
+Key insight: Let the LLM itself participate in reranking decisions, not just generation.
+
+MiniMax: Hybrid with Fallback
+MiniMax's documented approach:
+
+Embedding ≠ Semantic → Add BM25 fallback
+
+Rerank with Rerankers → Anchor citations via Retrieval Traceability
+
+Retrieval drift → BBMC + Data Contracts
