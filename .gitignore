@@ -5,3 +5,6 @@ __pycache__/
 .env
 *.egg-info/
 .pytest_cache/
+# Local ML model and downloaded wheels
+models/all-MiniLM-L6-v2/
+wheels/

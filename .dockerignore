@@ -1,100 +1,108 @@
-# .dockerignore (Expanded)
-
+# ─────────────────────────────
 # Python
+# ─────────────────────────────
 __pycache__/
-*.pyc
-*.pyo
+*.py[cod]
 *.pyd
-.Python
 *.so
 *.egg
 *.egg-info/
-dist/
-build/
-*.whl
+.Python
+
 .venv/
 venv/
 ENV/
 env/
-# .dockerignore (Add this)
-labs/
-# Version control
+
+dist/
+build/
+*.whl
+
+# ─────────────────────────────
+# Git
+# ─────────────────────────────
 .git/
 .gitignore
 .gitattributes
-.git/
 
-# IDE
+# ─────────────────────────────
+# IDE / OS
+# ─────────────────────────────
 .vscode/
 .idea/
 *.swp
 *.swo
 *~
+.DS_Store
+Thumbs.db
 
-# Data files
+# ─────────────────────────────
+# Heavy / local data
+# ─────────────────────────────
+labs/
 data/
-*.json
+learnings/
+
 *.db
 *.sqlite
 *.csv
 *.parquet
 
-# Labs (heavy)
-labs/
-002-structured-outputs/
-003-memory-generation/
-004-semantic-retrieval/
-002-*/
-003-*/
-004-*/
-005-*/
-
-# Evaluation outputs
+# ─────────────────────────────
+# Evaluation artifacts
+# ─────────────────────────────
 evaluation/results/
 evaluation/*.json
 !evaluation/scenarios.json
 
-# Docker
-Dockerfile
-docker-compose.yaml
-.dockerignore
-
-# Logs
-logs/
-*.log
-
-# OS files
-.DS_Store
-Thumbs.db
-
-# Misc
-*.md
-!README.md
-*.txt
-!requirements.txt
-!pyproject.toml
-docs/
-examples/__pycache__/
-
-# Notebooks
+# ─────────────────────────────
+# Notebooks / tests
+# ─────────────────────────────
 *.ipynb
 .ipynb_checkpoints/
-
-# Test files
-tests/__pycache__/
 .pytest_cache/
 .coverage
 htmlcov/
 
-# System
-*.swp
-*.swo
-*.lock
-~*
-ai-system/labs
-ai-system/labs/
-ai-system\labs
-labs/
-data/
-learnings/
-evaluation/results/
+tests/
+
+# ─────────────────────────────
+# Logs
+# ─────────────────────────────
+logs/
+*.log
+
+# ─────────────────────────────
+# Docker
+# ─────────────────────────────
+Dockerfile
+docker-compose.yaml
+.dockerignore
+
+# ─────────────────────────────
+# Documentation / misc
+# ─────────────────────────────
+docs/
+*.md
+!README.md
+
+# Keep dependency files
+*.txt
+!requirements.txt
+!pyproject.toml
+
+__pycache__
+*.pyc
+*.pyo
+*.pyd
+.Python
+env/
+venv/
+.venv/
+.env
+.git
+.gitignore
+*.md
+*.txt
+!.gitignore
+!requirements.txt

@@ -1,29 +1,28 @@
-# Dockerfile
-FROM python:3.11-slim
+FROM python:3.11-slim-bookworm
 
-# Set working directory
 WORKDIR /app
 
-# Set environment variables
 ENV PYTHONDONTWRITEBYTECODE=1 \
     PYTHONUNBUFFERED=1 \
-    PYTHONPATH=/app/ai-system
+    PYTHONPATH=/app/ai-system \
+    PIP_NO_CACHE_DIR=1 \
+    PIP_DISABLE_PIP_VERSION_CHECK=1
 
-# Install system dependencies
-RUN apt-get update && apt-get install -y \
-    gcc \
-    postgresql-client \
-    && rm -rf /var/lib/apt/lists/*
+RUN apt-get update && \
+    apt-get install -y --no-install-recommends \
+        gcc \
+        postgresql-client && \
+    rm -rf /var/lib/apt/lists/*
 
-# Copy requirements first (for better caching)
+RUN pip install --upgrade pip
+
 COPY requirements.txt .
-RUN pip install --no-cache-dir -r requirements.txt
 
-# Copy the entire project
+RUN pip install --no-cache-dir --timeout=1000 torch==2.0.1 --index-url https://download.pytorch.org/whl/cpu
+RUN pip install --no-cache-dir --timeout=1000 -r requirements.txt
+
 COPY . .
 
-# Create a non-root user
 RUN adduser --disabled-password --gecos '' chunkdup
 
-# Run the API (we'll add FastAPI later, for now just run tests)
 CMD ["python", "-c", "print('ChunkdUp is ready!')"]
