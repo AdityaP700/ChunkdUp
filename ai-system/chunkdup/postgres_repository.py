@@ -72,7 +72,8 @@ class PostgresRepository(MemoryRepository):
         """Store a new memory."""
         embedding = None
         if memory.get("value"):
-            embedding = self.embedding_generator.generate(memory["value"])
+            embedding_text = f"{memory['key']}: {memory['value']}"
+            embedding = self.embedding_generator.generate(embedding_text)
         with self.SessionLocal() as session:
             db_memory = MemoryModel(
                 id=memory.get("id", uuid.uuid4()),
@@ -118,7 +119,8 @@ class PostgresRepository(MemoryRepository):
             raise ValueError("Memory ID required for update")
         embedding = None
         if memory.get("value"):
-            embedding = self.embedding_generator.generate(memory["value"])
+            embedding_text = f"{memory['key']}: {memory['value']}"
+            embedding = self.embedding_generator.generate(embedding_text)
 
         expected_version = memory.get("version", 1)
 
@@ -265,7 +267,12 @@ class PostgresRepository(MemoryRepository):
                 for r in results
             ]
 
-    def search_semantic(self, query: str, limit: int = 5) -> List[Dict[str, Any]]:
+    def search_semantic(
+    self,
+    query: str,
+    limit: int = 5,
+    threshold: float = 0.15
+) -> List[Dict[str, Any]]:
         """
         Search memories by semantic similarity using pgvector.
 
@@ -284,14 +291,22 @@ class PostgresRepository(MemoryRepository):
         with self.SessionLocal() as session:
             # Use pgvector's cosine_distance operator (<->)
             results = session.execute(
-                select(MemoryModel)
-                .where(MemoryModel.status == "active")
-                .where(MemoryModel.embedding.is_not(None))
-                .order_by(MemoryModel.embedding.cosine_distance(query_embedding))
-                .limit(limit)
-            ).scalars().all()
-
-            return [self._to_dict(r) for r in results]
+    select(
+        MemoryModel,
+        MemoryModel.embedding.cosine_distance(query_embedding).label("distance")
+    )
+    .where(MemoryModel.status == "active")
+    .where(MemoryModel.embedding.is_not(None))
+    .order_by(MemoryModel.embedding.cosine_distance(query_embedding))
+    .limit(limit)
+).all()
+            output = []
+            for memory, distance in results:
+                item = self._to_dict(memory)
+    # pgvector cosine distance = 1 - cosine similarity
+                item["_similarity"] = 1.0 - float(distance)
+                output.append(item)
+        return output
 
     def search_hybrid(self, query: str, limit: int = 5) -> List[Dict[str, Any]]:
         """

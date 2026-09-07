@@ -179,6 +179,44 @@ class MemoryExtractor:
                         if match.group(group_idx):
                             memory[meta_key] = match.group(group_idx).strip()
                 memories.append(memory)
+                # Generic technical fact extraction
+        if not memories:
+            generic_rules = [
+                {
+                    "pattern": r"(?:uses?|using|use)\s+(PostgreSQL|MySQL|MongoDB|Redis|SQLite)(?:\s+with\s+pgvector)?",
+                    "type": "environment",
+                    "key": "database",
+                    "value_group": 1,
+                },
+                {
+                    "pattern": r"(?:embedding model is|embedding model:)\s*([A-Za-z0-9._-]+)",
+                    "type": "tool",
+                    "key": "embedding_model",
+                    "value_group": 1,
+                },
+                {
+                    "pattern": r"(?:runs? inside|runs? in|deployed on)\s+(Docker(?:\s+on\s+WSL2)?|WSL2|Kubernetes)",
+                    "type": "environment",
+                    "key": "runtime_environment",
+                    "value_group": 1,
+                },
+            ]
+
+            for rule in generic_rules:
+                matches = re.finditer(rule["pattern"], conversation, re.IGNORECASE)
+                for match in matches:
+                    memories.append({
+                        "id": str(uuid.uuid4()),
+                        "type": rule["type"],
+                        "key": rule["key"],
+                        "value": match.group(rule["value_group"]).strip(),
+                        "frequency": 1,
+                        "created_at": datetime.now(timezone.utc).isoformat().replace("+00:00", "Z"),
+                        "updated_at": datetime.now(timezone.utc).isoformat().replace("+00:00", "Z"),
+                        "source": "generic_rule",
+                        "status": "active",
+                    })
+
         return memories
 
 
@@ -315,7 +353,7 @@ class MemoryManager:
         memory["importance"] = importance
         existing = self.repository.get_by_key(memory["key"])
         if existing:
-            memory["version"] = existing.get("version", 1)  
+            memory["version"] = existing.get("version", 1)
             memory["id"] = existing.get("id", memory["id"])
 
         decision = self.engine.decide(existing, memory)

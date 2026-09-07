@@ -64,22 +64,70 @@ class PluggableReranker:
         scored.sort(key=lambda x: x["_rerank_score"], reverse=True)
         return scored[:limit]
 
-    def _rerank_heuristic(self, query: str, candidates: List[Dict[str, Any]], limit: int) -> List[Dict[str, Any]]:
+    def _rerank_heuristic(
+        self,
+        query: str,
+        candidates: List[Dict[str, Any]],
+        limit: int
+    ) -> List[Dict[str, Any]]:
+        """
+        Fast reranker combining semantic similarity with lightweight
+        type and lexical relevance signals.
+        """
         type_weights = {
-            "programming_language": 2.0,
-            "project_name": 1.5,
-            "environment": 1.3,
-            "editor": 1.0,
-            "preference": 0.8,
-            "response_style": 0.6
+            "programming_language": 1.05,
+            "project_name": 1.05,
+            "environment": 1.05,
+            "tool": 1.05,
+            "editor": 1.05,
+            "preference": 1.0,
+            "response_style": 0.95,
         }
+
+        q_words = set(query.lower().split())
         scored = []
+
         for c in candidates:
             c_copy = dict(c)
-            t_boost = type_weights.get(c.get("type"), 1.0)
-            base_score = c_copy.get("_score", 0.1)
-            c_copy["_rerank_score"] = round(base_score * t_boost, 4)
+
+            semantic_score = max(
+                0.0,
+                float(c.get("_similarity", 0.0))
+            )
+
+            hybrid_score = float(c.get("_score", 0.0))
+
+            text = f"{c.get('key', '')} {c.get('value', '')}".lower()
+            doc_words = set(text.split())
+
+            overlap = len(q_words & doc_words)
+
+            lexical_score = min(
+                overlap / max(len(q_words), 1),
+                1.0
+            )
+
+            type_boost = type_weights.get(
+                c.get("type"),
+                1.0
+            )
+
+            final_score = (
+                semantic_score * 0.75
+                + lexical_score * 0.15
+                + hybrid_score * 0.10
+            ) * type_boost
+
+            c_copy["_rerank_score"] = round(
+                final_score,
+                4
+            )
+
             scored.append(c_copy)
 
-        scored.sort(key=lambda x: x["_rerank_score"], reverse=True)
+        scored.sort(
+            key=lambda x: x["_rerank_score"],
+            reverse=True
+        )
+
         return scored[:limit]

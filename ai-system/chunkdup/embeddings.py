@@ -1,6 +1,7 @@
 # ai-system/chunkdup/embeddings.py
 from typing import List, Optional
 import logging
+import os
 from sentence_transformers import SentenceTransformer
 
 logger = logging.getLogger(__name__)
@@ -8,16 +9,11 @@ logger = logging.getLogger(__name__)
 class EmbeddingGenerator:
     """Generate embeddings for semantic search."""
 
-    def __init__(self, model_name: str = "all-MiniLM-L6-v2"):
-        """
-        Initialize the embedding model.
-
-        Args:
-            model_name: SentenceTransformer model name
-                       Options: all-MiniLM-L6-v2 (384 dims, fast)
-                                all-mpnet-base-v2 (768 dims, more accurate)
-        """
-        self.model_name = model_name
+    def __init__(self, model_name: Optional[str] = None):
+        self.model_name = model_name or os.getenv(
+        "CHUNKDUP_EMBEDDING_MODEL",
+        "all-MiniLM-L6-v2"
+    )
         self.model = None
         self._load_model()
 

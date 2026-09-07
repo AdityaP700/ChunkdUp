@@ -5,6 +5,7 @@ pgvector==0.3.6
 alembic==1.14.0
 
 # ML / Embeddings
+numpy==1.26.4
 sentence-transformers==2.6.1
 transformers==4.40.2
 

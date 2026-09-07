@@ -64,18 +64,18 @@ class MemoryRetriever:
             all_memories = self.repository.get_all()
             active_mems = [m for m in all_memories if m.get("status") == "active"]
             q_words = set(search_query.lower().split())
-            
+
             matched = []
             for m in active_mems:
                 c_text = m.get("contextual_text", f"{m.get('key')} {m.get('value')} {m.get('type')} {m.get('conversation_topic', '')}")
                 c_words = set(c_text.lower().split())
                 overlap = len(c_words & q_words)
-                
+
                 # Check for direct value/key containment or multi-word match
                 val_str = str(m.get("value", "")).lower()
                 key_str = str(m.get("key", "")).lower()
                 type_str = str(m.get("type", "")).lower()
-                
+
                 is_hit = overlap > 0 or any(w in val_str or w in key_str or w in type_str for w in q_words)
                 if is_hit:
                     score = float(overlap) + (2.0 if val_str in search_query.lower() or search_query.lower() in val_str else 0.5)
@@ -87,8 +87,15 @@ class MemoryRetriever:
             keyword_candidates = matched[:candidate_k]
 
         # Filter out low relevance candidates (Similarity Threshold Enforcement)
-        keyword_candidates = [r for r in keyword_candidates if r.get("_score", 1.0) >= threshold]
-        semantic_candidates = [r for r in semantic_candidates if r.get("_similarity", 1.0) >= threshold]
+        keyword_candidates = [
+    r for r in keyword_candidates
+    if r.get("_score", 1.0) >= threshold
+]
+
+        semantic_candidates = [
+    r for r in semantic_candidates
+    if r.get("_similarity", 1.0) > -1.0
+]
 
         if not keyword_candidates and not semantic_candidates:
             return []

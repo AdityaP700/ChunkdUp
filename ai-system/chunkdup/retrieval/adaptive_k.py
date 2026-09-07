@@ -23,7 +23,7 @@ class AdaptiveKSelector:
 
         # 2. Strict out-of-domain check: if maximum score is trivial, return 0
         max_score = max([r.get("_rerank_score", r.get("_score", 0.0)) for r in results]) if results else 0.0
-        if max_score < 0.05:
-            return 0
+        if max_score < 0.01:
+            return 1 if results else 0
 
         return min(target_k, len(results))

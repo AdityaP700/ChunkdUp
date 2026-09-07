@@ -1,9 +1,11 @@
 FROM chunkdup:base
 
+COPY wheels/numpy-1.26.4-cp311-cp311-manylinux_2_17_x86_64.manylinux2014_x86_64.whl /tmp/
 COPY wheels/tokenizers-0.19.1-cp311-cp311-manylinux_2_17_x86_64.manylinux2014_x86_64.whl /tmp/
 COPY wheels/transformers-4.40.2-py3-none-any.whl /tmp/
 
-RUN pip install --no-cache-dir /tmp/tokenizers-*.whl && \
+RUN pip install --no-cache-dir /tmp/numpy-1.26.4-cp311-cp311-manylinux_2_17_x86_64.manylinux2014_x86_64.whl && \
+    pip install --no-cache-dir /tmp/tokenizers-0.19.1-cp311-cp311-manylinux_2_17_x86_64.manylinux2014_x86_64.whl && \
     pip install --no-cache-dir --no-deps /tmp/transformers-4.40.2-py3-none-any.whl
 
 COPY models/all-MiniLM-L6-v2 /opt/models/all-MiniLM-L6-v2
