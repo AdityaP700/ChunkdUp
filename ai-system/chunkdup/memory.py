@@ -156,7 +156,7 @@ class MemoryExtractor:
         for rule in self.rules:
             matches = re.finditer(rule["pattern"], conversation, re.IGNORECASE)
             for match in matches:
-                value = match.group(rule["value_group"]).strip()
+                value = self._clean_value(match.group(rule["value_group"]).strip())
                 key = rule["key"]
                 for i in range(1, len(match.groups()) + 1):
                     placeholder = f"{{{i}}}"
@@ -209,7 +209,7 @@ class MemoryExtractor:
                         "id": str(uuid.uuid4()),
                         "type": rule["type"],
                         "key": rule["key"],
-                        "value": match.group(rule["value_group"]).strip(),
+                        "value": self._clean_value(match.group(rule["value_group"]).strip()),
                         "frequency": 1,
                         "created_at": datetime.now(timezone.utc).isoformat().replace("+00:00", "Z"),
                         "updated_at": datetime.now(timezone.utc).isoformat().replace("+00:00", "Z"),
@@ -218,6 +218,13 @@ class MemoryExtractor:
                     })
 
         return memories
+
+    # In memory.py, inside MemoryExtractor class:
+
+    def _clean_value(self, value: str) -> str:
+        if not value:
+            return value
+        return value.rstrip('.,;:')
 
 
 class MemoryScorer:

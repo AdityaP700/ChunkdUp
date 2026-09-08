@@ -72,7 +72,11 @@ class PostgresRepository(MemoryRepository):
         """Store a new memory."""
         embedding = None
         if memory.get("value"):
-            embedding_text = f"{memory['key']}: {memory['value']}"
+            embedding_text = (
+    f"ChunkdUp {memory['key'].replace('_', ' ')}: "
+    f"{memory['value']}"
+
+)
             embedding = self.embedding_generator.generate(embedding_text)
         with self.SessionLocal() as session:
             db_memory = MemoryModel(
@@ -119,7 +123,10 @@ class PostgresRepository(MemoryRepository):
             raise ValueError("Memory ID required for update")
         embedding = None
         if memory.get("value"):
-            embedding_text = f"{memory['key']}: {memory['value']}"
+            embedding_text = (
+    f"ChunkdUp {memory['key'].replace('_', ' ')}: "
+    f"{memory['value']}"
+)
             embedding = self.embedding_generator.generate(embedding_text)
 
         expected_version = memory.get("version", 1)

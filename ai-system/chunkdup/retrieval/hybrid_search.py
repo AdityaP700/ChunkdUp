@@ -10,14 +10,17 @@ class HybridSearchEngine:
         self.keyword_weight = keyword_weight
         self.semantic_weight = semantic_weight
         self.type_boost = type_boost or {
-            "programming_language": 2.0,
-            "project_name": 1.5,
-            "company": 2.5,
-            "role": 2.5,
-            "environment": 1.3,
-            "editor": 1.5,
-            "preference": 2.0,
-            "response_style": 2.0
+           "programming_language": 2.0,
+    "database": 1.8,
+    "runtime_environment": 2.5,   
+    "embedding_model": 2.0,
+    "environment": 1.8,
+    "tool": 1.5,
+    "project": 1.5,
+    "employment": 1.3,
+    "role": 1.3,
+    "learning": 1.2,
+    "preference": 1.0,
         }
 
     def _get_dynamic_intent_boost(self, query: str, candidate_type: str) -> float:

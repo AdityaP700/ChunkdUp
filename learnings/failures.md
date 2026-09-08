@@ -61,3 +61,13 @@ What It Does: Detect the type of query and filter results accordingly.
 - but it doesnt guarantee exact matches
 
 ### Option D: Hybrid (Keyword + Semantic with Reranking)
+
+Test	Query	Expected	Found?	Rank	Verdict
+Exact: Where runs?	"Where does ChunkdUp run?"	runtime_environment	❌	N/A	FAILED
+Exact: Database?	"What database?"	database	✅	1	PASSED
+Exact: Embedding model?	"What embedding model?"	embedding_model	❌	N/A	FAILED
+Exact: Language?	"What language?"	programming_language	✅	1	PASSED
+Semantic: Hosted?	"Where is ChunkdUp hosted?"	runtime_environment	❌	N/A	FAILED
+Semantic: Vector search?	"What technology for vector search?"	database	❌	N/A	FAILED
+Semantic: Model?	"What model for embeddings?"	embedding_model	❌	N/A	FAILED
+Semantic: Code?	"What language for backend?"	programming_language	✅	1	PASSED
