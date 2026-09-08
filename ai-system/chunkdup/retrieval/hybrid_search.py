@@ -6,9 +6,11 @@ class HybridSearchEngine:
     Implements Hybrid Search with Reciprocal Rank Fusion (RRF),
     Dynamic Intent-based Type Boosting, and Contextual Expansion.
     """
-    def __init__(self, keyword_weight: float = 0.4, semantic_weight: float = 0.6, type_boost: Dict[str, float] = None):
+    def __init__(self, keyword_weight: float = 0.4, semantic_weight: float = 0.6, entity_weight: float = 0.5, type_boost: Dict[str, float] = None):
         self.keyword_weight = keyword_weight
         self.semantic_weight = semantic_weight
+        self.entity_weight = entity_weight
+        self.last_diagnostics = []
         self.type_boost = type_boost or {
            "programming_language": 2.0,
     "database": 1.8,
@@ -43,33 +45,48 @@ class HybridSearchEngine:
         k = 60  # RRF constant
         scores = {}
         metadata = {}
+        diagnostics = {}
+
+        def add_rrf_result(item, rank, weight, signal):
+            m_id = item["id"]
+            m_type = item.get("type", "")
+            type_score = self.type_boost.get(m_type, 1.0) * self._get_dynamic_intent_boost(query, m_type)
+            contribution = weight * (1.0 / (k + rank + 1)) * type_score
+            scores[m_id] = scores.get(m_id, 0.0) + contribution
+            diagnostics.setdefault(m_id, {"keyword": 0.0, "semantic": 0.0})[signal] += contribution
+            diagnostics[m_id]["type"] = type_score
+            metadata.setdefault(m_id, dict(item))
+            if item.get("_entity_score", 0.0) > metadata[m_id].get("_entity_score", 0.0):
+                metadata[m_id]["_entity_score"] = item["_entity_score"]
 
         # 1. Apply static + dynamic intent boost before RRF
         for rank, item in enumerate(keyword_results):
-            m_id = item["id"]
-            m_type = item.get("type", "")
-            base_boost = self.type_boost.get(m_type, 1.0)
-            intent_boost = self._get_dynamic_intent_boost(query, m_type)
-            total_boost = base_boost * intent_boost
-
-            rrf_score = self.keyword_weight * (1.0 / (k + rank + 1)) * total_boost
-            scores[m_id] = scores.get(m_id, 0.0) + rrf_score
-            metadata[m_id] = dict(item)
+            add_rrf_result(item, rank, self.keyword_weight, "keyword")
 
         for rank, item in enumerate(semantic_results):
-            m_id = item["id"]
-            m_type = item.get("type", "")
-            base_boost = self.type_boost.get(m_type, 1.0)
-            intent_boost = self._get_dynamic_intent_boost(query, m_type)
-            total_boost = base_boost * intent_boost
-
-            rrf_score = self.semantic_weight * (1.0 / (k + rank + 1)) * total_boost
-            scores[m_id] = scores.get(m_id, 0.0) + rrf_score
-            if m_id not in metadata:
-                metadata[m_id] = dict(item)
+            add_rrf_result(item, rank, self.semantic_weight, "semantic")
 
         for m_id, item in metadata.items():
-            metadata[m_id]["_score"] = round(scores[m_id], 6)
+            entity_score = item.get("_entity_score", 0.0)
+            rrf_score = scores[m_id]
+            final_score = rrf_score + self.entity_weight * entity_score
+            metadata[m_id]["_rrf_score"] = round(rrf_score, 6)
+            metadata[m_id]["_score"] = round(final_score, 6)
+            diagnostics.setdefault(m_id, {}).update({
+                "entity": round(entity_score, 6),
+                "rrf": round(rrf_score, 6),
+                "final": round(final_score, 6),
+            })
 
-        sorted_ids = sorted(scores.keys(), key=lambda x: scores[x], reverse=True)
-        return [metadata[m_id] for m_id in sorted_ids[:limit]]
+        sorted_ids = sorted(scores.keys(), key=lambda x: metadata[x]["_score"], reverse=True)
+        results = [metadata[m_id] for m_id in sorted_ids[:limit]]
+        self.last_diagnostics = [
+            {
+                "id": item["id"],
+                "key": item.get("key"),
+                "value": item.get("value"),
+                **diagnostics[item["id"]],
+            }
+            for item in results
+        ]
+        return results

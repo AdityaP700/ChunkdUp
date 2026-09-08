@@ -40,6 +40,8 @@ class SemanticRetrievalTest:
             "top_3": [(r.get("key"), r.get("value"), r.get("_similarity", 0))
                       for r in results[:3]]
         }
+        if len(self.results) < 3:
+            result["diagnostics"] = self.memory.retriever.last_diagnostics[:3]
         self.results.append(result)
         return result
 
@@ -64,6 +66,8 @@ class SemanticRetrievalTest:
             print(f"   Expected: {r['expected']['key']} = {r['expected']['value']}")
             print(f"   Found: {r['found']} (Rank: {r['rank'] if r['rank'] else 'N/A'})")
             print(f"   Top 3: {r['top_3']}")
+            if "diagnostics" in r:
+                print(f"   Diagnostics: {r['diagnostics']}")
             print()
 
         print("="*70)

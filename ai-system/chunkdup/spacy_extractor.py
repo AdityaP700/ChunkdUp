@@ -3,18 +3,15 @@
 spaCy Named Entity Recognition & Linguistic Extractor for ChunkdUp.
 """
 import uuid
+import os
 import logging
 from datetime import datetime, timezone
 from typing import List, Dict, Any, Optional
 
 logger = logging.getLogger(__name__)
 
-try:
-    import spacy
-    NLP_AVAILABLE = True
-except ImportError:
-    NLP_AVAILABLE = False
-    spacy = None
+NLP_AVAILABLE = False
+spacy = None
 
 
 class SpacyExtractor:
@@ -22,6 +19,14 @@ class SpacyExtractor:
 
     def __init__(self, model_name: str = "en_core_web_sm"):
         self.nlp = None
+        global NLP_AVAILABLE, spacy
+        if os.getenv("CHUNKDUP_ENABLE_SPACY_NER") == "1":
+            try:
+                import spacy as spacy_module
+                spacy = spacy_module
+                NLP_AVAILABLE = True
+            except ImportError:
+                NLP_AVAILABLE = False
         if NLP_AVAILABLE:
             try:
                 self.nlp = spacy.load(model_name)

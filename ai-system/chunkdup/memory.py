@@ -33,12 +33,14 @@ try:
     from .retrieval_class import MemoryRetriever
     from .spacy_extractor import SpacyExtractor
     from .llm_extractor import LLMExtractor
+    from .entity_extractor import EntityExtractor
 except ImportError:
     from policies import Decision, PolicyFactory
     from prompt_builder import PromptBuilder
     from retrieval_class import MemoryRetriever
     from spacy_extractor import SpacyExtractor
     from llm_extractor import LLMExtractor
+    from entity_extractor import EntityExtractor
 
 
 class MemoryExtractor:
@@ -47,6 +49,7 @@ class MemoryExtractor:
     def __init__(self, llm_caller=None):
         self.spacy_extractor = SpacyExtractor()
         self.llm_extractor = LLMExtractor(llm_caller=llm_caller)
+        self.entity_extractor = EntityExtractor()
 
         self.rules = [
             {
@@ -139,17 +142,17 @@ class MemoryExtractor:
         # Tier 1: Pattern Rule Extraction
         memories = self._extract_with_rules(conversation)
         if memories:
-            return memories
+            return self.entity_extractor.annotate(memories, conversation)
 
         # Tier 2: spaCy NER Extraction
         if self.spacy_extractor.is_available():
             memories = self.spacy_extractor.extract(conversation)
             if memories:
-                return memories
+                return self.entity_extractor.annotate(memories, conversation)
 
         # Tier 3: LLM Fallback Extraction
         memories = self.llm_extractor.extract(conversation)
-        return memories
+        return self.entity_extractor.annotate(memories, conversation)
 
     def _extract_with_rules(self, conversation: str) -> List[Dict[str, Any]]:
         memories = []

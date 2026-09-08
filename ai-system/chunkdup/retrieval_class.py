@@ -7,6 +7,7 @@ from .retrieval import (
     RetrievalCache,
     QueryRewriter
 )
+from .entity_extractor import EntityExtractor
 
 class MemoryRetriever:
     """
@@ -27,6 +28,8 @@ class MemoryRetriever:
         self.adaptive_k_selector = AdaptiveKSelector()
         self.cache = RetrievalCache() if enable_cache else None
         self.rewriter = QueryRewriter() if enable_rewriter else None
+        self.entity_extractor = EntityExtractor()
+        self.last_diagnostics = []
 
     def index_memory(self, memory: Dict[str, Any]) -> Dict[str, Any]:
         """
@@ -34,6 +37,12 @@ class MemoryRetriever:
         """
         memory_copy = dict(memory)
         memory_copy["contextual_text"] = self.contextual_builder.build_contextual_text(memory_copy)
+        memory_copy.setdefault(
+            "entities",
+            self.entity_extractor.extract(
+                f"{memory_copy.get('key', '')} {memory_copy.get('value', '')} {memory_copy.get('contextual_text', '')}"
+            ),
+        )
         return memory_copy
 
     def retrieve(self, query: str, k: int = 5, threshold: float = 0.15) -> List[Dict[str, Any]]:
@@ -54,10 +63,28 @@ class MemoryRetriever:
 
         # 4. Query Rewriting (normalize abbreviations without stripping critical intent)
         search_query = self.rewriter.rewrite(query) if self.rewriter else query
+        query_entities = self.entity_extractor.extract(query)
 
         # 5. Candidate Generation via Hybrid Search (pgvector + keyword)
         keyword_candidates = self.repository.search(search_query, limit=candidate_k) if hasattr(self.repository, "search") else []
         semantic_candidates = self.repository.search_semantic(search_query, limit=candidate_k, threshold=threshold) if hasattr(self.repository, "search_semantic") else []
+
+        if query_entities and hasattr(self.repository, "get_all"):
+            entity_candidates = []
+            query_set = {entity.casefold() for entity in query_entities}
+            for memory in self.repository.get_all():
+                memory_entities = memory.get("entities", []) or self.entity_extractor.extract(
+                    f"{memory.get('key', '')} {memory.get('value', '')} {memory.get('contextual_text', '')}"
+                )
+                overlap = len(query_set & {entity.casefold() for entity in memory_entities}) / len(query_set)
+                if overlap:
+                    candidate = dict(memory)
+                    candidate["_entity_score"] = overlap
+                    entity_candidates.append(candidate)
+            keyword_candidates.extend(entity_candidates)
+
+        for candidate in keyword_candidates + semantic_candidates:
+            candidate.setdefault("_entity_score", 0.0)
 
         # If repo doesn't support vector search directly (e.g. basic memory repo), perform contextual token match
         if not keyword_candidates and not semantic_candidates and hasattr(self.repository, "get_all"):
@@ -105,6 +132,16 @@ class MemoryRetriever:
 
         # 7. Pluggable Reranking (Cross-Encoder / LLM / Heuristic)
         reranked_results = self.reranker.rerank(search_query, candidates, limit=candidate_k)
+        self.last_diagnostics = []
+        for candidate in reranked_results:
+            trace = next(
+                (item for item in self.hybrid_engine.last_diagnostics if item["id"] == candidate["id"]),
+                {"id": candidate["id"]},
+            )
+            self.last_diagnostics.append({
+                **trace,
+                "final": candidate.get("_rerank_score", trace.get("final", 0.0)),
+            })
 
         # 8. Adaptive K Selection
         final_k = self.adaptive_k_selector.select_k(search_query, reranked_results, target_k=k)

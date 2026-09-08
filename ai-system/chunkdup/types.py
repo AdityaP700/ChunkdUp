@@ -17,6 +17,7 @@ class MemoryDict(TypedDict, total=False):
     created_at: str
     updated_at: str
     metadata: Dict[str, Any]
+    entities: List[str]
     embedding: Optional[List[float]]
 
 

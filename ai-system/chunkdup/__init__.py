@@ -14,8 +14,8 @@ from .memory import (
     MemoryRetriever
 )
 from .async_memory import AsyncMemory
-from .embeddings import EmbeddingGenerator
 from .in_memory_repository import InMemoryRepository
+from .entity_extractor import EntityExtractor
 try:
     from .postgres_repository import PostgresRepository
 except ImportError:
@@ -69,14 +69,22 @@ __all__ = [
     "DecisionEngine",
     "PromptBuilder",
     "MemoryRetriever",
+    "EntityExtractor",
     "InMemoryRepository",
     "PostgresRepository",
     "Decision",
     "BasePolicy",
-    "EmbeddingGenerator"
+    "EmbeddingGenerator",
     "EnvironmentPolicy",
     "PreferencePolicy",
     "ToolPolicy",
     "ProjectPolicy",
     "PolicyFactory",
 ]
+
+
+def __getattr__(name):
+    if name == "EmbeddingGenerator":
+        from .embeddings import EmbeddingGenerator
+        return EmbeddingGenerator
+    raise AttributeError(name)

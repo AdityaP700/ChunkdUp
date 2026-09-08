@@ -21,7 +21,9 @@ class MemoryModel(Base):
     version = Column(Integer, default=1)
     created_at = Column(DateTime(timezone=True), default=lambda: datetime.now(timezone.utc))
     updated_at = Column(DateTime(timezone=True), default=lambda: datetime.now(timezone.utc), onupdate=lambda: datetime.now(timezone.utc))
-    metadata_ = Column("metadata",JSON)
+    metadata_ = Column("metadata", JSON)
+    entities = Column(JSON, default=list)
+    contextual_text = Column(Text)
 
     embedding = Column(Vector(384), nullable=True)  # 384-dimensional embeddings
 

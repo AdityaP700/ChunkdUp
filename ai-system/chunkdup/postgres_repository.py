@@ -4,7 +4,6 @@ from sqlalchemy import create_engine, select, update, delete, text
 from sqlalchemy.orm import sessionmaker, Session
 from sqlalchemy.exc import SQLAlchemyError, IntegrityError
 from datetime import datetime, timezone
-from .embeddings import EmbeddingGenerator
 import uuid
 import os
 
@@ -39,6 +38,7 @@ class PostgresRepository(MemoryRepository):
     def embedding_generator(self):
         """Lazy load embedding generator."""
         if self._embedding_generator is None:
+            from .embeddings import EmbeddingGenerator
             self._embedding_generator = EmbeddingGenerator()
         return self._embedding_generator
 
@@ -51,6 +51,9 @@ class PostgresRepository(MemoryRepository):
 
         # Create tables
         Base.metadata.create_all(self.engine)
+        with self.engine.begin() as conn:
+            conn.execute(text("ALTER TABLE memories ADD COLUMN IF NOT EXISTS entities JSON"))
+            conn.execute(text("ALTER TABLE memories ADD COLUMN IF NOT EXISTS contextual_text TEXT"))
 
     def _to_dict(self, model: MemoryModel) -> Dict[str, Any]:
         """Convert SQLAlchemy model to dict."""
@@ -66,17 +69,39 @@ class PostgresRepository(MemoryRepository):
             "created_at": model.created_at.isoformat() if model.created_at else None,
             "updated_at": model.updated_at.isoformat() if model.updated_at else None,
             "metadata": model.metadata_ or {},
+            "entities": model.entities or [],
+            "contextual_text": model.contextual_text or "",
         }
+
+    @staticmethod
+    def _embedding_text(memory: Dict[str, Any]) -> str:
+        source = memory.get("contextual_text") or memory.get("source_text") or "Stored memory record"
+        return (
+            f"key: {memory.get('key', '')}\n"
+            f"type: {memory.get('type', '')}\n"
+            f"value: {memory.get('value', '')}\n"
+            f"contextualized source: {source}"
+        ).strip()
+
+    def reindex_embeddings(self) -> int:
+        """Regenerate all active embeddings using the v3 representation."""
+        updated = 0
+        with self.SessionLocal() as session:
+            memories = session.execute(
+                select(MemoryModel).where(MemoryModel.status == "active")
+            ).scalars().all()
+            for memory in memories:
+                memory_dict = self._to_dict(memory)
+                memory.embedding = self.embedding_generator.generate(self._embedding_text(memory_dict))
+                updated += 1
+            session.commit()
+        return updated
 
     def save(self, memory: Dict[str, Any]) -> None:
         """Store a new memory."""
         embedding = None
         if memory.get("value"):
-            embedding_text = (
-    f"ChunkdUp {memory['key'].replace('_', ' ')}: "
-    f"{memory['value']}"
-
-)
+            embedding_text = self._embedding_text(memory)
             embedding = self.embedding_generator.generate(embedding_text)
         with self.SessionLocal() as session:
             db_memory = MemoryModel(
@@ -89,6 +114,8 @@ class PostgresRepository(MemoryRepository):
                 status=memory.get("status", "active"),
                 version=1,
                 metadata_=memory.get("metadata", {}),
+                entities=memory.get("entities", []),
+                contextual_text=memory.get("contextual_text", ""),
                 embedding=embedding,
             )
             session.add(db_memory)
@@ -123,10 +150,7 @@ class PostgresRepository(MemoryRepository):
             raise ValueError("Memory ID required for update")
         embedding = None
         if memory.get("value"):
-            embedding_text = (
-    f"ChunkdUp {memory['key'].replace('_', ' ')}: "
-    f"{memory['value']}"
-)
+            embedding_text = self._embedding_text(memory)
             embedding = self.embedding_generator.generate(embedding_text)
 
         expected_version = memory.get("version", 1)
@@ -149,6 +173,8 @@ class PostgresRepository(MemoryRepository):
                     version=MemoryModel.version + 1,
                     updated_at=datetime.now(timezone.utc),
                     metadata_=memory.get("metadata", {}),
+                    entities=memory.get("entities", []),
+                    contextual_text=memory.get("contextual_text", ""),
                     embedding=embedding,
                 )
             )

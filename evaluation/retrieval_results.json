@@ -2,9 +2,9 @@
   "heuristic": {
     "reranker_mode": "heuristic",
     "metrics": {
-      "MRR": 0.4286,
-      "Mean_Precision@K": 0.2679,
-      "Mean_Recall@K": 0.4286
+      "MRR": 0.7857,
+      "Mean_Precision@K": 0.3821,
+      "Mean_Recall@K": 0.8571
     },
     "details": [
       {
@@ -14,157 +14,41 @@
         "retrieved": [
           "Python",
           "Go",
-          "Google DeepMind",
+          "Linux Ubuntu 22.04",
+          "PostgreSQL with pgvector",
           "Senior AI Architect",
           "ChunkdUp",
-          "Linux Ubuntu 22.04",
-          "Concise and technical",
-          "Neovim"
-        ],
-        "expected": [
-          "Go",
-          "Python"
-        ],
-        "precision": 0.25,
-        "recall": 1.0,
-        "reciprocal_rank": 1.0
-      },
-      {
-        "query": "What is my tech stack?",
-        "category": "synthesis",
-        "retrieved_count": 8,
-        "retrieved": [
-          "Python",
-          "Go",
-          "ChunkdUp",
-          "Linux Ubuntu 22.04",
-          "Concise and technical",
           "Neovim",
-          "PostgreSQL with pgvector",
-          "AWS"
-        ],
-        "expected": [
-          "Go",
-          "ChunkdUp",
-          "PostgreSQL with pgvector",
-          "Neovim",
-          "Python"
-        ],
-        "precision": 0.625,
-        "recall": 1.0,
-        "reciprocal_rank": 1.0
-      },
-      {
-        "query": "Python",
-        "category": "exact_lookup",
-        "retrieved_count": 0,
-        "retrieved": [],
-        "expected": [
-          "Python"
-        ],
-        "precision": 0.0,
-        "recall": 0.0,
-        "reciprocal_rank": 0.0
-      },
-      {
-        "query": "What editor or IDE do I prefer?",
-        "category": "tool",
-        "retrieved_count": 0,
-        "retrieved": [],
-        "expected": [
-          "Neovim"
-        ],
-        "precision": 0.0,
-        "recall": 0.0,
-        "reciprocal_rank": 0.0
-      },
-      {
-        "query": "What is the weather forecast today?",
-        "category": "out_of_domain",
-        "retrieved_count": 0,
-        "retrieved": [],
-        "expected": [],
-        "precision": 1.0,
-        "recall": 1.0,
-        "reciprocal_rank": 1.0
-      },
-      {
-        "query": "How should you respond to me?",
-        "category": "preference",
-        "retrieved_count": 0,
-        "retrieved": [],
-        "expected": [
           "Concise and technical"
         ],
-        "precision": 0.0,
-        "recall": 0.0,
-        "reciprocal_rank": 0.0
-      },
-      {
-        "query": "Where do I work and what is my role?",
-        "category": "career",
-        "retrieved_count": 0,
-        "retrieved": [],
         "expected": [
-          "Google DeepMind",
-          "Senior AI Architect"
-        ],
-        "precision": 0.0,
-        "recall": 0.0,
-        "reciprocal_rank": 0.0
-      }
-    ]
-  },
-  "llm": {
-    "reranker_mode": "llm",
-    "metrics": {
-      "MRR": 0.8333,
-      "Mean_Precision@K": 0.525,
-      "Mean_Recall@K": 1.0
-    },
-    "details": [
-      {
-        "query": "What programming languages do I use?",
-        "category": "language",
-        "retrieved_count": 8,
-        "retrieved": [
-          "Google DeepMind",
-          "Senior AI Architect",
           "Python",
-          "Go",
-          "Concise and technical",
-          "ChunkdUp",
-          "Neovim",
-          "Linux Ubuntu 22.04"
-        ],
-        "expected": [
-          "Go",
-          "Python"
+          "Go"
         ],
         "precision": 0.25,
         "recall": 1.0,
-        "reciprocal_rank": 0.3333
+        "reciprocal_rank": 1.0
       },
       {
         "query": "What is my tech stack?",
         "category": "synthesis",
         "retrieved_count": 8,
         "retrieved": [
-          "Neovim",
           "PostgreSQL with pgvector",
+          "Neovim",
           "Python",
           "Go",
-          "Concise and technical",
-          "ChunkdUp",
           "Linux Ubuntu 22.04",
+          "ChunkdUp",
+          "Concise and technical",
           "AWS"
         ],
         "expected": [
-          "Go",
-          "ChunkdUp",
-          "PostgreSQL with pgvector",
           "Neovim",
-          "Python"
+          "Go",
+          "PostgreSQL with pgvector",
+          "Python",
+          "ChunkdUp"
         ],
         "precision": 0.625,
         "recall": 1.0,
@@ -190,10 +74,10 @@
         "retrieved_count": 5,
         "retrieved": [
           "Neovim",
+          "PostgreSQL with pgvector",
           "Concise and technical",
-          "Google DeepMind",
-          "Senior AI Architect",
-          "PostgreSQL with pgvector"
+          "Python",
+          "Go"
         ],
         "expected": [
           "Neovim"
@@ -205,12 +89,14 @@
       {
         "query": "What is the weather forecast today?",
         "category": "out_of_domain",
-        "retrieved_count": 0,
-        "retrieved": [],
+        "retrieved_count": 1,
+        "retrieved": [
+          "Python"
+        ],
         "expected": [],
-        "precision": 1.0,
-        "recall": 1.0,
-        "reciprocal_rank": 1.0
+        "precision": 0.0,
+        "recall": 0.0,
+        "reciprocal_rank": 0.0
       },
       {
         "query": "How should you respond to me?",
@@ -218,10 +104,10 @@
         "retrieved_count": 5,
         "retrieved": [
           "Concise and technical",
-          "Google DeepMind",
-          "Senior AI Architect",
           "Python",
-          "Go"
+          "Go",
+          "Linux Ubuntu 22.04",
+          "PostgreSQL with pgvector"
         ],
         "expected": [
           "Concise and technical"
@@ -236,14 +122,156 @@
         "retrieved_count": 5,
         "retrieved": [
           "Concise and technical",
-          "Google DeepMind",
           "Senior AI Architect",
+          "Google DeepMind",
           "Python",
           "Go"
         ],
         "expected": [
-          "Google DeepMind",
+          "Senior AI Architect",
+          "Google DeepMind"
+        ],
+        "precision": 0.4,
+        "recall": 1.0,
+        "reciprocal_rank": 0.5
+      }
+    ]
+  },
+  "llm": {
+    "reranker_mode": "llm",
+    "metrics": {
+      "MRR": 0.7857,
+      "Mean_Precision@K": 0.3821,
+      "Mean_Recall@K": 0.8571
+    },
+    "details": [
+      {
+        "query": "What programming languages do I use?",
+        "category": "language",
+        "retrieved_count": 8,
+        "retrieved": [
+          "Python",
+          "Go",
+          "Linux Ubuntu 22.04",
+          "PostgreSQL with pgvector",
+          "Senior AI Architect",
+          "ChunkdUp",
+          "Neovim",
+          "Concise and technical"
+        ],
+        "expected": [
+          "Python",
+          "Go"
+        ],
+        "precision": 0.25,
+        "recall": 1.0,
+        "reciprocal_rank": 1.0
+      },
+      {
+        "query": "What is my tech stack?",
+        "category": "synthesis",
+        "retrieved_count": 8,
+        "retrieved": [
+          "PostgreSQL with pgvector",
+          "Neovim",
+          "Python",
+          "Go",
+          "Linux Ubuntu 22.04",
+          "ChunkdUp",
+          "Concise and technical",
+          "AWS"
+        ],
+        "expected": [
+          "Neovim",
+          "Go",
+          "PostgreSQL with pgvector",
+          "Python",
+          "ChunkdUp"
+        ],
+        "precision": 0.625,
+        "recall": 1.0,
+        "reciprocal_rank": 1.0
+      },
+      {
+        "query": "Python",
+        "category": "exact_lookup",
+        "retrieved_count": 1,
+        "retrieved": [
+          "Python"
+        ],
+        "expected": [
+          "Python"
+        ],
+        "precision": 1.0,
+        "recall": 1.0,
+        "reciprocal_rank": 1.0
+      },
+      {
+        "query": "What editor or IDE do I prefer?",
+        "category": "tool",
+        "retrieved_count": 5,
+        "retrieved": [
+          "Neovim",
+          "PostgreSQL with pgvector",
+          "Concise and technical",
+          "Python",
+          "Go"
+        ],
+        "expected": [
+          "Neovim"
+        ],
+        "precision": 0.2,
+        "recall": 1.0,
+        "reciprocal_rank": 1.0
+      },
+      {
+        "query": "What is the weather forecast today?",
+        "category": "out_of_domain",
+        "retrieved_count": 5,
+        "retrieved": [
+          "Python",
+          "Go",
+          "Linux Ubuntu 22.04",
+          "PostgreSQL with pgvector",
           "Senior AI Architect"
+        ],
+        "expected": [],
+        "precision": 0.0,
+        "recall": 0.0,
+        "reciprocal_rank": 0.0
+      },
+      {
+        "query": "How should you respond to me?",
+        "category": "preference",
+        "retrieved_count": 5,
+        "retrieved": [
+          "Concise and technical",
+          "Python",
+          "Go",
+          "Linux Ubuntu 22.04",
+          "PostgreSQL with pgvector"
+        ],
+        "expected": [
+          "Concise and technical"
+        ],
+        "precision": 0.2,
+        "recall": 1.0,
+        "reciprocal_rank": 1.0
+      },
+      {
+        "query": "Where do I work and what is my role?",
+        "category": "career",
+        "retrieved_count": 5,
+        "retrieved": [
+          "Concise and technical",
+          "Senior AI Architect",
+          "Google DeepMind",
+          "Python",
+          "Go"
+        ],
+        "expected": [
+          "Senior AI Architect",
+          "Google DeepMind"
         ],
         "precision": 0.4,
         "recall": 1.0,
