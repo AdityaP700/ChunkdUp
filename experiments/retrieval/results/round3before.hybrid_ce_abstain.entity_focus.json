@@ -1,0 +1,1083 @@
+{
+  "config": "hybrid_ce_abstain",
+  "split": "entity_focus",
+  "k": 5,
+  "summary": {
+    "n_queries": 15,
+    "MRR": 0.6167,
+    "Precision@K": 0.4189,
+    "Recall@K": 0.8667,
+    "HitRate@K": 0.8667,
+    "answerable": {
+      "n": 13,
+      "MRR": 0.6346,
+      "HitRate@K": 0.9231,
+      "false_abstain_rate": 0.0,
+      "relevant_memories_returned": 12
+    },
+    "unanswerable": {
+      "n": 2,
+      "correct_rejection_rate": 0.5,
+      "false_positive_rate": 0.5,
+      "irrelevant_memories_returned": 1
+    }
+  },
+  "latency_ms": {
+    "retrieve_dense_ms": {
+      "mean": 21.694,
+      "p50": 15.385,
+      "p95": 28.304
+    },
+    "retrieve_bm25_ms": {
+      "mean": 0.158,
+      "p50": 0.131,
+      "p95": 0.233
+    },
+    "fuse_ms": {
+      "mean": 0.048,
+      "p50": 0.048,
+      "p95": 0.062
+    },
+    "rerank_ms": {
+      "mean": 385.118,
+      "p50": 327.175,
+      "p95": 680.814
+    },
+    "abstain_ms": {
+      "mean": 0.015,
+      "p50": 0.013,
+      "p95": 0.024
+    },
+    "total_ms": {
+      "mean": 407.033,
+      "p50": 339.681,
+      "p95": 781.303
+    }
+  },
+  "environment": {
+    "python": "3.11.9",
+    "platform": "Windows-10-10.0.26200-SP0"
+  },
+  "per_query": [
+    {
+      "id": "e01",
+      "query": "What database does ChunkdUp store memories in?",
+      "category": "project_specific",
+      "expected": [
+        "m9"
+      ],
+      "returned": [
+        "m3",
+        "m11",
+        "m9",
+        "m12",
+        "m7"
+      ],
+      "returned_values": [
+        "ChunkdUp",
+        "Docker",
+        "PostgreSQL with pgvector",
+        "all-MiniLM-L6-v2",
+        "Google DeepMind"
+      ],
+      "abstained": false,
+      "top_score_field": "_rerank_score",
+      "metrics": {
+        "precision": 0.2,
+        "recall": 1.0,
+        "reciprocal_rank": 0.3333333333333333,
+        "hit": 1.0
+      },
+      "timings_ms": {
+        "retrieve_dense_ms": 18.595,
+        "retrieve_bm25_ms": 0.233,
+        "fuse_ms": 0.077,
+        "rerank_ms": 343.207,
+        "abstain_ms": 0.024,
+        "total_ms": 362.136
+      },
+      "candidates": [
+        {
+          "rank": 1,
+          "id": "m3",
+          "value": "ChunkdUp",
+          "_similarity": 0.5711,
+          "_bm25_score": null,
+          "_rrf_score": 0.032522,
+          "_rrf_parts": {
+            "dense": 0.01639344262295082,
+            "bm25": 0.016129032258064516
+          },
+          "_rerank_score": 1.369
+        },
+        {
+          "rank": 2,
+          "id": "m11",
+          "value": "Docker",
+          "_similarity": 0.4021,
+          "_bm25_score": null,
+          "_rrf_score": 0.031746,
+          "_rrf_parts": {
+            "dense": 0.015873015873015872,
+            "bm25": 0.015873015873015872
+          },
+          "_rerank_score": 0.3534
+        },
+        {
+          "rank": 3,
+          "id": "m9",
+          "value": "PostgreSQL with pgvector",
+          "_similarity": 0.4879,
+          "_bm25_score": null,
+          "_rrf_score": 0.032522,
+          "_rrf_parts": {
+            "dense": 0.016129032258064516,
+            "bm25": 0.01639344262295082
+          },
+          "_rerank_score": -5.1726
+        },
+        {
+          "rank": 4,
+          "id": "m12",
+          "value": "all-MiniLM-L6-v2",
+          "_similarity": 0.2867,
+          "_bm25_score": null,
+          "_rrf_score": 0.014706,
+          "_rrf_parts": {
+            "dense": 0.014705882352941176
+          },
+          "_rerank_score": -10.1181
+        },
+        {
+          "rank": 5,
+          "id": "m7",
+          "value": "Google DeepMind",
+          "_similarity": 0.3906,
+          "_bm25_score": null,
+          "_rrf_score": 0.015625,
+          "_rrf_parts": {
+            "dense": 0.015625
+          },
+          "_rerank_score": -10.1431
+        },
+        {
+          "rank": 6,
+          "id": "m10",
+          "value": "AWS",
+          "_similarity": 0.2796,
+          "_bm25_score": null,
+          "_rrf_score": 0.014493,
+          "_rrf_parts": {
+            "dense": 0.014492753623188406
+          },
+          "_rerank_score": -10.1777
+        },
+        {
+          "rank": 7,
+          "id": "m4",
+          "value": "Linux Ubuntu 22.04",
+          "_similarity": 0.3143,
+          "_bm25_score": null,
+          "_rrf_score": 0.015385,
+          "_rrf_parts": {
+            "dense": 0.015384615384615385
+          },
+          "_rerank_score": -10.3691
+        },
+        {
+          "rank": 8,
+          "id": "m5",
+          "value": "Neovim",
+          "_similarity": 0.2629,
+          "_bm25_score": null,
+          "_rrf_score": 0.014286,
+          "_rrf_parts": {
+            "dense": 0.014285714285714285
+          },
+          "_rerank_score": -10.5029
+        },
+        {
+          "rank": 9,
+          "id": "m1",
+          "value": "Python",
+          "_similarity": 0.3037,
+          "_bm25_score": null,
+          "_rrf_score": 0.015152,
+          "_rrf_parts": {
+            "dense": 0.015151515151515152
+          },
+          "_rerank_score": -10.7598
+        },
+        {
+          "rank": 10,
+          "id": "m2",
+          "value": "Go",
+          "_similarity": 0.2918,
+          "_bm25_score": null,
+          "_rrf_score": 0.014925,
+          "_rrf_parts": {
+            "dense": 0.014925373134328358
+          },
+          "_rerank_score": -10.7916
+        }
+      ]
+    },
+    {
+      "id": "e02",
+      "query": "Where is ChunkdUp deployed?",
+      "category": "project_specific",
+      "expected": [
+        "m11"
+      ],
+      "returned": [
+        "m3",
+        "m11"
+      ],
+      "returned_values": [
+        "ChunkdUp",
+        "Docker"
+      ],
+      "abstained": false,
+      "top_score_field": "_rerank_score",
+      "metrics": {
+        "precision": 0.5,
+        "recall": 1.0,
+        "reciprocal_rank": 0.5,
+        "hit": 1.0
+      },
+      "timings_ms": {
+        "retrieve_dense_ms": 15.385,
+        "retrieve_bm25_ms": 0.148,
+        "fuse_ms": 0.058,
+        "rerank_ms": 397.24,
+        "abstain_ms": 0.024,
+        "total_ms": 412.854
+      },
+      "candidates": [
+        {
+          "rank": 1,
+          "id": "m3",
+          "value": "ChunkdUp",
+          "_similarity": 0.5017,
+          "_bm25_score": null,
+          "_rrf_score": 0.032787,
+          "_rrf_parts": {
+            "dense": 0.01639344262295082,
+            "bm25": 0.01639344262295082
+          },
+          "_rerank_score": -1.3131
+        },
+        {
+          "rank": 2,
+          "id": "m11",
+          "value": "Docker",
+          "_similarity": 0.4006,
+          "_bm25_score": null,
+          "_rrf_score": 0.032258,
+          "_rrf_parts": {
+            "dense": 0.016129032258064516,
+            "bm25": 0.016129032258064516
+          },
+          "_rerank_score": -2.0426
+        }
+      ]
+    },
+    {
+      "id": "e03",
+      "query": "Does ChunkdUp use Kubernetes or Docker?",
+      "category": "project_specific",
+      "expected": [
+        "m11"
+      ],
+      "returned": [
+        "m11",
+        "m3"
+      ],
+      "returned_values": [
+        "Docker",
+        "ChunkdUp"
+      ],
+      "abstained": false,
+      "top_score_field": "_rerank_score",
+      "metrics": {
+        "precision": 0.5,
+        "recall": 1.0,
+        "reciprocal_rank": 1.0,
+        "hit": 1.0
+      },
+      "timings_ms": {
+        "retrieve_dense_ms": 28.304,
+        "retrieve_bm25_ms": 0.276,
+        "fuse_ms": 0.062,
+        "rerank_ms": 846.273,
+        "abstain_ms": 0.02,
+        "total_ms": 874.934
+      },
+      "candidates": [
+        {
+          "rank": 1,
+          "id": "m11",
+          "value": "Docker",
+          "_similarity": 0.5532,
+          "_bm25_score": null,
+          "_rrf_score": 0.032787,
+          "_rrf_parts": {
+            "dense": 0.01639344262295082,
+            "bm25": 0.01639344262295082
+          },
+          "_rerank_score": 1.114
+        },
+        {
+          "rank": 2,
+          "id": "m3",
+          "value": "ChunkdUp",
+          "_similarity": 0.3816,
+          "_bm25_score": null,
+          "_rrf_score": 0.032258,
+          "_rrf_parts": {
+            "dense": 0.016129032258064516,
+            "bm25": 0.016129032258064516
+          },
+          "_rerank_score": -5.5457
+        }
+      ]
+    },
+    {
+      "id": "e04",
+      "query": "Which OS does ChunkdUp development happen on?",
+      "category": "project_specific",
+      "expected": [
+        "m4"
+      ],
+      "returned": [
+        "m3",
+        "m11",
+        "m4"
+      ],
+      "returned_values": [
+        "ChunkdUp",
+        "Docker",
+        "Linux Ubuntu 22.04"
+      ],
+      "abstained": false,
+      "top_score_field": "_rerank_score",
+      "metrics": {
+        "precision": 0.3333333333333333,
+        "recall": 1.0,
+        "reciprocal_rank": 0.3333333333333333,
+        "hit": 1.0
+      },
+      "timings_ms": {
+        "retrieve_dense_ms": 22.533,
+        "retrieve_bm25_ms": 0.199,
+        "fuse_ms": 0.052,
+        "rerank_ms": 445.911,
+        "abstain_ms": 0.029,
+        "total_ms": 468.723
+      },
+      "candidates": [
+        {
+          "rank": 1,
+          "id": "m3",
+          "value": "ChunkdUp",
+          "_similarity": 0.5034,
+          "_bm25_score": null,
+          "_rrf_score": 0.032522,
+          "_rrf_parts": {
+            "dense": 0.01639344262295082,
+            "bm25": 0.016129032258064516
+          },
+          "_rerank_score": -3.3948
+        },
+        {
+          "rank": 2,
+          "id": "m11",
+          "value": "Docker",
+          "_similarity": 0.4172,
+          "_bm25_score": null,
+          "_rrf_score": 0.032002,
+          "_rrf_parts": {
+            "dense": 0.016129032258064516,
+            "bm25": 0.015873015873015872
+          },
+          "_rerank_score": -4.639
+        },
+        {
+          "rank": 3,
+          "id": "m4",
+          "value": "Linux Ubuntu 22.04",
+          "_similarity": 0.3603,
+          "_bm25_score": null,
+          "_rrf_score": 0.032266,
+          "_rrf_parts": {
+            "dense": 0.015873015873015872,
+            "bm25": 0.01639344262295082
+          },
+          "_rerank_score": -9.5315
+        }
+      ]
+    },
+    {
+      "id": "e05",
+      "query": "What model does ChunkdUp embed with?",
+      "category": "project_specific",
+      "expected": [
+        "m12"
+      ],
+      "returned": [
+        "m12",
+        "m3",
+        "m11"
+      ],
+      "returned_values": [
+        "all-MiniLM-L6-v2",
+        "ChunkdUp",
+        "Docker"
+      ],
+      "abstained": false,
+      "top_score_field": "_rerank_score",
+      "metrics": {
+        "precision": 0.3333333333333333,
+        "recall": 1.0,
+        "reciprocal_rank": 1.0,
+        "hit": 1.0
+      },
+      "timings_ms": {
+        "retrieve_dense_ms": 100.299,
+        "retrieve_bm25_ms": 0.129,
+        "fuse_ms": 0.044,
+        "rerank_ms": 680.814,
+        "abstain_ms": 0.016,
+        "total_ms": 781.303
+      },
+      "candidates": [
+        {
+          "rank": 1,
+          "id": "m12",
+          "value": "all-MiniLM-L6-v2",
+          "_similarity": 0.3848,
+          "_bm25_score": null,
+          "_rrf_score": 0.016129,
+          "_rrf_parts": {
+            "dense": 0.016129032258064516
+          },
+          "_rerank_score": 0.07
+        },
+        {
+          "rank": 2,
+          "id": "m3",
+          "value": "ChunkdUp",
+          "_similarity": 0.5458,
+          "_bm25_score": null,
+          "_rrf_score": 0.032787,
+          "_rrf_parts": {
+            "dense": 0.01639344262295082,
+            "bm25": 0.01639344262295082
+          },
+          "_rerank_score": -4.4923
+        },
+        {
+          "rank": 3,
+          "id": "m11",
+          "value": "Docker",
+          "_similarity": 0.3658,
+          "_bm25_score": null,
+          "_rrf_score": 0.032002,
+          "_rrf_parts": {
+            "dense": 0.015873015873015872,
+            "bm25": 0.016129032258064516
+          },
+          "_rerank_score": -4.7331
+        }
+      ]
+    },
+    {
+      "id": "e06",
+      "query": "Is ChunkdUp written in Go or Python?",
+      "category": "project_specific",
+      "expected": [
+        "m1"
+      ],
+      "returned": [
+        "m3",
+        "m11",
+        "m2",
+        "m1"
+      ],
+      "returned_values": [
+        "ChunkdUp",
+        "Docker",
+        "Go",
+        "Python"
+      ],
+      "abstained": false,
+      "top_score_field": "_rerank_score",
+      "metrics": {
+        "precision": 0.25,
+        "recall": 1.0,
+        "reciprocal_rank": 0.25,
+        "hit": 1.0
+      },
+      "timings_ms": {
+        "retrieve_dense_ms": 20.539,
+        "retrieve_bm25_ms": 0.183,
+        "fuse_ms": 0.052,
+        "rerank_ms": 336.054,
+        "abstain_ms": 0.013,
+        "total_ms": 356.842
+      },
+      "candidates": [
+        {
+          "rank": 1,
+          "id": "m3",
+          "value": "ChunkdUp",
+          "_similarity": 0.4683,
+          "_bm25_score": null,
+          "_rrf_score": 0.032266,
+          "_rrf_parts": {
+            "dense": 0.01639344262295082,
+            "bm25": 0.015873015873015872
+          },
+          "_rerank_score": -1.7382
+        },
+        {
+          "rank": 2,
+          "id": "m11",
+          "value": "Docker",
+          "_similarity": 0.3236,
+          "_bm25_score": null,
+          "_rrf_score": 0.03125,
+          "_rrf_parts": {
+            "dense": 0.015625,
+            "bm25": 0.015625
+          },
+          "_rerank_score": -3.9903
+        },
+        {
+          "rank": 3,
+          "id": "m2",
+          "value": "Go",
+          "_similarity": 0.4204,
+          "_bm25_score": null,
+          "_rrf_score": 0.032522,
+          "_rrf_parts": {
+            "dense": 0.016129032258064516,
+            "bm25": 0.01639344262295082
+          },
+          "_rerank_score": -7.9917
+        },
+        {
+          "rank": 4,
+          "id": "m1",
+          "value": "Python",
+          "_similarity": 0.353,
+          "_bm25_score": null,
+          "_rrf_score": 0.032002,
+          "_rrf_parts": {
+            "dense": 0.015873015873015872,
+            "bm25": 0.016129032258064516
+          },
+          "_rerank_score": -9.1055
+        }
+      ]
+    },
+    {
+      "id": "e07",
+      "query": "ChunkdUp's cloud provider?",
+      "category": "project_specific",
+      "expected": [
+        "m10"
+      ],
+      "returned": [
+        "m11",
+        "m3",
+        "m10"
+      ],
+      "returned_values": [
+        "Docker",
+        "ChunkdUp",
+        "AWS"
+      ],
+      "abstained": false,
+      "top_score_field": "_rerank_score",
+      "metrics": {
+        "precision": 0.3333333333333333,
+        "recall": 1.0,
+        "reciprocal_rank": 0.3333333333333333,
+        "hit": 1.0
+      },
+      "timings_ms": {
+        "retrieve_dense_ms": 12.338,
+        "retrieve_bm25_ms": 0.116,
+        "fuse_ms": 0.037,
+        "rerank_ms": 327.175,
+        "abstain_ms": 0.016,
+        "total_ms": 339.681
+      },
+      "candidates": [
+        {
+          "rank": 1,
+          "id": "m11",
+          "value": "Docker",
+          "_similarity": 0.3555,
+          "_bm25_score": null,
+          "_rrf_score": 0.031746,
+          "_rrf_parts": {
+            "dense": 0.015873015873015872,
+            "bm25": 0.015873015873015872
+          },
+          "_rerank_score": -2.5435
+        },
+        {
+          "rank": 2,
+          "id": "m3",
+          "value": "ChunkdUp",
+          "_similarity": 0.3717,
+          "_bm25_score": null,
+          "_rrf_score": 0.032258,
+          "_rrf_parts": {
+            "dense": 0.016129032258064516,
+            "bm25": 0.016129032258064516
+          },
+          "_rerank_score": -2.9193
+        },
+        {
+          "rank": 3,
+          "id": "m10",
+          "value": "AWS",
+          "_similarity": 0.4283,
+          "_bm25_score": null,
+          "_rrf_score": 0.032787,
+          "_rrf_parts": {
+            "dense": 0.01639344262295082,
+            "bm25": 0.01639344262295082
+          },
+          "_rerank_score": -4.6463
+        }
+      ]
+    },
+    {
+      "id": "e08",
+      "query": "Where does the developer of ChunkdUp work?",
+      "category": "project_specific",
+      "expected": [
+        "m7"
+      ],
+      "returned": [
+        "m3",
+        "m11"
+      ],
+      "returned_values": [
+        "ChunkdUp",
+        "Docker"
+      ],
+      "abstained": false,
+      "top_score_field": "_rerank_score",
+      "metrics": {
+        "precision": 0.0,
+        "recall": 0.0,
+        "reciprocal_rank": 0.0,
+        "hit": 0.0
+      },
+      "timings_ms": {
+        "retrieve_dense_ms": 16.78,
+        "retrieve_bm25_ms": 0.117,
+        "fuse_ms": 0.04,
+        "rerank_ms": 419.24,
+        "abstain_ms": 0.016,
+        "total_ms": 436.193
+      },
+      "candidates": [
+        {
+          "rank": 1,
+          "id": "m3",
+          "value": "ChunkdUp",
+          "_similarity": 0.5515,
+          "_bm25_score": null,
+          "_rrf_score": 0.032787,
+          "_rrf_parts": {
+            "dense": 0.01639344262295082,
+            "bm25": 0.01639344262295082
+          },
+          "_rerank_score": -1.9481
+        },
+        {
+          "rank": 2,
+          "id": "m11",
+          "value": "Docker",
+          "_similarity": 0.3561,
+          "_bm25_score": null,
+          "_rrf_score": 0.032258,
+          "_rrf_parts": {
+            "dense": 0.016129032258064516,
+            "bm25": 0.016129032258064516
+          },
+          "_rerank_score": -3.4557
+        }
+      ]
+    },
+    {
+      "id": "e09",
+      "query": "Does my stack include pgvector?",
+      "category": "paraphrase",
+      "expected": [
+        "m9"
+      ],
+      "returned": [
+        "m9",
+        "m12",
+        "m1"
+      ],
+      "returned_values": [
+        "PostgreSQL with pgvector",
+        "all-MiniLM-L6-v2",
+        "Python"
+      ],
+      "abstained": false,
+      "top_score_field": "_rerank_score",
+      "metrics": {
+        "precision": 0.3333333333333333,
+        "recall": 1.0,
+        "reciprocal_rank": 1.0,
+        "hit": 1.0
+      },
+      "timings_ms": {
+        "retrieve_dense_ms": 18.0,
+        "retrieve_bm25_ms": 0.099,
+        "fuse_ms": 0.035,
+        "rerank_ms": 301.264,
+        "abstain_ms": 0.009,
+        "total_ms": 319.406
+      },
+      "candidates": [
+        {
+          "rank": 1,
+          "id": "m9",
+          "value": "PostgreSQL with pgvector",
+          "_similarity": 0.4685,
+          "_bm25_score": null,
+          "_rrf_score": 0.032787,
+          "_rrf_parts": {
+            "dense": 0.01639344262295082,
+            "bm25": 0.01639344262295082
+          },
+          "_rerank_score": -0.4903
+        },
+        {
+          "rank": 2,
+          "id": "m12",
+          "value": "all-MiniLM-L6-v2",
+          "_similarity": 0.3185,
+          "_bm25_score": null,
+          "_rrf_score": 0.016129,
+          "_rrf_parts": {
+            "dense": 0.016129032258064516
+          },
+          "_rerank_score": -10.5204
+        },
+        {
+          "rank": 3,
+          "id": "m1",
+          "value": "Python",
+          "_similarity": 0.1911,
+          "_bm25_score": null,
+          "_rrf_score": 0.015385,
+          "_rrf_parts": {
+            "dense": 0.015384615384615385
+          },
+          "_rerank_score": -10.8475
+        }
+      ]
+    },
+    {
+      "id": "e10",
+      "query": "Which database engine powers vector search for me?",
+      "category": "paraphrase",
+      "expected": [
+        "m9"
+      ],
+      "returned": [
+        "m12",
+        "m9"
+      ],
+      "returned_values": [
+        "all-MiniLM-L6-v2",
+        "PostgreSQL with pgvector"
+      ],
+      "abstained": false,
+      "top_score_field": "_rerank_score",
+      "metrics": {
+        "precision": 0.5,
+        "recall": 1.0,
+        "reciprocal_rank": 0.5,
+        "hit": 1.0
+      },
+      "timings_ms": {
+        "retrieve_dense_ms": 11.708,
+        "retrieve_bm25_ms": 0.21,
+        "fuse_ms": 0.048,
+        "rerank_ms": 289.53,
+        "abstain_ms": 0.009,
+        "total_ms": 301.506
+      },
+      "candidates": [
+        {
+          "rank": 1,
+          "id": "m12",
+          "value": "all-MiniLM-L6-v2",
+          "_similarity": 0.3384,
+          "_bm25_score": null,
+          "_rrf_score": 0.032522,
+          "_rrf_parts": {
+            "dense": 0.016129032258064516,
+            "bm25": 0.01639344262295082
+          },
+          "_rerank_score": -4.7851
+        },
+        {
+          "rank": 2,
+          "id": "m9",
+          "value": "PostgreSQL with pgvector",
+          "_similarity": 0.4201,
+          "_bm25_score": null,
+          "_rrf_score": 0.032522,
+          "_rrf_parts": {
+            "dense": 0.01639344262295082,
+            "bm25": 0.016129032258064516
+          },
+          "_rerank_score": -10.1626
+        }
+      ]
+    },
+    {
+      "id": "e11",
+      "query": "What handles embedding generation in my setup?",
+      "category": "paraphrase",
+      "expected": [
+        "m12"
+      ],
+      "returned": [
+        "m12",
+        "m4"
+      ],
+      "returned_values": [
+        "all-MiniLM-L6-v2",
+        "Linux Ubuntu 22.04"
+      ],
+      "abstained": false,
+      "top_score_field": "_rerank_score",
+      "metrics": {
+        "precision": 0.5,
+        "recall": 1.0,
+        "reciprocal_rank": 1.0,
+        "hit": 1.0
+      },
+      "timings_ms": {
+        "retrieve_dense_ms": 12.961,
+        "retrieve_bm25_ms": 0.183,
+        "fuse_ms": 0.048,
+        "rerank_ms": 283.66,
+        "abstain_ms": 0.013,
+        "total_ms": 296.865
+      },
+      "candidates": [
+        {
+          "rank": 1,
+          "id": "m12",
+          "value": "all-MiniLM-L6-v2",
+          "_similarity": 0.4225,
+          "_bm25_score": null,
+          "_rrf_score": 0.016393,
+          "_rrf_parts": {
+            "dense": 0.01639344262295082
+          },
+          "_rerank_score": -3.2711
+        },
+        {
+          "rank": 2,
+          "id": "m4",
+          "value": "Linux Ubuntu 22.04",
+          "_similarity": 0.111,
+          "_bm25_score": null,
+          "_rrf_score": 0.014706,
+          "_rrf_parts": {
+            "dense": 0.014705882352941176
+          },
+          "_rerank_score": -10.8943
+        }
+      ]
+    },
+    {
+      "id": "e12",
+      "query": "PostgreSQL or MongoDB for my vector storage?",
+      "category": "paraphrase",
+      "expected": [
+        "m9"
+      ],
+      "returned": [
+        "m9",
+        "m12"
+      ],
+      "returned_values": [
+        "PostgreSQL with pgvector",
+        "all-MiniLM-L6-v2"
+      ],
+      "abstained": false,
+      "top_score_field": "_rerank_score",
+      "metrics": {
+        "precision": 0.5,
+        "recall": 1.0,
+        "reciprocal_rank": 1.0,
+        "hit": 1.0
+      },
+      "timings_ms": {
+        "retrieve_dense_ms": 11.005,
+        "retrieve_bm25_ms": 0.109,
+        "fuse_ms": 0.033,
+        "rerank_ms": 257.408,
+        "abstain_ms": 0.01,
+        "total_ms": 268.566
+      },
+      "candidates": [
+        {
+          "rank": 1,
+          "id": "m9",
+          "value": "PostgreSQL with pgvector",
+          "_similarity": 0.5116,
+          "_bm25_score": null,
+          "_rrf_score": 0.032787,
+          "_rrf_parts": {
+            "dense": 0.01639344262295082,
+            "bm25": 0.01639344262295082
+          },
+          "_rerank_score": -0.7488
+        },
+        {
+          "rank": 2,
+          "id": "m12",
+          "value": "all-MiniLM-L6-v2",
+          "_similarity": 0.1554,
+          "_bm25_score": null,
+          "_rrf_score": 0.032258,
+          "_rrf_parts": {
+            "dense": 0.016129032258064516,
+            "bm25": 0.016129032258064516
+          },
+          "_rerank_score": -10.7
+        }
+      ]
+    },
+    {
+      "id": "e13",
+      "query": "Which MiniLM variant do I use?",
+      "category": "paraphrase",
+      "expected": [
+        "m12"
+      ],
+      "returned": [
+        "m12"
+      ],
+      "returned_values": [
+        "all-MiniLM-L6-v2"
+      ],
+      "abstained": false,
+      "top_score_field": "_rerank_score",
+      "metrics": {
+        "precision": 1.0,
+        "recall": 1.0,
+        "reciprocal_rank": 1.0,
+        "hit": 1.0
+      },
+      "timings_ms": {
+        "retrieve_dense_ms": 12.381,
+        "retrieve_bm25_ms": 0.118,
+        "fuse_ms": 0.044,
+        "rerank_ms": 263.419,
+        "abstain_ms": 0.009,
+        "total_ms": 275.971
+      },
+      "candidates": [
+        {
+          "rank": 1,
+          "id": "m12",
+          "value": "all-MiniLM-L6-v2",
+          "_similarity": 0.3263,
+          "_bm25_score": null,
+          "_rrf_score": 0.016393,
+          "_rrf_parts": {
+            "dense": 0.01639344262295082
+          },
+          "_rerank_score": 0.2603
+        }
+      ]
+    },
+    {
+      "id": "e14",
+      "query": "Do I use MongoDB?",
+      "category": "absent_answer",
+      "expected": [],
+      "returned": [],
+      "returned_values": [],
+      "abstained": true,
+      "top_score_field": "_rerank_score",
+      "metrics": {
+        "precision": 1.0,
+        "recall": 1.0,
+        "reciprocal_rank": 1.0,
+        "hit": 1.0
+      },
+      "timings_ms": {
+        "retrieve_dense_ms": 13.921,
+        "retrieve_bm25_ms": 0.131,
+        "fuse_ms": 0.05,
+        "rerank_ms": 291.543,
+        "abstain_ms": 0.008,
+        "total_ms": 305.652
+      },
+      "candidates": []
+    },
+    {
+      "id": "e15",
+      "query": "What version of Docker do I run?",
+      "category": "absent_answer",
+      "expected": [],
+      "returned": [
+        "m11"
+      ],
+      "returned_values": [
+        "Docker"
+      ],
+      "abstained": false,
+      "top_score_field": "_rerank_score",
+      "metrics": {
+        "precision": 0.0,
+        "recall": 0.0,
+        "reciprocal_rank": 0.0,
+        "hit": 0.0
+      },
+      "timings_ms": {
+        "retrieve_dense_ms": 10.664,
+        "retrieve_bm25_ms": 0.112,
+        "fuse_ms": 0.034,
+        "rerank_ms": 294.038,
+        "abstain_ms": 0.01,
+        "total_ms": 304.859
+      },
+      "candidates": [
+        {
+          "rank": 1,
+          "id": "m11",
+          "value": "Docker",
+          "_similarity": 0.47,
+          "_bm25_score": null,
+          "_rrf_score": 0.032787,
+          "_rrf_parts": {
+            "dense": 0.01639344262295082,
+            "bm25": 0.01639344262295082
+          },
+          "_rerank_score": 0.3025
+        }
+      ]
+    }
+  ]
+}

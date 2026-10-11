@@ -65,6 +65,12 @@ def apply_entity_demotion(query: str, ranked: List[Dict], score_field: str,
     No-op when the query names no stored identity entity, or when the query
     is about the entity itself (no non-entity tokens left), or on candidates
     that carry any substantive (non-identity) overlap.
+
+    Demoted candidates SINK below every non-demoted candidate rather than
+    taking a multiplicative penalty: CE logits are unbounded (~+0.3 for the
+    entity match vs ~-10 for irrelevant candidates), so a multiplicative
+    factor cannot cross that gap (observed in the first round-3 run). The
+    first non-demoted candidate sits 1.0 above the sink floor.
     """
     query_tokens = set(tokenize(query))
     identity = identity_tokens_in_query(query)
@@ -72,17 +78,29 @@ def apply_entity_demotion(query: str, ranked: List[Dict], score_field: str,
     if not identity or not non_entity:
         return ranked
 
-    adjusted = []
+    demoted_flags = []
     for candidate in ranked:
-        candidate = dict(candidate)
+        is_demoted = False
         if candidate.get("type") == "project_name":
             candidate_tokens = set(tokenize(_candidate_text(candidate)))
             substantive = (query_tokens & candidate_tokens) - identity
             value_tokens = set(tokenize(str(candidate.get("value", "")).lower()))
             if not substantive and value_tokens and value_tokens <= identity:
-                candidate[f"_pre_demotion_{score_field}"] = candidate.get(score_field)
-                candidate[score_field] = float(candidate.get(score_field, 0.0)) * demote_factor
-                candidate["_entity_demoted"] = True
+                is_demoted = True
+        demoted_flags.append(is_demoted)
+
+    live_scores = [float(c.get(score_field, 0.0)) for c, d in zip(ranked, demoted_flags) if not d]
+    sink_floor = (min(live_scores) - 1.0) if live_scores else 0.0
+
+    adjusted = []
+    sink_offset = 0
+    for candidate, is_demoted in zip(ranked, demoted_flags):
+        candidate = dict(candidate)
+        if is_demoted:
+            candidate[f"_pre_demotion_{score_field}"] = candidate.get(score_field)
+            candidate[score_field] = sink_floor - 0.001 * sink_offset
+            candidate["_entity_demoted"] = True
+            sink_offset += 1
         adjusted.append(candidate)
 
     adjusted.sort(key=lambda c: c.get(score_field, 0.0), reverse=True)

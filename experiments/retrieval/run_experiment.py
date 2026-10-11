@@ -170,7 +170,10 @@ class ExperimentPipeline:
                 field = "_bm25_score"
             candidates = apply_entity_demotion(query, candidates, field)
         if cfg.entity_guard and self.reranker:
-            candidates = apply_entity_guard(query, candidates, fused_candidates)
+            # Exp 7 must not re-admit candidates exp 6 sank.
+            demoted_ids = {c["id"] for c in candidates if c.get("_entity_demoted")}
+            guard_fused = [c for c in fused_candidates if c["id"] not in demoted_ids]
+            candidates = apply_entity_guard(query, candidates, guard_fused)
 
         abstained = False
         top_score = None
@@ -291,7 +294,8 @@ def main() -> int:
     parser = argparse.ArgumentParser(description="Run retrieval experiment configurations.")
     parser.add_argument("--config", choices=[BASELINE_CURRENT] + list(CONFIGS.keys()))
     parser.add_argument("--all", action="store_true")
-    parser.add_argument("--split", choices=["dev", "heldout", "both"], default="dev")
+    parser.add_argument("--split", default="dev",
+                        help="dev | heldout | both | a named split such as entity_focus")
     parser.add_argument("--k", type=int, default=K)
     parser.add_argument("--extra-dataset", default=None,
                         help="Optional extra dataset JSONL merged into the fixed set (e.g. round-2 held-out expansion)")
