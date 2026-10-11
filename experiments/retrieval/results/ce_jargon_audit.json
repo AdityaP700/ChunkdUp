@@ -1,0 +1,254 @@
+{
+  "summary": {
+    "n_technical_queries": 15,
+    "ce_rank_inversion": 2,
+    "ce_rank_inversion_pct": 13.3,
+    "strict_negative_pattern": 1,
+    "strict_negative_pct": 6.7,
+    "gate_filtered_correct_memory": 0,
+    "threshold": -10.947404,
+    "verdict_rule": "miscalibrated = CE ranks an incorrect memory above a correct one"
+  },
+  "records": [
+    {
+      "id": "q01",
+      "query": "Python",
+      "category": "exact_lookup",
+      "expected": [
+        "m1"
+      ],
+      "best_expected_ce": 4.7008,
+      "top_incorrect_id": "m2",
+      "top_incorrect_ce": -9.3641,
+      "ce_rank_of_expected": 1,
+      "dense_rank_of_expected": 1,
+      "gate_filtered_correct_memory": false,
+      "miscalibrated": false,
+      "strict_negative_pattern": false
+    },
+    {
+      "id": "q02",
+      "query": "Go",
+      "category": "exact_lookup",
+      "expected": [
+        "m2"
+      ],
+      "best_expected_ce": 4.5144,
+      "top_incorrect_id": "m11",
+      "top_incorrect_ce": -9.4719,
+      "ce_rank_of_expected": 1,
+      "dense_rank_of_expected": 1,
+      "gate_filtered_correct_memory": false,
+      "miscalibrated": false,
+      "strict_negative_pattern": false
+    },
+    {
+      "id": "q03",
+      "query": "Neovim",
+      "category": "exact_lookup",
+      "expected": [
+        "m5"
+      ],
+      "best_expected_ce": 5.5527,
+      "top_incorrect_id": "m3",
+      "top_incorrect_ce": -11.2424,
+      "ce_rank_of_expected": 1,
+      "dense_rank_of_expected": 1,
+      "gate_filtered_correct_memory": false,
+      "miscalibrated": false,
+      "strict_negative_pattern": false
+    },
+    {
+      "id": "q04",
+      "query": "pgvector",
+      "category": "exact_lookup",
+      "expected": [
+        "m9"
+      ],
+      "best_expected_ce": 4.8045,
+      "top_incorrect_id": "m12",
+      "top_incorrect_ce": -11.1618,
+      "ce_rank_of_expected": 1,
+      "dense_rank_of_expected": 1,
+      "gate_filtered_correct_memory": false,
+      "miscalibrated": false,
+      "strict_negative_pattern": false
+    },
+    {
+      "id": "q05",
+      "query": "Docker",
+      "category": "exact_lookup",
+      "expected": [
+        "m11"
+      ],
+      "best_expected_ce": 4.661,
+      "top_incorrect_id": "m9",
+      "top_incorrect_ce": -11.0824,
+      "ce_rank_of_expected": 1,
+      "dense_rank_of_expected": 1,
+      "gate_filtered_correct_memory": false,
+      "miscalibrated": false,
+      "strict_negative_pattern": false
+    },
+    {
+      "id": "q06",
+      "query": "AWS",
+      "category": "exact_lookup",
+      "expected": [
+        "m10"
+      ],
+      "best_expected_ce": 5.0559,
+      "top_incorrect_id": "m4",
+      "top_incorrect_ce": -10.5192,
+      "ce_rank_of_expected": 1,
+      "dense_rank_of_expected": 1,
+      "gate_filtered_correct_memory": false,
+      "miscalibrated": false,
+      "strict_negative_pattern": false
+    },
+    {
+      "id": "q07",
+      "query": "Google DeepMind",
+      "category": "exact_lookup",
+      "expected": [
+        "m7"
+      ],
+      "best_expected_ce": 6.2224,
+      "top_incorrect_id": "m12",
+      "top_incorrect_ce": -11.2866,
+      "ce_rank_of_expected": 1,
+      "dense_rank_of_expected": 1,
+      "gate_filtered_correct_memory": false,
+      "miscalibrated": false,
+      "strict_negative_pattern": false
+    },
+    {
+      "id": "q08",
+      "query": "all-MiniLM-L6-v2",
+      "category": "exact_lookup",
+      "expected": [
+        "m12"
+      ],
+      "best_expected_ce": 8.8704,
+      "top_incorrect_id": "m3",
+      "top_incorrect_ce": -11.2992,
+      "ce_rank_of_expected": 1,
+      "dense_rank_of_expected": 1,
+      "gate_filtered_correct_memory": false,
+      "miscalibrated": false,
+      "strict_negative_pattern": false
+    },
+    {
+      "id": "q45",
+      "query": "Where does ChunkdUp run?",
+      "category": "project_specific",
+      "expected": [
+        "m11"
+      ],
+      "best_expected_ce": 1.8939,
+      "top_incorrect_id": "m3",
+      "top_incorrect_ce": -0.3116,
+      "ce_rank_of_expected": 1,
+      "dense_rank_of_expected": 2,
+      "gate_filtered_correct_memory": false,
+      "miscalibrated": false,
+      "strict_negative_pattern": false
+    },
+    {
+      "id": "q46",
+      "query": "What database does ChunkdUp use?",
+      "category": "project_specific",
+      "expected": [
+        "m9"
+      ],
+      "best_expected_ce": -8.064,
+      "top_incorrect_id": "m11",
+      "top_incorrect_ce": 0.6127,
+      "ce_rank_of_expected": 3,
+      "dense_rank_of_expected": 2,
+      "gate_filtered_correct_memory": false,
+      "miscalibrated": true,
+      "strict_negative_pattern": true
+    },
+    {
+      "id": "q48",
+      "query": "What embedding model does ChunkdUp use?",
+      "category": "project_specific",
+      "expected": [
+        "m12"
+      ],
+      "best_expected_ce": 0.0355,
+      "top_incorrect_id": "m3",
+      "top_incorrect_ce": -4.937,
+      "ce_rank_of_expected": 1,
+      "dense_rank_of_expected": 2,
+      "gate_filtered_correct_memory": false,
+      "miscalibrated": false,
+      "strict_negative_pattern": false
+    },
+    {
+      "id": "q49",
+      "query": "What is ChunkdUp?",
+      "category": "project_specific",
+      "expected": [
+        "m3"
+      ],
+      "best_expected_ce": 4.2361,
+      "top_incorrect_id": "m11",
+      "top_incorrect_ce": 0.7826,
+      "ce_rank_of_expected": 1,
+      "dense_rank_of_expected": 1,
+      "gate_filtered_correct_memory": false,
+      "miscalibrated": false,
+      "strict_negative_pattern": false
+    },
+    {
+      "id": "q72",
+      "query": "Linux Ubuntu 22.04",
+      "category": "exact_lookup",
+      "expected": [
+        "m4"
+      ],
+      "best_expected_ce": 8.1168,
+      "top_incorrect_id": "m12",
+      "top_incorrect_ce": -11.2837,
+      "ce_rank_of_expected": 1,
+      "dense_rank_of_expected": 1,
+      "gate_filtered_correct_memory": false,
+      "miscalibrated": false,
+      "strict_negative_pattern": false
+    },
+    {
+      "id": "q87",
+      "query": "What vector database powers ChunkdUp?",
+      "category": "project_specific",
+      "expected": [
+        "m9"
+      ],
+      "best_expected_ce": -10.8462,
+      "top_incorrect_id": "m3",
+      "top_incorrect_ce": -3.8876,
+      "ce_rank_of_expected": 4,
+      "dense_rank_of_expected": 2,
+      "gate_filtered_correct_memory": false,
+      "miscalibrated": true,
+      "strict_negative_pattern": false
+    },
+    {
+      "id": "q88",
+      "query": "What model does ChunkdUp embed memories with?",
+      "category": "project_specific",
+      "expected": [
+        "m12"
+      ],
+      "best_expected_ce": 1.3036,
+      "top_incorrect_id": "m3",
+      "top_incorrect_ce": -2.3308,
+      "ce_rank_of_expected": 1,
+      "dense_rank_of_expected": 2,
+      "gate_filtered_correct_memory": false,
+      "miscalibrated": false,
+      "strict_negative_pattern": false
+    }
+  ]
+}
