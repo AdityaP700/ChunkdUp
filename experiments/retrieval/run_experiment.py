@@ -62,13 +62,17 @@ def load_calibration() -> Dict:
 
 
 class CrossEncoderReranker:
-    """Wraps the pretrained cross-encoder. Load failure is explicit."""
+    """Wraps the pretrained cross-encoder. Load failure is explicit.
+    Accepts a preloaded CrossEncoder so callers can share one instance."""
 
-    def __init__(self, model_name: str = "cross-encoder/ms-marco-MiniLM-L-12-v2"):
-        from sentence_transformers import CrossEncoder
-
+    def __init__(self, model_name: str = "cross-encoder/ms-marco-MiniLM-L-12-v2", model=None):
         self.model_name = model_name
-        self.model = CrossEncoder(model_name)  # raises on failure; no silent fallback
+        if model is not None:
+            self.model = model
+        else:
+            from sentence_transformers import CrossEncoder
+
+            self.model = CrossEncoder(model_name)  # raises on failure; no silent fallback
 
     def rerank(self, query: str, candidates: List[Dict], limit: int) -> List[Dict]:
         if not candidates:
@@ -85,13 +89,15 @@ class CrossEncoderReranker:
 
 
 class ExperimentPipeline:
-    """One configuration over a memory store (defaults to the shared fixture)."""
+    """One configuration over a memory store (defaults to the shared fixture).
+    Accepts preloaded model instances for memory-constrained environments."""
 
-    def __init__(self, config: ExperimentConfig, calibration: Optional[Dict] = None, memories: Optional[List[Dict]] = None):
+    def __init__(self, config: ExperimentConfig, calibration: Optional[Dict] = None,
+                 memories: Optional[List[Dict]] = None, dense_model=None, cross_model=None):
         self.config = config
-        self.dense = DenseRetriever(memories) if config.retriever in ("dense", "both") else None
+        self.dense = DenseRetriever(memories, model=dense_model) if config.retriever in ("dense", "both") else None
         self.bm25 = BM25Retriever(memories) if config.retriever in ("bm25", "both") else None
-        self.reranker = CrossEncoderReranker() if config.rerank == "cross_encoder" else None
+        self.reranker = CrossEncoderReranker(model=cross_model) if config.rerank == "cross_encoder" else None
 
         self.abstain_score_field = config.abstain_score_field
         if config.abstain:

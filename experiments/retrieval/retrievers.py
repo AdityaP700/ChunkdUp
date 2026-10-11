@@ -26,6 +26,14 @@ from fixture import all_memories
 _REPO_ROOT = Path(__file__).resolve().parent.parent.parent
 
 
+def embedding_model_source() -> str:
+    """Resolves the embedding model location without loading it."""
+    local_path = _REPO_ROOT / "models" / "all-MiniLM-L6-v2"
+    if local_path.exists():
+        return str(local_path)
+    return os.getenv("CHUNKDUP_EMBEDDING_MODEL", "all-MiniLM-L6-v2")
+
+
 def index_text(memory: Dict) -> str:
     """Text representation used for both embedding and BM25 indexing."""
     contextual = memory.get("contextual_text") or ""
@@ -60,9 +68,12 @@ def tokenize(text: str) -> List[str]:
 
 
 class DenseRetriever:
-    """Dense retrieval with the local all-MiniLM-L6-v2 embedding model."""
+    """Dense retrieval with the local all-MiniLM-L6-v2 embedding model.
 
-    def __init__(self, memories: List[Dict] = None):
+    Accepts a preloaded SentenceTransformer so callers can share one model
+    instance across multiple retrievers (memory-constrained environments)."""
+
+    def __init__(self, memories: List[Dict] = None, model=None):
         from sentence_transformers import SentenceTransformer
 
         self._source_memories = memories if memories is not None else all_memories()
@@ -72,7 +83,7 @@ class DenseRetriever:
         else:
             # Fall back to the package cache; recorded so runs are traceable.
             self.model_source = os.getenv("CHUNKDUP_EMBEDDING_MODEL", "all-MiniLM-L6-v2")
-        self.model = SentenceTransformer(self.model_source)
+        self.model = model if model is not None else SentenceTransformer(self.model_source)
         self._contextual = ContextualRetriever()
         self._embeddings: List[List[float]] = []
         self._memories: List[Dict] = []
