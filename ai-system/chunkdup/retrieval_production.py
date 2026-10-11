@@ -202,6 +202,8 @@ class ProductionRetriever:
         self.gate = _Gate("_rerank_score", FROZEN_CE_THRESHOLD)
         self._dense_gate = _Gate("_similarity", FROZEN_COSINE_THRESHOLD)
         self._executor = ThreadPoolExecutor(max_workers=1, thread_name_prefix="chunkdup-ce")
+        self.last_calibration_size = None
+        self.last_calibration = None
 
         if self.config_name == "baseline_current":
             from .retrieval_class import MemoryRetriever
@@ -329,53 +331,176 @@ class ProductionRetriever:
 
     # -- public API --------------------------------------------------------------
 
-    def retrieve(self, query: str, k: int = 5) -> List[Dict[str, Any]]:
-        t0 = time.perf_counter()
+    def _collect_ranked(self, query: str, k: int):
+        """Candidate pipeline WITHOUT the relevance gate.
+        Returns (ranked_candidates, score_field); (None, None) on the
+        baseline path (no gate applies)."""
         self._ensure_index()
 
         if self.effective_config == "baseline_current":
-            results = self._legacy.retrieve(query, k=k)
-            self._log_query(query, results, [], (time.perf_counter() - t0) * 1000, not results)
-            return results
+            return None, None
 
         pool = max(10, 2 * k)
-        fused = []
-        if self.effective_config in ("hybrid_ce_abstain", "dense_abstain"):
-            try:
-                dense_results = self._dense_search(query, pool)
-            except Exception as exc:
-                self._degrade("embedding_model_failure", str(exc))
-                dense_results = []
-            if self.effective_config == "hybrid_ce_abstain":
-                try:
-                    bm25_results = self._bm25_search(query, pool)
-                except Exception as exc:
-                    logger.warning("BM25 leg failed (%s); continuing dense-only", exc)
-                    bm25_results = []
-                fused = _rrf_fuse([dense_results, bm25_results], k=60, limit=pool)
-            else:
-                fused = dense_results
+        try:
+            dense_results = self._dense_search(query, pool)
+        except Exception as exc:
+            self._degrade("embedding_model_failure", str(exc))
+            dense_results = []
+        if self.effective_config == "baseline_current":
+            return None, None
 
         if self.effective_config == "hybrid_ce_abstain":
             try:
-                ranked = self._cross_encoder_rerank(query, fused, limit=pool)
-                gate = self.gate
+                bm25_results = self._bm25_search(query, pool)
+            except Exception as exc:
+                logger.warning("BM25 leg failed (%s); continuing dense-only", exc)
+                bm25_results = []
+            fused = _rrf_fuse([dense_results, bm25_results], k=60, limit=pool)
+            try:
+                return self._cross_encoder_rerank(query, fused, limit=pool), "_rerank_score"
             except Exception as exc:
                 self._ce_failed = True  # sticky: never retry a failed CE mid-process
                 self._degrade(
                     "timeout" if isinstance(exc, TimeoutError) else "cross_encoder_failure",
                     str(exc),
                 )
-                ranked = fused
-                gate = self._dense_gate
-        else:
-            ranked = fused
-            gate = self._dense_gate
+                return fused, "_similarity"
+        return dense_results, "_similarity"
 
+    def retrieve(self, query: str, k: int = 5) -> List[Dict[str, Any]]:
+        t0 = time.perf_counter()
+        ranked, score_field = self._collect_ranked(query, k)
+
+        if ranked is None:
+            results = self._legacy.retrieve(query, k=k)
+            self._log_query(query, results, [], (time.perf_counter() - t0) * 1000, not results)
+            return results
+
+        gate = self.gate if score_field == "_rerank_score" else self._dense_gate
         final = gate.filter(ranked)[:k]
         latency_ms = (time.perf_counter() - t0) * 1000
         self._log_query(query, final, ranked, latency_ms, not final)
         return final
+
+    # -- scale-aware gate recalibration (part 2.4) --------------------------------
+
+    def recalibrate(self, sample: List[Dict[str, Any]], k: int = 5) -> Dict[str, Any]:
+        """Recompute the abstention threshold from a labeled, dev-representative
+        sample against the CURRENT store state.
+
+        This is the hard shipping dependency from docs/round3-decision.md: the
+        frozen CE threshold (calibrated on a 12-memory dev set) loses rejection
+        accuracy as the store grows (round-2 risk 1: rejection 0.895 at 12
+        memories -> 0.737 by ~500; recalibration restored 1.00 at -2.1..-2.3).
+
+        Args:
+            sample: [{"query": str, "relevant_memory_ids": [ids], "answerable": bool}]
+                A small set of representative queries for THIS store, labeled
+                by hand the same way as the evaluation dataset.
+        Returns:
+            {"changed": bool, "threshold": float|None, "score_field": str,
+             "objective": float|None, "reason": str}
+        Schedule guidance: call on startup, and re-call whenever
+        should_recalibrate() turns True (store grew ~50% past the last
+        calibration). Drift is measurable from ~100 memories and material by
+        ~500 (round-2 scale data), so do not let the store more than double
+        past the calibration point.
+        """
+        self._ensure_index()
+        if self.effective_config == "baseline_current":
+            return {"changed": False, "reason": "no gate on the baseline path", "threshold": None}
+        if not sample:
+            return {"changed": False, "reason": "empty sample", "threshold": None}
+
+        config_before = self.effective_config
+        score_field = "_rerank_score" if config_before == "hybrid_ce_abstain" else "_similarity"
+
+        collected = []
+        for row in sample:
+            ranked, field = self._collect_ranked(row["query"], k)
+            if ranked is None:
+                return {"changed": False, "reason": "no gate on the baseline path", "threshold": None}
+            if field != score_field or self.effective_config != config_before:
+                return {"changed": False,
+                        "reason": f"degraded during calibration ({config_before} -> {self.effective_config})",
+                        "threshold": None}
+            collected.append((row, ranked))
+
+        observed = sorted({float(ranked[0].get(score_field, 0.0)) for _row, ranked in collected if ranked})
+        if not observed:
+            return {"changed": False, "reason": "no candidates observed for any sample query", "threshold": None}
+
+        def evaluate(threshold: float):
+            ans_hits = ans_total = unans_reject = 0
+            for row, ranked in collected:
+                scores = [float(c.get(score_field, 0.0)) for c in ranked]
+                if not scores or scores[0] < threshold:
+                    ids = []
+                else:
+                    ids = [c["id"] for c in ranked if float(c.get(score_field, 0.0)) >= threshold]
+                expected = set(row["relevant_memory_ids"])
+                if row["answerable"]:
+                    ans_total += 1
+                    if any(i in expected for i in ids):
+                        ans_hits += 1
+                else:
+                    unans_reject += 1 if not ids else 0
+            n_ans = max(1, ans_total)
+            n_unans = max(1, sum(1 for row, _ in collected if not row["answerable"]))
+            hit_rate = ans_hits / ans_total if ans_total else 0.0
+            reject_rate = unans_reject / n_unans
+            return 0.5 * hit_rate + 0.5 * reject_rate, hit_rate, reject_rate
+
+        # Sweep observed top-scores + midpoints + reject-all, ties -> lower threshold.
+        thresholds = set(observed)
+        for a, b in zip(observed, observed[1:]):
+            thresholds.add((a + b) / 2)
+        thresholds.add(observed[-1] + 1e-6)
+        thresholds.add(min(0.0, observed[0] - 1e-6))
+
+        best_threshold, best_objective, best_hit, best_reject = None, -1.0, 0.0, 0.0
+        for t in sorted(thresholds):
+            objective, hit_rate, reject_rate = evaluate(t)
+            if objective > best_objective or (
+                objective == best_objective and best_threshold is not None and t < best_threshold
+            ):
+                best_threshold, best_objective, best_hit, best_reject = t, objective, hit_rate, reject_rate
+
+        old_threshold = self.gate.threshold if score_field == "_rerank_score" else self._dense_gate.threshold
+        if score_field == "_rerank_score":
+            self.gate.threshold = best_threshold
+        else:
+            self._dense_gate.threshold = best_threshold
+        self.last_calibration_size = len(self.repository.get_all())
+        self.last_calibration = {
+            "timestamp": datetime.now(timezone.utc).isoformat(),
+            "score_field": score_field,
+            "old_threshold": old_threshold,
+            "threshold": best_threshold,
+            "objective": round(best_objective, 4),
+            "sample_size": len(sample),
+        }
+        logger.info("Gate recalibrated: %s %.6f -> %.6f (objective %.4f)",
+                    score_field, old_threshold, best_threshold, best_objective)
+        return {
+            "changed": best_threshold != old_threshold,
+            "threshold": best_threshold,
+            "old_threshold": old_threshold,
+            "score_field": score_field,
+            "objective": round(best_objective, 4),
+            "answerable_hit_rate": round(best_hit, 4),
+            "unanswerable_reject_rate": round(best_reject, 4),
+        }
+
+    def should_recalibrate(self) -> bool:
+        """True when the store has grown ~50% past the last calibration size
+        (or nothing was ever calibrated). Round-2 drift data: measurable from
+        ~100 memories, material by ~500 - so recalibrate before doubling."""
+        if self.effective_config == "baseline_current":
+            return False
+        if self.last_calibration_size is None:
+            return True
+        return len(self.repository.get_all()) >= self.last_calibration_size * 1.5
 
     # -- logging (part 2.2) ------------------------------------------------------
 

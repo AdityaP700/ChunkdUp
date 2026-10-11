@@ -184,5 +184,60 @@ class TestRollback(unittest.TestCase):
         self.assertTrue(results)
 
 
+class TestScaleAwareRecalibration(unittest.TestCase):
+    """P2.4: gate thresholds computed from a store-representative labeled
+    sample (the hard shipping dependency from docs/round3-decision.md)."""
+
+    SAMPLE = [
+        {"query": "What database does ChunkdUp use?", "relevant_memory_ids": ["m9"], "answerable": True},
+        {"query": "Where does ChunkdUp run?", "relevant_memory_ids": ["m11"], "answerable": True},
+        {"query": "What is my favorite programming book?", "relevant_memory_ids": [], "answerable": False},
+        {"query": "sourdough bread baking", "relevant_memory_ids": [], "answerable": False},
+    ]
+
+    def test_recalibrate_updates_gate_and_result(self):
+        retriever = ProductionRetriever(make_repo(), config_name="hybrid_ce_abstain")
+        result = retriever.recalibrate(self.SAMPLE)
+        self.assertTrue(result["changed"], f"expected recalibration to move the frozen threshold: {result}")
+        self.assertIsNotNone(result["threshold"])
+        self.assertIn("objective", result)
+        self.assertEqual(retriever.gate.threshold, result["threshold"])
+        self.assertEqual(retriever.last_calibration_size, 4)
+        # retrieval still works with the recalibrated gate
+        results = retriever.retrieve("What database does ChunkdUp use?", k=5)
+        self.assertTrue(results)
+
+    def test_recalibrate_dense_config(self):
+        retriever = ProductionRetriever(make_repo(), config_name="dense_abstain")
+        result = retriever.recalibrate(self.SAMPLE)
+        self.assertEqual(result["score_field"], "_similarity")
+        self.assertEqual(retriever._dense_gate.threshold, result["threshold"])
+
+    def test_recalibrate_empty_sample_no_change(self):
+        retriever = ProductionRetriever(make_repo(), config_name="hybrid_ce_abstain")
+        frozen = retriever.gate.threshold
+        result = retriever.recalibrate([])
+        self.assertFalse(result["changed"])
+        self.assertEqual(retriever.gate.threshold, frozen)
+
+    def test_baseline_skips_recalibration(self):
+        retriever = ProductionRetriever(make_repo(), config_name="baseline_current")
+        result = retriever.recalibrate(self.SAMPLE)
+        self.assertFalse(result["changed"])
+        self.assertFalse(retriever.should_recalibrate())
+
+    def test_should_recalibrate_tracks_store_growth(self):
+        retriever = ProductionRetriever(make_repo(), config_name="hybrid_ce_abstain")
+        self.assertTrue(retriever.should_recalibrate(), "never-calibrated store must recalibrate")
+        retriever.recalibrate(self.SAMPLE)
+        self.assertFalse(retriever.should_recalibrate())
+        repo = retriever.repository
+        for i in range(3):  # 4 -> 7 memories: >= 1.5x the calibration size of 4
+            repo.save({"id": f"extra{i}", "type": "learning", "key": f"topic{i}",
+                       "value": f"Kubernetes internals part {i}",
+                       "conversation_topic": "study plan", "status": "active"})
+        self.assertTrue(retriever.should_recalibrate(), "store grew past 1.5x calibration size")
+
+
 if __name__ == "__main__":
     unittest.main()
