@@ -1,0 +1,524 @@
+{
+  "scale": 1000,
+  "n_memories": 1000,
+  "configs": {
+    "baseline_current": {
+      "metrics": {
+        "n_queries": 70,
+        "MRR": 0.3731,
+        "Precision@K": 0.2571,
+        "Recall@K": 0.4364,
+        "HitRate@K": 0.4714,
+        "answerable": {
+          "n": 51,
+          "MRR": 0.4925,
+          "HitRate@K": 0.6275,
+          "false_abstain_rate": 0.0196,
+          "relevant_memories_returned": 45
+        },
+        "unanswerable": {
+          "n": 19,
+          "correct_rejection_rate": 0.0526,
+          "false_positive_rate": 0.9474,
+          "irrelevant_memories_returned": 57
+        }
+      },
+      "latency_ms": {
+        "total_ms": {
+          "mean": 8.357,
+          "p50": 2.392,
+          "p95": 46.875
+        }
+      },
+      "variant": "direct"
+    },
+    "bm25": {
+      "metrics": {
+        "n_queries": 70,
+        "MRR": 0.3214,
+        "Precision@K": 0.3143,
+        "Recall@K": 0.3171,
+        "HitRate@K": 0.3286,
+        "answerable": {
+          "n": 51,
+          "MRR": 0.2059,
+          "HitRate@K": 0.2157,
+          "false_abstain_rate": 0.0588,
+          "relevant_memories_returned": 11
+        },
+        "unanswerable": {
+          "n": 19,
+          "correct_rejection_rate": 0.6316,
+          "false_positive_rate": 0.3684,
+          "irrelevant_memories_returned": 31
+        }
+      },
+      "latency_ms": {
+        "total_ms": {
+          "mean": 2.094,
+          "p50": 1.955,
+          "p95": 3.92
+        },
+        "retrieve_dense_ms": {
+          "mean": 0.0,
+          "p50": 0.001,
+          "p95": 0.001
+        },
+        "retrieve_bm25_ms": {
+          "mean": 2.08,
+          "p50": 1.941,
+          "p95": 3.905
+        },
+        "fuse_ms": {
+          "mean": 0.004,
+          "p50": 0.003,
+          "p95": 0.006
+        },
+        "rerank_ms": {
+          "mean": 0.001,
+          "p50": 0.001,
+          "p95": 0.001
+        }
+      },
+      "variant": "direct"
+    },
+    "dense": {
+      "metrics": {
+        "n_queries": 70,
+        "MRR": 0.1429,
+        "Precision@K": 0.0343,
+        "Recall@K": 0.1714,
+        "HitRate@K": 0.1714,
+        "answerable": {
+          "n": 51,
+          "MRR": 0.1961,
+          "HitRate@K": 0.2353,
+          "false_abstain_rate": 0.0,
+          "relevant_memories_returned": 12
+        },
+        "unanswerable": {
+          "n": 19,
+          "correct_rejection_rate": 0.0,
+          "false_positive_rate": 1.0,
+          "irrelevant_memories_returned": 95
+        }
+      },
+      "latency_ms": {
+        "total_ms": {
+          "mean": 13.211,
+          "p50": 13.352,
+          "p95": 16.263
+        },
+        "retrieve_dense_ms": {
+          "mean": 13.196,
+          "p50": 13.338,
+          "p95": 16.247
+        },
+        "retrieve_bm25_ms": {
+          "mean": 0.001,
+          "p50": 0.001,
+          "p95": 0.001
+        },
+        "fuse_ms": {
+          "mean": 0.002,
+          "p50": 0.002,
+          "p95": 0.003
+        },
+        "rerank_ms": {
+          "mean": 0.001,
+          "p50": 0.001,
+          "p95": 0.001
+        }
+      },
+      "variant": "direct"
+    },
+    "hybrid_rrf": {
+      "metrics": {
+        "n_queries": 70,
+        "MRR": 0.1429,
+        "Precision@K": 0.0314,
+        "Recall@K": 0.1457,
+        "HitRate@K": 0.1571,
+        "answerable": {
+          "n": 51,
+          "MRR": 0.1961,
+          "HitRate@K": 0.2157,
+          "false_abstain_rate": 0.0,
+          "relevant_memories_returned": 11
+        },
+        "unanswerable": {
+          "n": 19,
+          "correct_rejection_rate": 0.0,
+          "false_positive_rate": 1.0,
+          "irrelevant_memories_returned": 95
+        }
+      },
+      "latency_ms": {
+        "total_ms": {
+          "mean": 13.69,
+          "p50": 13.452,
+          "p95": 16.537
+        },
+        "retrieve_dense_ms": {
+          "mean": 11.99,
+          "p50": 11.774,
+          "p95": 14.741
+        },
+        "retrieve_bm25_ms": {
+          "mean": 1.61,
+          "p50": 1.584,
+          "p95": 2.098
+        },
+        "fuse_ms": {
+          "mean": 0.076,
+          "p50": 0.077,
+          "p95": 0.098
+        },
+        "rerank_ms": {
+          "mean": 0.001,
+          "p50": 0.001,
+          "p95": 0.001
+        }
+      },
+      "variant": "direct"
+    },
+    "dense_ce": {
+      "metrics": {
+        "n_queries": 70,
+        "MRR": 0.1976,
+        "Precision@K": 0.0429,
+        "Recall@K": 0.2048,
+        "HitRate@K": 0.2143,
+        "answerable": {
+          "n": 51,
+          "MRR": 0.2712,
+          "HitRate@K": 0.2941,
+          "false_abstain_rate": 0.0,
+          "relevant_memories_returned": 15
+        },
+        "unanswerable": {
+          "n": 19,
+          "correct_rejection_rate": 0.0,
+          "false_positive_rate": 1.0,
+          "irrelevant_memories_returned": 95
+        }
+      },
+      "latency_ms": {
+        "total_ms": {
+          "mean": 940.66,
+          "p50": 638.79,
+          "p95": 2260.399
+        },
+        "retrieve_dense_ms": {
+          "mean": 47.087,
+          "p50": 16.963,
+          "p95": 120.659
+        },
+        "retrieve_bm25_ms": {
+          "mean": 0.001,
+          "p50": 0.001,
+          "p95": 0.001
+        },
+        "fuse_ms": {
+          "mean": 0.003,
+          "p50": 0.003,
+          "p95": 0.004
+        },
+        "rerank_ms": {
+          "mean": 893.551,
+          "p50": 622.351,
+          "p95": 2075.532
+        }
+      },
+      "variant": "direct"
+    },
+    "hybrid_ce": {
+      "metrics": {
+        "n_queries": 70,
+        "MRR": 0.1929,
+        "Precision@K": 0.04,
+        "Recall@K": 0.1886,
+        "HitRate@K": 0.2,
+        "answerable": {
+          "n": 51,
+          "MRR": 0.2647,
+          "HitRate@K": 0.2745,
+          "false_abstain_rate": 0.0,
+          "relevant_memories_returned": 14
+        },
+        "unanswerable": {
+          "n": 19,
+          "correct_rejection_rate": 0.0,
+          "false_positive_rate": 1.0,
+          "irrelevant_memories_returned": 95
+        }
+      },
+      "latency_ms": {
+        "total_ms": {
+          "mean": 778.122,
+          "p50": 696.958,
+          "p95": 1151.602
+        },
+        "retrieve_dense_ms": {
+          "mean": 26.82,
+          "p50": 20.294,
+          "p95": 77.947
+        },
+        "retrieve_bm25_ms": {
+          "mean": 2.276,
+          "p50": 2.225,
+          "p95": 3.331
+        },
+        "fuse_ms": {
+          "mean": 0.111,
+          "p50": 0.111,
+          "p95": 0.144
+        },
+        "rerank_ms": {
+          "mean": 748.882,
+          "p50": 672.831,
+          "p95": 1067.471
+        }
+      },
+      "variant": "direct"
+    },
+    "dense_abstain": {
+      "score_field": "_similarity",
+      "latency_ms": {
+        "total_ms": {
+          "mean": 13.211,
+          "p50": 13.352,
+          "p95": 16.263
+        },
+        "retrieve_dense_ms": {
+          "mean": 13.196,
+          "p50": 13.338,
+          "p95": 16.247
+        },
+        "retrieve_bm25_ms": {
+          "mean": 0.001,
+          "p50": 0.001,
+          "p95": 0.001
+        },
+        "fuse_ms": {
+          "mean": 0.002,
+          "p50": 0.002,
+          "p95": 0.003
+        },
+        "rerank_ms": {
+          "mean": 0.001,
+          "p50": 0.001,
+          "p95": 0.001
+        }
+      },
+      "variants": {
+        "frozen": {
+          "threshold": 0.262475,
+          "metrics": {
+            "n_queries": 70,
+            "MRR": 0.3286,
+            "Precision@K": 0.2429,
+            "Recall@K": 0.3571,
+            "HitRate@K": 0.3571,
+            "answerable": {
+              "n": 51,
+              "MRR": 0.1765,
+              "HitRate@K": 0.2157,
+              "false_abstain_rate": 0.0784,
+              "relevant_memories_returned": 11
+            },
+            "unanswerable": {
+              "n": 19,
+              "correct_rejection_rate": 0.7368,
+              "false_positive_rate": 0.2632,
+              "irrelevant_memories_returned": 21
+            }
+          }
+        },
+        "recalibrated": {
+          "threshold": 0.27633336186408997,
+          "objective": 0.5833,
+          "metrics": {
+            "n_queries": 70,
+            "MRR": 0.3571,
+            "Precision@K": 0.2757,
+            "Recall@K": 0.3857,
+            "HitRate@K": 0.3857,
+            "answerable": {
+              "n": 51,
+              "MRR": 0.1765,
+              "HitRate@K": 0.2157,
+              "false_abstain_rate": 0.0784,
+              "relevant_memories_returned": 11
+            },
+            "unanswerable": {
+              "n": 19,
+              "correct_rejection_rate": 0.8421,
+              "false_positive_rate": 0.1579,
+              "irrelevant_memories_returned": 15
+            }
+          }
+        }
+      }
+    },
+    "hybrid_abstain": {
+      "score_field": "_rrf_score",
+      "latency_ms": {
+        "total_ms": {
+          "mean": 13.69,
+          "p50": 13.452,
+          "p95": 16.537
+        },
+        "retrieve_dense_ms": {
+          "mean": 11.99,
+          "p50": 11.774,
+          "p95": 14.741
+        },
+        "retrieve_bm25_ms": {
+          "mean": 1.61,
+          "p50": 1.584,
+          "p95": 2.098
+        },
+        "fuse_ms": {
+          "mean": 0.076,
+          "p50": 0.077,
+          "p95": 0.098
+        },
+        "rerank_ms": {
+          "mean": 0.001,
+          "p50": 0.001,
+          "p95": 0.001
+        }
+      },
+      "variants": {
+        "frozen": {
+          "threshold": 0.023969,
+          "metrics": {
+            "n_queries": 70,
+            "MRR": 0.35,
+            "Precision@K": 0.3429,
+            "Recall@K": 0.3571,
+            "HitRate@K": 0.3571,
+            "answerable": {
+              "n": 51,
+              "MRR": 0.1863,
+              "HitRate@K": 0.1961,
+              "false_abstain_rate": 0.2353,
+              "relevant_memories_returned": 10
+            },
+            "unanswerable": {
+              "n": 19,
+              "correct_rejection_rate": 0.7895,
+              "false_positive_rate": 0.2105,
+              "irrelevant_memories_returned": 16
+            }
+          }
+        },
+        "recalibrated": {
+          "threshold": 0.032654680063458494,
+          "objective": 0.6023,
+          "metrics": {
+            "n_queries": 70,
+            "MRR": 0.3857,
+            "Precision@K": 0.3857,
+            "Recall@K": 0.3857,
+            "HitRate@K": 0.3857,
+            "answerable": {
+              "n": 51,
+              "MRR": 0.1765,
+              "HitRate@K": 0.1765,
+              "false_abstain_rate": 0.7255,
+              "relevant_memories_returned": 9
+            },
+            "unanswerable": {
+              "n": 19,
+              "correct_rejection_rate": 0.9474,
+              "false_positive_rate": 0.0526,
+              "irrelevant_memories_returned": 1
+            }
+          }
+        }
+      }
+    },
+    "hybrid_ce_abstain": {
+      "score_field": "_rerank_score",
+      "latency_ms": {
+        "total_ms": {
+          "mean": 778.122,
+          "p50": 696.958,
+          "p95": 1151.602
+        },
+        "retrieve_dense_ms": {
+          "mean": 26.82,
+          "p50": 20.294,
+          "p95": 77.947
+        },
+        "retrieve_bm25_ms": {
+          "mean": 2.276,
+          "p50": 2.225,
+          "p95": 3.331
+        },
+        "fuse_ms": {
+          "mean": 0.111,
+          "p50": 0.111,
+          "p95": 0.144
+        },
+        "rerank_ms": {
+          "mean": 748.882,
+          "p50": 672.831,
+          "p95": 1067.471
+        }
+      },
+      "variants": {
+        "frozen": {
+          "threshold": -10.947404,
+          "metrics": {
+            "n_queries": 70,
+            "MRR": 0.4071,
+            "Precision@K": 0.2876,
+            "Recall@K": 0.4029,
+            "HitRate@K": 0.4143,
+            "answerable": {
+              "n": 51,
+              "MRR": 0.2647,
+              "HitRate@K": 0.2745,
+              "false_abstain_rate": 0.0,
+              "relevant_memories_returned": 14
+            },
+            "unanswerable": {
+              "n": 19,
+              "correct_rejection_rate": 0.7895,
+              "false_positive_rate": 0.2105,
+              "irrelevant_memories_returned": 20
+            }
+          }
+        },
+        "recalibrated": {
+          "threshold": -2.1334011554718018,
+          "objective": 0.6477,
+          "metrics": {
+            "n_queries": 70,
+            "MRR": 0.4571,
+            "Precision@K": 0.42,
+            "Recall@K": 0.4457,
+            "HitRate@K": 0.4571,
+            "answerable": {
+              "n": 51,
+              "MRR": 0.2549,
+              "HitRate@K": 0.2549,
+              "false_abstain_rate": 0.451,
+              "relevant_memories_returned": 13
+            },
+            "unanswerable": {
+              "n": 19,
+              "correct_rejection_rate": 1.0,
+              "false_positive_rate": 0.0,
+              "irrelevant_memories_returned": 0
+            }
+          }
+        }
+      }
+    }
+  },
+  "index_seconds": 18.72
+}

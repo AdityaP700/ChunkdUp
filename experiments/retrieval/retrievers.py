@@ -102,19 +102,29 @@ class DenseRetriever:
         # Batched encode (same normalization as before; one call instead of N).
         vectors = self.model.encode(texts, normalize_embeddings=True).tolist() if texts else []
         self._embeddings = vectors
+        # Row matrix for vectorized cosine (rows are unit-norm).
+        if vectors:
+            import numpy as np
+
+            self._matrix = np.asarray(vectors, dtype="float32")
+        else:
+            self._matrix = None
 
     def search(self, query: str, limit: int = 20) -> List[Dict]:
-        if not self._memories or not query.strip():
+        if self._matrix is None or not query.strip():
             return []
         q_vec = self.model.encode(query, normalize_embeddings=True).tolist()
+        import numpy as np
+
+        sims = self._matrix @ np.asarray(q_vec, dtype="float32")
+        order = np.argsort(-sims)[:limit]
         scored = []
-        for memory, m_vec in zip(self._memories, self._embeddings):
-            similarity = sum(a * b for a, b in zip(q_vec, m_vec))
+        for i in order:
+            memory = self._memories[int(i)]
             candidate = dict(memory)
-            candidate["_similarity"] = similarity
+            candidate["_similarity"] = float(sims[int(i)])
             scored.append(candidate)
-        scored.sort(key=lambda c: c["_similarity"], reverse=True)
-        return scored[:limit]
+        return scored
 
 
 class BM25Retriever:

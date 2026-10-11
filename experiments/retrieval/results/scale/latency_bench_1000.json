@@ -1,0 +1,37 @@
+{
+  "scale": 1000,
+  "n_memories": 1000,
+  "reps": 30,
+  "stages": {
+    "bm25_search": {
+      "median_ms": 0.877,
+      "mean_ms": 0.933,
+      "min_ms": 0.446
+    },
+    "bm25_search_all_queries_avg": {
+      "median_ms": 96.974,
+      "mean_ms": 115.975,
+      "min_ms": 96.94
+    },
+    "dense_search": {
+      "median_ms": 7.966,
+      "mean_ms": 8.331,
+      "min_ms": 6.742
+    },
+    "dense_search_all_queries_avg": {
+      "median_ms": 645.622,
+      "mean_ms": 688.287,
+      "min_ms": 625.774
+    },
+    "ce_predict_20_pairs": {
+      "median_ms": 65.75,
+      "mean_ms": 67.779,
+      "min_ms": 60.586
+    },
+    "ce_full_rerank": {
+      "median_ms": 453.189,
+      "mean_ms": 450.278,
+      "min_ms": 385.412
+    }
+  }
+}
