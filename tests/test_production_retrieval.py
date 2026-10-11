@@ -5,6 +5,7 @@ P2.1: graceful degradation - cross-encoder load failure, inference failure,
 and timeout must fall back to the dense gate (dense_abstain) and embedding
 failures to the frozen baseline, with every fallback logged, never silent.
 """
+import json
 import sys
 import time
 import unittest
@@ -87,6 +88,73 @@ class TestProductionFallback(unittest.TestCase):
     def test_empty_store_returns_empty(self):
         retriever = ProductionRetriever(InMemoryRepository(), config_name="hybrid_ce_abstain")
         self.assertEqual(retriever.retrieve("anything at all", k=5), [])
+
+
+class TestQueryLogging(unittest.TestCase):
+    """P2.2: JSONL query/result logging for post-hoc drift inspection."""
+
+    def setUp(self):
+        import tempfile
+
+        self.tmp = tempfile.mkdtemp()
+        self.log_path = __import__("os").path.join(self.tmp, "retrieval_log.jsonl")
+
+    def _read_log(self):
+        with open(self.log_path, encoding="utf-8") as f:
+            return [json.loads(line) for line in f if line.strip()]
+
+    def test_log_written_with_required_fields(self):
+        retriever = ProductionRetriever(make_repo(), config_name="hybrid_ce_abstain",
+                                        query_log_path=self.log_path)
+        retriever.retrieve("What database does ChunkdUp use?", k=5)
+        retriever.retrieve("sourdough bread baking", k=5)  # expect abstention
+
+        records = self._read_log()
+        self.assertEqual(len(records), 2)
+        for record in records:
+            for key in ("timestamp", "query", "config", "requested_config",
+                        "returned_ids", "top_scores", "latency_ms", "abstained",
+                        "fallback_events"):
+                self.assertIn(key, record)
+        self.assertEqual(records[0]["query"], "What database does ChunkdUp use?")
+        self.assertIn("m9", records[0]["returned_ids"])
+        self.assertFalse(records[0]["abstained"])
+        self.assertTrue(records[0]["top_scores"], "scores must be recorded")
+        self.assertTrue(records[0]["timestamp"] <= records[1]["timestamp"])
+        self.assertTrue(records[1]["abstained"], "no-overlap query must be logged as abstained")
+
+    def test_log_disabled_by_env(self):
+        retriever = ProductionRetriever(make_repo(), config_name="hybrid_ce_abstain",
+                                        query_log_path=self.log_path)
+        with mock.patch.dict(__import__("os").environ, {"CHUNKDUP_QUERY_LOG": "off"}):
+            retriever = ProductionRetriever(make_repo(), config_name="hybrid_ce_abstain",
+                                            query_log_path=self.log_path)
+            retriever.retrieve("What database does ChunkdUp use?", k=5)
+        self.assertFalse(__import__("os").path.exists(self.log_path))
+
+    def test_log_records_fallback_events(self):
+        retriever = ProductionRetriever(make_repo(), config_name="hybrid_ce_abstain",
+                                        query_log_path=self.log_path)
+        with mock.patch.object(rp, "_get_cross_encoder", side_effect=RuntimeError("broken")):
+            retriever.retrieve("What database does ChunkdUp use?", k=5)
+        record = self._read_log()[0]
+        self.assertEqual(record["config"], "dense_abstain")
+        self.assertEqual(record["requested_config"], "hybrid_ce_abstain")
+        self.assertTrue(record["fallback_events"])
+
+    def test_memory_writes_log_to_data_dir(self):
+        import tempfile
+
+        from chunkdup import Memory
+
+        data_dir = tempfile.mkdtemp()
+        memory = Memory(store="memory", data_dir=data_dir)
+        memory.remember("I use Python")
+        memory.retrieve("What language do I use?")
+        log_path = __import__("os").path.join(data_dir, "retrieval_log.jsonl")
+        self.assertTrue(__import__("os").path.exists(log_path))
+        record = json.loads(open(log_path, encoding="utf-8").readline())
+        self.assertEqual(record["query"], "What language do I use?")
 
 
 if __name__ == "__main__":
