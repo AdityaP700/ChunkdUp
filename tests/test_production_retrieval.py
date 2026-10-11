@@ -157,5 +157,32 @@ class TestQueryLogging(unittest.TestCase):
         self.assertEqual(record["query"], "What language do I use?")
 
 
+class TestRollback(unittest.TestCase):
+    """P2.3: one-move rollback via CHUNKDUP_RETRIEVAL_CONFIG."""
+
+    def test_env_rollback_forces_baseline(self):
+        repo = make_repo()
+        with mock.patch.dict(__import__("os").environ, {"CHUNKDUP_RETRIEVAL_CONFIG": "baseline_current"}):
+            retriever = ProductionRetriever(repo)
+        self.assertEqual(retriever.config_name, "baseline_current")
+        self.assertEqual(retriever.effective_config, "baseline_current")
+        results = retriever.retrieve("What database does ChunkdUp use?", k=5)
+        self.assertTrue(results, "rollback path returned nothing for an answerable store")
+        self.assertTrue(retriever._legacy is not None, "rollback must use the frozen legacy path")
+
+    def test_unknown_config_falls_back_to_default(self):
+        with mock.patch.dict(__import__("os").environ, {"CHUNKDUP_RETRIEVAL_CONFIG": "graph_rag_ultra"}):
+            retriever = ProductionRetriever(make_repo())
+        self.assertEqual(retriever.config_name, rp.DEFAULT_CONFIG)
+
+    def test_fast_mode_selection(self):
+        with mock.patch.dict(__import__("os").environ, {"CHUNKDUP_RETRIEVAL_CONFIG": "dense_abstain"}):
+            retriever = ProductionRetriever(make_repo())
+        self.assertEqual(retriever.config_name, "dense_abstain")
+        results = retriever.retrieve("What database does ChunkdUp use?", k=5)
+        self.assertEqual(retriever.effective_config, "dense_abstain")
+        self.assertTrue(results)
+
+
 if __name__ == "__main__":
     unittest.main()
