@@ -27,8 +27,18 @@ REQUIRED_QUERIES = {
 }
 
 
+def load_rows(extra_path=None):
+    base = Path(__file__).parent / "dataset.jsonl"
+    rows = [json.loads(line) for line in base.read_text(encoding="utf-8").splitlines() if line.strip()]
+    if extra_path:
+        extra = Path(extra_path)
+        rows.extend(json.loads(line) for line in extra.read_text(encoding="utf-8").splitlines() if line.strip())
+    return rows
+
+
 def main() -> int:
-    rows = [json.loads(line) for line in (Path(__file__).parent / "dataset.jsonl").read_text(encoding="utf-8").splitlines() if line.strip()]
+    extra_path = sys.argv[1] if len(sys.argv) > 1 else None
+    rows = load_rows(extra_path)
     errors = []
 
     ids = [r["id"] for r in rows]

@@ -43,12 +43,19 @@ DEFAULT_ABSTAIN_FIELD = {
 }
 
 
-def load_dataset(split: str) -> List[Dict]:
+def load_dataset(split: str, extra_path: Optional[str] = None) -> List[Dict]:
     rows = [
         json.loads(line)
         for line in DATASET_PATH.read_text(encoding="utf-8").splitlines()
         if line.strip()
     ]
+    if extra_path:
+        extra = Path(extra_path)
+        rows.extend(
+            json.loads(line)
+            for line in extra.read_text(encoding="utf-8").splitlines()
+            if line.strip()
+        )
     if split in ("dev", "heldout"):
         return [r for r in rows if r["split"] == split]
     return rows
@@ -184,8 +191,8 @@ class BaselinePipeline:
         return results, timings, results
 
 
-def run_config(config_name: str, split: str, k: int = 5) -> Dict:
-    rows = load_dataset(split)
+def run_config(config_name: str, split: str, k: int = 5, extra_path: Optional[str] = None) -> Dict:
+    rows = load_dataset(split, extra_path)
     calibration = load_calibration()
 
     if config_name == BASELINE_CURRENT:
@@ -264,6 +271,10 @@ def main() -> int:
     parser.add_argument("--all", action="store_true")
     parser.add_argument("--split", choices=["dev", "heldout", "both"], default="dev")
     parser.add_argument("--k", type=int, default=K)
+    parser.add_argument("--extra-dataset", default=None,
+                        help="Optional extra dataset JSONL merged into the fixed set (e.g. round-2 held-out expansion)")
+    parser.add_argument("--tag", default=None,
+                        help="Output filename tag; writes results/<tag>.<config>.<split>.json instead of overwriting")
     args = parser.parse_args()
 
     if not args.all and not args.config:
@@ -277,12 +288,13 @@ def main() -> int:
     for name in names:
         for split in splits:
             try:
-                result = run_config(name, split, k=args.k)
+                result = run_config(name, split, k=args.k, extra_path=args.extra_dataset)
             except Exception as exc:  # noqa: BLE001 - report failures honestly
                 failures.append(f"{name}/{split}: {exc}")
                 print(f"[FAIL] {name} [{split}]: {exc}")
                 continue
-            out_path = RESULTS_DIR / f"{name}.{split}.json"
+            stem = f"{args.tag}.{name}" if args.tag else name
+            out_path = RESULTS_DIR / f"{stem}.{split}.json"
             out_path.write_text(json.dumps(result, indent=2), encoding="utf-8")
             s = result["summary"]
             print(
