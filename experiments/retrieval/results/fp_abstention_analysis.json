@@ -1,0 +1,1838 @@
+{
+  "risk4_false_abstention": {
+    "baseline_current": {
+      "dev": {
+        "n_answerable": 44,
+        "false_abstentions": 1,
+        "false_abstention_rate": 0.0227,
+        "false_abstention_query_ids": [
+          "q23"
+        ],
+        "n_unanswerable": 12,
+        "correct_rejection_rate": 0.3333,
+        "irrelevant_memories_returned": 8
+      },
+      "heldout": {
+        "n_answerable": 7,
+        "false_abstentions": 0,
+        "false_abstention_rate": 0.0,
+        "false_abstention_query_ids": [],
+        "n_unanswerable": 7,
+        "correct_rejection_rate": 0.1429,
+        "irrelevant_memories_returned": 10
+      },
+      "heldout_r2": {
+        "n_answerable": 25,
+        "false_abstentions": 0,
+        "false_abstention_rate": 0.0,
+        "false_abstention_query_ids": [],
+        "n_unanswerable": 11,
+        "correct_rejection_rate": 0.1818,
+        "irrelevant_memories_returned": 13
+      }
+    },
+    "dense": {
+      "dev": {
+        "n_answerable": 44,
+        "false_abstentions": 0,
+        "false_abstention_rate": 0.0,
+        "false_abstention_query_ids": [],
+        "n_unanswerable": 12,
+        "correct_rejection_rate": 0.0,
+        "irrelevant_memories_returned": 60
+      },
+      "heldout": {
+        "n_answerable": 7,
+        "false_abstentions": 0,
+        "false_abstention_rate": 0.0,
+        "false_abstention_query_ids": [],
+        "n_unanswerable": 7,
+        "correct_rejection_rate": 0.0,
+        "irrelevant_memories_returned": 35
+      }
+    },
+    "bm25": {
+      "dev": {
+        "n_answerable": 44,
+        "false_abstentions": 12,
+        "false_abstention_rate": 0.2727,
+        "false_abstention_query_ids": [
+          "q09",
+          "q13",
+          "q14",
+          "q18",
+          "q23",
+          "q25",
+          "q27",
+          "q28",
+          "q32",
+          "q38",
+          "q41",
+          "q69"
+        ],
+        "n_unanswerable": 12,
+        "correct_rejection_rate": 0.9167,
+        "irrelevant_memories_returned": 1
+      },
+      "heldout": {
+        "n_answerable": 7,
+        "false_abstentions": 3,
+        "false_abstention_rate": 0.4286,
+        "false_abstention_query_ids": [
+          "q16",
+          "q17",
+          "q29"
+        ],
+        "n_unanswerable": 7,
+        "correct_rejection_rate": 0.7143,
+        "irrelevant_memories_returned": 2
+      },
+      "heldout_r2": {
+        "n_answerable": 25,
+        "false_abstentions": 6,
+        "false_abstention_rate": 0.24,
+        "false_abstention_query_ids": [
+          "q16",
+          "q17",
+          "q29",
+          "q79",
+          "q81",
+          "q82"
+        ],
+        "n_unanswerable": 11,
+        "correct_rejection_rate": 0.8182,
+        "irrelevant_memories_returned": 2
+      }
+    },
+    "hybrid_rrf": {
+      "dev": {
+        "n_answerable": 44,
+        "false_abstentions": 0,
+        "false_abstention_rate": 0.0,
+        "false_abstention_query_ids": [],
+        "n_unanswerable": 12,
+        "correct_rejection_rate": 0.0,
+        "irrelevant_memories_returned": 60
+      },
+      "heldout": {
+        "n_answerable": 7,
+        "false_abstentions": 0,
+        "false_abstention_rate": 0.0,
+        "false_abstention_query_ids": [],
+        "n_unanswerable": 7,
+        "correct_rejection_rate": 0.0,
+        "irrelevant_memories_returned": 35
+      }
+    },
+    "dense_ce": {
+      "dev": {
+        "n_answerable": 44,
+        "false_abstentions": 0,
+        "false_abstention_rate": 0.0,
+        "false_abstention_query_ids": [],
+        "n_unanswerable": 12,
+        "correct_rejection_rate": 0.0,
+        "irrelevant_memories_returned": 60
+      },
+      "heldout": {
+        "n_answerable": 7,
+        "false_abstentions": 0,
+        "false_abstention_rate": 0.0,
+        "false_abstention_query_ids": [],
+        "n_unanswerable": 7,
+        "correct_rejection_rate": 0.0,
+        "irrelevant_memories_returned": 35
+      }
+    },
+    "hybrid_ce": {
+      "dev": {
+        "n_answerable": 44,
+        "false_abstentions": 0,
+        "false_abstention_rate": 0.0,
+        "false_abstention_query_ids": [],
+        "n_unanswerable": 12,
+        "correct_rejection_rate": 0.0,
+        "irrelevant_memories_returned": 60
+      },
+      "heldout": {
+        "n_answerable": 7,
+        "false_abstentions": 0,
+        "false_abstention_rate": 0.0,
+        "false_abstention_query_ids": [],
+        "n_unanswerable": 7,
+        "correct_rejection_rate": 0.0,
+        "irrelevant_memories_returned": 35
+      }
+    },
+    "dense_abstain": {
+      "dev": {
+        "n_answerable": 44,
+        "false_abstentions": 8,
+        "false_abstention_rate": 0.1818,
+        "false_abstention_query_ids": [
+          "q02",
+          "q09",
+          "q14",
+          "q25",
+          "q27",
+          "q33",
+          "q38",
+          "q41"
+        ],
+        "n_unanswerable": 12,
+        "correct_rejection_rate": 0.9167,
+        "irrelevant_memories_returned": 1
+      },
+      "heldout": {
+        "n_answerable": 7,
+        "false_abstentions": 1,
+        "false_abstention_rate": 0.1429,
+        "false_abstention_query_ids": [
+          "q29"
+        ],
+        "n_unanswerable": 7,
+        "correct_rejection_rate": 0.8571,
+        "irrelevant_memories_returned": 1
+      },
+      "heldout_r2": {
+        "n_answerable": 25,
+        "false_abstentions": 4,
+        "false_abstention_rate": 0.16,
+        "false_abstention_query_ids": [
+          "q29",
+          "q74",
+          "q79",
+          "q84"
+        ],
+        "n_unanswerable": 11,
+        "correct_rejection_rate": 0.9091,
+        "irrelevant_memories_returned": 1
+      }
+    },
+    "hybrid_abstain": {
+      "dev": {
+        "n_answerable": 44,
+        "false_abstentions": 12,
+        "false_abstention_rate": 0.2727,
+        "false_abstention_query_ids": [
+          "q09",
+          "q13",
+          "q14",
+          "q18",
+          "q23",
+          "q25",
+          "q27",
+          "q28",
+          "q32",
+          "q38",
+          "q41",
+          "q69"
+        ],
+        "n_unanswerable": 12,
+        "correct_rejection_rate": 0.9167,
+        "irrelevant_memories_returned": 1
+      },
+      "heldout": {
+        "n_answerable": 7,
+        "false_abstentions": 3,
+        "false_abstention_rate": 0.4286,
+        "false_abstention_query_ids": [
+          "q16",
+          "q17",
+          "q29"
+        ],
+        "n_unanswerable": 7,
+        "correct_rejection_rate": 0.7143,
+        "irrelevant_memories_returned": 2
+      }
+    },
+    "hybrid_ce_abstain": {
+      "dev": {
+        "n_answerable": 44,
+        "false_abstentions": 3,
+        "false_abstention_rate": 0.0682,
+        "false_abstention_query_ids": [
+          "q14",
+          "q27",
+          "q28"
+        ],
+        "n_unanswerable": 12,
+        "correct_rejection_rate": 0.9167,
+        "irrelevant_memories_returned": 1
+      },
+      "heldout": {
+        "n_answerable": 7,
+        "false_abstentions": 1,
+        "false_abstention_rate": 0.1429,
+        "false_abstention_query_ids": [
+          "q29"
+        ],
+        "n_unanswerable": 7,
+        "correct_rejection_rate": 0.8571,
+        "irrelevant_memories_returned": 1
+      },
+      "heldout_r2": {
+        "n_answerable": 25,
+        "false_abstentions": 3,
+        "false_abstention_rate": 0.12,
+        "false_abstention_query_ids": [
+          "q29",
+          "q74",
+          "q79"
+        ],
+        "n_unanswerable": 11,
+        "correct_rejection_rate": 0.8182,
+        "irrelevant_memories_returned": 6
+      }
+    }
+  },
+  "risk5_fp_patterns": {
+    "dense_abstain": {
+      "n_answerable_total": 69,
+      "total_answerable_queries_with_fp": 26,
+      "fp_queries_by_category": {
+        "exact_lookup": 2,
+        "paraphrase": 8,
+        "multi_memory": 3,
+        "project_specific": 12,
+        "short_ambiguous": 1
+      },
+      "fp_memories_by_category": {
+        "exact_lookup": 3,
+        "paraphrase": 15,
+        "multi_memory": 3,
+        "project_specific": 35,
+        "short_ambiguous": 1
+      },
+      "examples": [
+        {
+          "id": "q04",
+          "category": "exact_lookup",
+          "query": "pgvector",
+          "expected": [
+            "m9"
+          ],
+          "irrelevant_returned": [
+            "m12"
+          ],
+          "returned": [
+            "m9",
+            "m12"
+          ]
+        },
+        {
+          "id": "q07",
+          "category": "exact_lookup",
+          "query": "Google DeepMind",
+          "expected": [
+            "m7"
+          ],
+          "irrelevant_returned": [
+            "m3",
+            "m12"
+          ],
+          "returned": [
+            "m7",
+            "m3",
+            "m12"
+          ]
+        },
+        {
+          "id": "q12",
+          "category": "paraphrase",
+          "query": "Who is my employer?",
+          "expected": [
+            "m7"
+          ],
+          "irrelevant_returned": [
+            "m8"
+          ],
+          "returned": [
+            "m7",
+            "m8"
+          ]
+        },
+        {
+          "id": "q13",
+          "category": "paraphrase",
+          "query": "What is my job title?",
+          "expected": [
+            "m8"
+          ],
+          "irrelevant_returned": [
+            "m7"
+          ],
+          "returned": [
+            "m8",
+            "m7"
+          ]
+        },
+        {
+          "id": "q31",
+          "category": "multi_memory",
+          "query": "What is my tech stack?",
+          "expected": [
+            "m1",
+            "m2",
+            "m3",
+            "m5",
+            "m9"
+          ],
+          "irrelevant_returned": [
+            "m4"
+          ],
+          "returned": [
+            "m4"
+          ]
+        },
+        {
+          "id": "q34",
+          "category": "multi_memory",
+          "query": "What AI tools and models do I work with?",
+          "expected": [
+            "m12",
+            "m3"
+          ],
+          "irrelevant_returned": [
+            "m8"
+          ],
+          "returned": [
+            "m8"
+          ]
+        },
+        {
+          "id": "q37",
+          "category": "multi_memory",
+          "query": "List my development environment components.",
+          "expected": [
+            "m11",
+            "m4",
+            "m5"
+          ],
+          "irrelevant_returned": [
+            "m3"
+          ],
+          "returned": [
+            "m4",
+            "m11",
+            "m3"
+          ]
+        },
+        {
+          "id": "q45",
+          "category": "project_specific",
+          "query": "Where does ChunkdUp run?",
+          "expected": [
+            "m11"
+          ],
+          "irrelevant_returned": [
+            "m3"
+          ],
+          "returned": [
+            "m3",
+            "m11"
+          ]
+        },
+        {
+          "id": "q46",
+          "category": "project_specific",
+          "query": "What database does ChunkdUp use?",
+          "expected": [
+            "m9"
+          ],
+          "irrelevant_returned": [
+            "m3",
+            "m11",
+            "m7"
+          ],
+          "returned": [
+            "m3",
+            "m9",
+            "m11",
+            "m7"
+          ]
+        },
+        {
+          "id": "q47",
+          "category": "project_specific",
+          "query": "What technology does it use for vector search?",
+          "expected": [
+            "m9"
+          ],
+          "irrelevant_returned": [
+            "m12"
+          ],
+          "returned": [
+            "m12",
+            "m9"
+          ]
+        },
+        {
+          "id": "q48",
+          "category": "project_specific",
+          "query": "What embedding model does ChunkdUp use?",
+          "expected": [
+            "m12"
+          ],
+          "irrelevant_returned": [
+            "m3",
+            "m11"
+          ],
+          "returned": [
+            "m3",
+            "m12",
+            "m11"
+          ]
+        },
+        {
+          "id": "q49",
+          "category": "project_specific",
+          "query": "What is ChunkdUp?",
+          "expected": [
+            "m3"
+          ],
+          "irrelevant_returned": [
+            "m11"
+          ],
+          "returned": [
+            "m3",
+            "m11"
+          ]
+        },
+        {
+          "id": "q16",
+          "category": "paraphrase",
+          "query": "What do I use to store vectors?",
+          "expected": [
+            "m9"
+          ],
+          "irrelevant_returned": [
+            "m12"
+          ],
+          "returned": [
+            "m9",
+            "m12"
+          ]
+        },
+        {
+          "id": "q17",
+          "category": "paraphrase",
+          "query": "What model converts my memories into embeddings?",
+          "expected": [
+            "m12"
+          ],
+          "irrelevant_returned": [
+            "m3",
+            "m7",
+            "m9"
+          ],
+          "returned": [
+            "m12",
+            "m3",
+            "m7",
+            "m9"
+          ]
+        },
+        {
+          "id": "q51",
+          "category": "project_specific",
+          "query": "Is my memory layer containerized?",
+          "expected": [
+            "m11"
+          ],
+          "irrelevant_returned": [
+            "m9",
+            "m3",
+            "m12",
+            "m4"
+          ],
+          "returned": [
+            "m11",
+            "m9",
+            "m3",
+            "m12",
+            "m4"
+          ]
+        },
+        {
+          "id": "q52",
+          "category": "project_specific",
+          "query": "What backs the memory storage layer?",
+          "expected": [
+            "m9"
+          ],
+          "irrelevant_returned": [
+            "m3",
+            "m4",
+            "m11",
+            "m2"
+          ],
+          "returned": [
+            "m9",
+            "m3",
+            "m4",
+            "m11",
+            "m2"
+          ]
+        },
+        {
+          "id": "q16",
+          "category": "paraphrase",
+          "query": "What do I use to store vectors?",
+          "expected": [
+            "m9"
+          ],
+          "irrelevant_returned": [
+            "m12"
+          ],
+          "returned": [
+            "m9",
+            "m12"
+          ]
+        },
+        {
+          "id": "q17",
+          "category": "paraphrase",
+          "query": "What model converts my memories into embeddings?",
+          "expected": [
+            "m12"
+          ],
+          "irrelevant_returned": [
+            "m3",
+            "m7",
+            "m9"
+          ],
+          "returned": [
+            "m12",
+            "m3",
+            "m7",
+            "m9"
+          ]
+        },
+        {
+          "id": "q51",
+          "category": "project_specific",
+          "query": "Is my memory layer containerized?",
+          "expected": [
+            "m11"
+          ],
+          "irrelevant_returned": [
+            "m9",
+            "m3",
+            "m12",
+            "m4"
+          ],
+          "returned": [
+            "m11",
+            "m9",
+            "m3",
+            "m12",
+            "m4"
+          ]
+        },
+        {
+          "id": "q52",
+          "category": "project_specific",
+          "query": "What backs the memory storage layer?",
+          "expected": [
+            "m9"
+          ],
+          "irrelevant_returned": [
+            "m3",
+            "m4",
+            "m11",
+            "m2"
+          ],
+          "returned": [
+            "m9",
+            "m3",
+            "m4",
+            "m11",
+            "m2"
+          ]
+        },
+        {
+          "id": "q75",
+          "category": "paraphrase",
+          "query": "What do I type my code into?",
+          "expected": [
+            "m5"
+          ],
+          "irrelevant_returned": [
+            "m1",
+            "m2"
+          ],
+          "returned": [
+            "m1",
+            "m5",
+            "m2"
+          ]
+        },
+        {
+          "id": "q76",
+          "category": "paraphrase",
+          "query": "What backend language is part of my stack?",
+          "expected": [
+            "m1",
+            "m2"
+          ],
+          "irrelevant_returned": [
+            "m6",
+            "m4",
+            "m3"
+          ],
+          "returned": [
+            "m1",
+            "m2",
+            "m6",
+            "m4",
+            "m3"
+          ]
+        },
+        {
+          "id": "q77",
+          "category": "short_ambiguous",
+          "query": "employer",
+          "expected": [
+            "m7"
+          ],
+          "irrelevant_returned": [
+            "m8"
+          ],
+          "returned": [
+            "m7",
+            "m8"
+          ]
+        },
+        {
+          "id": "q86",
+          "category": "project_specific",
+          "query": "Which container platform hosts my memory service?",
+          "expected": [
+            "m11"
+          ],
+          "irrelevant_returned": [
+            "m10",
+            "m4",
+            "m9",
+            "m2"
+          ],
+          "returned": [
+            "m11",
+            "m10",
+            "m4",
+            "m9",
+            "m2"
+          ]
+        },
+        {
+          "id": "q87",
+          "category": "project_specific",
+          "query": "What vector database powers ChunkdUp?",
+          "expected": [
+            "m9"
+          ],
+          "irrelevant_returned": [
+            "m3",
+            "m12",
+            "m11"
+          ],
+          "returned": [
+            "m3",
+            "m9",
+            "m12",
+            "m11"
+          ]
+        },
+        {
+          "id": "q88",
+          "category": "project_specific",
+          "query": "What model does ChunkdUp embed memories with?",
+          "expected": [
+            "m12"
+          ],
+          "irrelevant_returned": [
+            "m3",
+            "m11",
+            "m9",
+            "m7"
+          ],
+          "returned": [
+            "m3",
+            "m12",
+            "m11",
+            "m9",
+            "m7"
+          ]
+        }
+      ]
+    },
+    "hybrid_ce_abstain": {
+      "n_answerable_total": 69,
+      "total_answerable_queries_with_fp": 38,
+      "fp_queries_by_category": {
+        "exact_lookup": 3,
+        "paraphrase": 10,
+        "short_ambiguous": 7,
+        "multi_memory": 6,
+        "updated_facts": 2,
+        "project_specific": 10
+      },
+      "fp_memories_by_category": {
+        "exact_lookup": 12,
+        "paraphrase": 21,
+        "short_ambiguous": 25,
+        "multi_memory": 11,
+        "updated_facts": 7,
+        "project_specific": 25
+      },
+      "examples": [
+        {
+          "id": "q01",
+          "category": "exact_lookup",
+          "query": "Python",
+          "expected": [
+            "m1"
+          ],
+          "irrelevant_returned": [
+            "m2",
+            "m12",
+            "m9",
+            "m5"
+          ],
+          "returned": [
+            "m1",
+            "m2",
+            "m12",
+            "m9",
+            "m5"
+          ]
+        },
+        {
+          "id": "q02",
+          "category": "exact_lookup",
+          "query": "Go",
+          "expected": [
+            "m2"
+          ],
+          "irrelevant_returned": [
+            "m11",
+            "m3",
+            "m9",
+            "m12"
+          ],
+          "returned": [
+            "m2",
+            "m11",
+            "m3",
+            "m9",
+            "m12"
+          ]
+        },
+        {
+          "id": "q06",
+          "category": "exact_lookup",
+          "query": "AWS",
+          "expected": [
+            "m10"
+          ],
+          "irrelevant_returned": [
+            "m4",
+            "m8",
+            "m9",
+            "m11"
+          ],
+          "returned": [
+            "m10",
+            "m4",
+            "m8",
+            "m9",
+            "m11"
+          ]
+        },
+        {
+          "id": "q09",
+          "category": "paraphrase",
+          "query": "What do I write code in?",
+          "expected": [
+            "m1",
+            "m2"
+          ],
+          "irrelevant_returned": [
+            "m5",
+            "m4",
+            "m12"
+          ],
+          "returned": [
+            "m1",
+            "m2",
+            "m5",
+            "m4",
+            "m12"
+          ]
+        },
+        {
+          "id": "q12",
+          "category": "paraphrase",
+          "query": "Who is my employer?",
+          "expected": [
+            "m7"
+          ],
+          "irrelevant_returned": [
+            "m8"
+          ],
+          "returned": [
+            "m7",
+            "m8"
+          ]
+        },
+        {
+          "id": "q13",
+          "category": "paraphrase",
+          "query": "What is my job title?",
+          "expected": [
+            "m8"
+          ],
+          "irrelevant_returned": [
+            "m7"
+          ],
+          "returned": [
+            "m8",
+            "m7"
+          ]
+        },
+        {
+          "id": "q15",
+          "category": "paraphrase",
+          "query": "Which cloud platform do I use?",
+          "expected": [
+            "m10"
+          ],
+          "irrelevant_returned": [
+            "m4",
+            "m11",
+            "m9"
+          ],
+          "returned": [
+            "m10",
+            "m4",
+            "m11",
+            "m9"
+          ]
+        },
+        {
+          "id": "q18",
+          "category": "paraphrase",
+          "query": "What container technology do I run projects in?",
+          "expected": [
+            "m11"
+          ],
+          "irrelevant_returned": [
+            "m3"
+          ],
+          "returned": [
+            "m3",
+            "m11"
+          ]
+        },
+        {
+          "id": "q19",
+          "category": "short_ambiguous",
+          "query": "editor",
+          "expected": [
+            "m5"
+          ],
+          "irrelevant_returned": [
+            "m11",
+            "m3",
+            "m6",
+            "m1"
+          ],
+          "returned": [
+            "m5",
+            "m11",
+            "m3",
+            "m6",
+            "m1"
+          ]
+        },
+        {
+          "id": "q20",
+          "category": "short_ambiguous",
+          "query": "database",
+          "expected": [
+            "m9"
+          ],
+          "irrelevant_returned": [
+            "m12",
+            "m3",
+            "m2",
+            "m11"
+          ],
+          "returned": [
+            "m9",
+            "m12",
+            "m3",
+            "m2",
+            "m11"
+          ]
+        },
+        {
+          "id": "q21",
+          "category": "short_ambiguous",
+          "query": "cloud",
+          "expected": [
+            "m10"
+          ],
+          "irrelevant_returned": [
+            "m11",
+            "m9",
+            "m2",
+            "m4"
+          ],
+          "returned": [
+            "m10",
+            "m11",
+            "m9",
+            "m2",
+            "m4"
+          ]
+        },
+        {
+          "id": "q23",
+          "category": "short_ambiguous",
+          "query": "languages",
+          "expected": [
+            "m1",
+            "m2"
+          ],
+          "irrelevant_returned": [
+            "m6",
+            "m5",
+            "m11"
+          ],
+          "returned": [
+            "m2",
+            "m1",
+            "m6",
+            "m5",
+            "m11"
+          ]
+        },
+        {
+          "id": "q24",
+          "category": "short_ambiguous",
+          "query": "role",
+          "expected": [
+            "m8"
+          ],
+          "irrelevant_returned": [
+            "m9",
+            "m11",
+            "m3",
+            "m12"
+          ],
+          "returned": [
+            "m8",
+            "m9",
+            "m11",
+            "m3",
+            "m12"
+          ]
+        },
+        {
+          "id": "q31",
+          "category": "multi_memory",
+          "query": "What is my tech stack?",
+          "expected": [
+            "m1",
+            "m2",
+            "m3",
+            "m5",
+            "m9"
+          ],
+          "irrelevant_returned": [
+            "m12",
+            "m6"
+          ],
+          "returned": [
+            "m1",
+            "m12",
+            "m6"
+          ]
+        },
+        {
+          "id": "q32",
+          "category": "multi_memory",
+          "query": "What languages do I code in professionally?",
+          "expected": [
+            "m1",
+            "m2"
+          ],
+          "irrelevant_returned": [
+            "m8"
+          ],
+          "returned": [
+            "m1",
+            "m2",
+            "m8"
+          ]
+        },
+        {
+          "id": "q34",
+          "category": "multi_memory",
+          "query": "What AI tools and models do I work with?",
+          "expected": [
+            "m12",
+            "m3"
+          ],
+          "irrelevant_returned": [
+            "m8",
+            "m9"
+          ],
+          "returned": [
+            "m12",
+            "m8",
+            "m3",
+            "m9"
+          ]
+        },
+        {
+          "id": "q38",
+          "category": "multi_memory",
+          "query": "What tools do I use to write and run code?",
+          "expected": [
+            "m1",
+            "m11",
+            "m2",
+            "m5"
+          ],
+          "irrelevant_returned": [
+            "m9",
+            "m12"
+          ],
+          "returned": [
+            "m9",
+            "m12",
+            "m11",
+            "m1",
+            "m2"
+          ]
+        },
+        {
+          "id": "q40",
+          "category": "updated_facts",
+          "query": "What OS am I running?",
+          "expected": [
+            "m4"
+          ],
+          "irrelevant_returned": [
+            "m11",
+            "m1",
+            "m9"
+          ],
+          "returned": [
+            "m4",
+            "m11",
+            "m1",
+            "m9"
+          ]
+        },
+        {
+          "id": "q45",
+          "category": "project_specific",
+          "query": "Where does ChunkdUp run?",
+          "expected": [
+            "m11"
+          ],
+          "irrelevant_returned": [
+            "m3"
+          ],
+          "returned": [
+            "m11",
+            "m3"
+          ]
+        },
+        {
+          "id": "q46",
+          "category": "project_specific",
+          "query": "What database does ChunkdUp use?",
+          "expected": [
+            "m9"
+          ],
+          "irrelevant_returned": [
+            "m11",
+            "m3"
+          ],
+          "returned": [
+            "m11",
+            "m3",
+            "m9"
+          ]
+        },
+        {
+          "id": "q47",
+          "category": "project_specific",
+          "query": "What technology does it use for vector search?",
+          "expected": [
+            "m9"
+          ],
+          "irrelevant_returned": [
+            "m12"
+          ],
+          "returned": [
+            "m12"
+          ]
+        },
+        {
+          "id": "q48",
+          "category": "project_specific",
+          "query": "What embedding model does ChunkdUp use?",
+          "expected": [
+            "m12"
+          ],
+          "irrelevant_returned": [
+            "m3",
+            "m11"
+          ],
+          "returned": [
+            "m12",
+            "m3",
+            "m11"
+          ]
+        },
+        {
+          "id": "q49",
+          "category": "project_specific",
+          "query": "What is ChunkdUp?",
+          "expected": [
+            "m3"
+          ],
+          "irrelevant_returned": [
+            "m11"
+          ],
+          "returned": [
+            "m3",
+            "m11"
+          ]
+        },
+        {
+          "id": "q69",
+          "category": "multi_memory",
+          "query": "What programming languages do I use?",
+          "expected": [
+            "m1",
+            "m2"
+          ],
+          "irrelevant_returned": [
+            "m4",
+            "m12",
+            "m11"
+          ],
+          "returned": [
+            "m1",
+            "m2",
+            "m4",
+            "m12",
+            "m11"
+          ]
+        },
+        {
+          "id": "q70",
+          "category": "paraphrase",
+          "query": "What editor or IDE do I prefer?",
+          "expected": [
+            "m5"
+          ],
+          "irrelevant_returned": [
+            "m6",
+            "m9",
+            "m1",
+            "m11"
+          ],
+          "returned": [
+            "m5",
+            "m6",
+            "m9",
+            "m1",
+            "m11"
+          ]
+        },
+        {
+          "id": "q16",
+          "category": "paraphrase",
+          "query": "What do I use to store vectors?",
+          "expected": [
+            "m9"
+          ],
+          "irrelevant_returned": [
+            "m12"
+          ],
+          "returned": [
+            "m12"
+          ]
+        },
+        {
+          "id": "q51",
+          "category": "project_specific",
+          "query": "Is my memory layer containerized?",
+          "expected": [
+            "m11"
+          ],
+          "irrelevant_returned": [
+            "m9",
+            "m12",
+            "m10",
+            "m1"
+          ],
+          "returned": [
+            "m11",
+            "m9",
+            "m12",
+            "m10",
+            "m1"
+          ]
+        },
+        {
+          "id": "q16",
+          "category": "paraphrase",
+          "query": "What do I use to store vectors?",
+          "expected": [
+            "m9"
+          ],
+          "irrelevant_returned": [
+            "m12"
+          ],
+          "returned": [
+            "m12"
+          ]
+        },
+        {
+          "id": "q51",
+          "category": "project_specific",
+          "query": "Is my memory layer containerized?",
+          "expected": [
+            "m11"
+          ],
+          "irrelevant_returned": [
+            "m9",
+            "m12",
+            "m10",
+            "m1"
+          ],
+          "returned": [
+            "m11",
+            "m9",
+            "m12",
+            "m10",
+            "m1"
+          ]
+        },
+        {
+          "id": "q75",
+          "category": "paraphrase",
+          "query": "What do I type my code into?",
+          "expected": [
+            "m5"
+          ],
+          "irrelevant_returned": [
+            "m1",
+            "m2",
+            "m12",
+            "m3"
+          ],
+          "returned": [
+            "m1",
+            "m2",
+            "m5",
+            "m12",
+            "m3"
+          ]
+        },
+        {
+          "id": "q76",
+          "category": "paraphrase",
+          "query": "What backend language is part of my stack?",
+          "expected": [
+            "m1",
+            "m2"
+          ],
+          "irrelevant_returned": [
+            "m9",
+            "m12"
+          ],
+          "returned": [
+            "m1",
+            "m9",
+            "m12",
+            "m2"
+          ]
+        },
+        {
+          "id": "q77",
+          "category": "short_ambiguous",
+          "query": "employer",
+          "expected": [
+            "m7"
+          ],
+          "irrelevant_returned": [
+            "m8",
+            "m3"
+          ],
+          "returned": [
+            "m7",
+            "m8",
+            "m3"
+          ]
+        },
+        {
+          "id": "q78",
+          "category": "short_ambiguous",
+          "query": "project",
+          "expected": [
+            "m3"
+          ],
+          "irrelevant_returned": [
+            "m11",
+            "m4",
+            "m12",
+            "m6"
+          ],
+          "returned": [
+            "m3",
+            "m11",
+            "m4",
+            "m12",
+            "m6"
+          ]
+        },
+        {
+          "id": "q83",
+          "category": "multi_memory",
+          "query": "What runs my projects and what OS do I have?",
+          "expected": [
+            "m11",
+            "m4"
+          ],
+          "irrelevant_returned": [
+            "m3"
+          ],
+          "returned": [
+            "m4",
+            "m3",
+            "m11"
+          ]
+        },
+        {
+          "id": "q84",
+          "category": "updated_facts",
+          "query": "Which IDE do I prefer now?",
+          "expected": [
+            "m5"
+          ],
+          "irrelevant_returned": [
+            "m6",
+            "m8",
+            "m4",
+            "m10"
+          ],
+          "returned": [
+            "m5",
+            "m6",
+            "m8",
+            "m4",
+            "m10"
+          ]
+        },
+        {
+          "id": "q86",
+          "category": "project_specific",
+          "query": "Which container platform hosts my memory service?",
+          "expected": [
+            "m11"
+          ],
+          "irrelevant_returned": [
+            "m10",
+            "m9",
+            "m4",
+            "m3"
+          ],
+          "returned": [
+            "m10",
+            "m11",
+            "m9",
+            "m4",
+            "m3"
+          ]
+        },
+        {
+          "id": "q87",
+          "category": "project_specific",
+          "query": "What vector database powers ChunkdUp?",
+          "expected": [
+            "m9"
+          ],
+          "irrelevant_returned": [
+            "m3",
+            "m11",
+            "m12"
+          ],
+          "returned": [
+            "m3",
+            "m11",
+            "m12",
+            "m9"
+          ]
+        },
+        {
+          "id": "q88",
+          "category": "project_specific",
+          "query": "What model does ChunkdUp embed memories with?",
+          "expected": [
+            "m12"
+          ],
+          "irrelevant_returned": [
+            "m3",
+            "m11",
+            "m9"
+          ],
+          "returned": [
+            "m12",
+            "m3",
+            "m11",
+            "m9"
+          ]
+        }
+      ]
+    },
+    "bm25": {
+      "n_answerable_total": 69,
+      "total_answerable_queries_with_fp": 17,
+      "fp_queries_by_category": {
+        "multi_memory": 2,
+        "project_specific": 12,
+        "exact_lookup": 1,
+        "paraphrase": 2
+      },
+      "fp_memories_by_category": {
+        "multi_memory": 4,
+        "project_specific": 35,
+        "exact_lookup": 1,
+        "paraphrase": 5
+      },
+      "examples": [
+        {
+          "id": "q33",
+          "category": "multi_memory",
+          "query": "Tell me about my work infrastructure.",
+          "expected": [
+            "m10",
+            "m11",
+            "m9"
+          ],
+          "irrelevant_returned": [
+            "m2",
+            "m1",
+            "m5"
+          ],
+          "returned": [
+            "m10",
+            "m9",
+            "m2",
+            "m1",
+            "m5"
+          ]
+        },
+        {
+          "id": "q34",
+          "category": "multi_memory",
+          "query": "What AI tools and models do I work with?",
+          "expected": [
+            "m12",
+            "m3"
+          ],
+          "irrelevant_returned": [
+            "m8"
+          ],
+          "returned": [
+            "m8",
+            "m3"
+          ]
+        },
+        {
+          "id": "q45",
+          "category": "project_specific",
+          "query": "Where does ChunkdUp run?",
+          "expected": [
+            "m11"
+          ],
+          "irrelevant_returned": [
+            "m3"
+          ],
+          "returned": [
+            "m3",
+            "m11"
+          ]
+        },
+        {
+          "id": "q46",
+          "category": "project_specific",
+          "query": "What database does ChunkdUp use?",
+          "expected": [
+            "m9"
+          ],
+          "irrelevant_returned": [
+            "m3",
+            "m11"
+          ],
+          "returned": [
+            "m9",
+            "m3",
+            "m11"
+          ]
+        },
+        {
+          "id": "q47",
+          "category": "project_specific",
+          "query": "What technology does it use for vector search?",
+          "expected": [
+            "m9"
+          ],
+          "irrelevant_returned": [
+            "m12"
+          ],
+          "returned": [
+            "m12"
+          ]
+        },
+        {
+          "id": "q48",
+          "category": "project_specific",
+          "query": "What embedding model does ChunkdUp use?",
+          "expected": [
+            "m12"
+          ],
+          "irrelevant_returned": [
+            "m3",
+            "m11"
+          ],
+          "returned": [
+            "m3",
+            "m11"
+          ]
+        },
+        {
+          "id": "q49",
+          "category": "project_specific",
+          "query": "What is ChunkdUp?",
+          "expected": [
+            "m3"
+          ],
+          "irrelevant_returned": [
+            "m11"
+          ],
+          "returned": [
+            "m3",
+            "m11"
+          ]
+        },
+        {
+          "id": "q51",
+          "category": "project_specific",
+          "query": "Is my memory layer containerized?",
+          "expected": [
+            "m11"
+          ],
+          "irrelevant_returned": [
+            "m3",
+            "m2",
+            "m1",
+            "m5",
+            "m10"
+          ],
+          "returned": [
+            "m3",
+            "m2",
+            "m1",
+            "m5",
+            "m10"
+          ]
+        },
+        {
+          "id": "q52",
+          "category": "project_specific",
+          "query": "What backs the memory storage layer?",
+          "expected": [
+            "m9"
+          ],
+          "irrelevant_returned": [
+            "m3",
+            "m2",
+            "m1",
+            "m5"
+          ],
+          "returned": [
+            "m9",
+            "m3",
+            "m2",
+            "m1",
+            "m5"
+          ]
+        },
+        {
+          "id": "q51",
+          "category": "project_specific",
+          "query": "Is my memory layer containerized?",
+          "expected": [
+            "m11"
+          ],
+          "irrelevant_returned": [
+            "m3",
+            "m2",
+            "m1",
+            "m5",
+            "m10"
+          ],
+          "returned": [
+            "m3",
+            "m2",
+            "m1",
+            "m5",
+            "m10"
+          ]
+        },
+        {
+          "id": "q52",
+          "category": "project_specific",
+          "query": "What backs the memory storage layer?",
+          "expected": [
+            "m9"
+          ],
+          "irrelevant_returned": [
+            "m3",
+            "m2",
+            "m1",
+            "m5"
+          ],
+          "returned": [
+            "m9",
+            "m3",
+            "m2",
+            "m1",
+            "m5"
+          ]
+        },
+        {
+          "id": "q71",
+          "category": "exact_lookup",
+          "query": "Senior AI Architect",
+          "expected": [
+            "m8"
+          ],
+          "irrelevant_returned": [
+            "m3"
+          ],
+          "returned": [
+            "m8",
+            "m3"
+          ]
+        },
+        {
+          "id": "q75",
+          "category": "paraphrase",
+          "query": "What do I type my code into?",
+          "expected": [
+            "m5"
+          ],
+          "irrelevant_returned": [
+            "m2",
+            "m1",
+            "m10",
+            "m3"
+          ],
+          "returned": [
+            "m2",
+            "m1",
+            "m5",
+            "m10",
+            "m3"
+          ]
+        },
+        {
+          "id": "q76",
+          "category": "paraphrase",
+          "query": "What backend language is part of my stack?",
+          "expected": [
+            "m1",
+            "m2"
+          ],
+          "irrelevant_returned": [
+            "m9"
+          ],
+          "returned": [
+            "m2",
+            "m1",
+            "m9"
+          ]
+        },
+        {
+          "id": "q86",
+          "category": "project_specific",
+          "query": "Which container platform hosts my memory service?",
+          "expected": [
+            "m11"
+          ],
+          "irrelevant_returned": [
+            "m3",
+            "m2",
+            "m1",
+            "m5",
+            "m10"
+          ],
+          "returned": [
+            "m3",
+            "m2",
+            "m1",
+            "m5",
+            "m10"
+          ]
+        },
+        {
+          "id": "q87",
+          "category": "project_specific",
+          "query": "What vector database powers ChunkdUp?",
+          "expected": [
+            "m9"
+          ],
+          "irrelevant_returned": [
+            "m3",
+            "m12",
+            "m11"
+          ],
+          "returned": [
+            "m9",
+            "m3",
+            "m12",
+            "m11"
+          ]
+        },
+        {
+          "id": "q88",
+          "category": "project_specific",
+          "query": "What model does ChunkdUp embed memories with?",
+          "expected": [
+            "m12"
+          ],
+          "irrelevant_returned": [
+            "m3",
+            "m11"
+          ],
+          "returned": [
+            "m3",
+            "m11"
+          ]
+        }
+      ]
+    }
+  }
+}
