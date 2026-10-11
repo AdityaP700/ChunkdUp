@@ -1,0 +1,426 @@
+# ai-system/chunkdup/retrieval_production.py
+"""
+Production retrieval pipeline — the hardened, selected configuration from
+docs/round3-decision.md (hybrid_ce_abstain), with operational safety:
+
+  - graceful degradation: cross-encoder failure or timeout falls back to the
+    dense gate (dense_abstain); embedding-model failure falls back further to
+    the frozen round-1 baseline path;
+  - JSONL query/result logging for post-hoc drift inspection;
+  - one-move rollback via CHUNKDUP_RETRIEVAL_CONFIG=baseline_current;
+  - scale-aware gate recalibration (see recalibrate()).
+
+The dense/BM25/RRF/gate implementations here intentionally mirror the
+experiment modules in experiments/retrieval/ (round-1/2 evidence); tests in
+tests/test_production_retrieval.py assert behavioral consistency between the
+two. Scope note (round-3 brief): no caching layers, async queues, sharding,
+load balancing, or multi-tenant isolation.
+"""
+import json
+import logging
+import os
+import re
+import time
+from concurrent.futures import ThreadPoolExecutor
+from datetime import datetime, timezone
+from pathlib import Path
+from typing import Any, Dict, List, Optional
+
+logger = logging.getLogger(__name__)
+
+# ---------------------------------------------------------------------------
+# Configuration selection (rollback switch)
+# ---------------------------------------------------------------------------
+
+DEFAULT_CONFIG = "hybrid_ce_abstain"
+KNOWN_CONFIGS = ("hybrid_ce_abstain", "dense_abstain", "baseline_current")
+
+# Round-1 dev-split calibrated thresholds (docs/retrieval-experiments.md §4).
+# The CE threshold is a starting point ONLY — scale-aware recalibration
+# (recalibrate()) is a hard shipping dependency per docs/round3-decision.md.
+FROZEN_COSINE_THRESHOLD = 0.262475
+FROZEN_CE_THRESHOLD = -10.947404
+
+# CE rerank timeout. Derivation: round-1 dev p95 rerank latency was 264-268 ms
+# (results/dense_ce.dev.json), so 2x p95 = ~530 ms; round-2 isolated benchmark
+# observed up to ~450 ms under host memory pressure, so 1.0 s covers
+# contention with margin while still bounding a hung model.
+DEFAULT_CE_TIMEOUT_S = 1.0
+
+
+def select_config() -> str:
+    """Resolve the active configuration: explicit env var wins, else default."""
+    configured = os.getenv("CHUNKDUP_RETRIEVAL_CONFIG", DEFAULT_CONFIG).strip()
+    if configured not in KNOWN_CONFIGS:
+        logger.warning(
+            "Unknown CHUNKDUP_RETRIEVAL_CONFIG=%r; using default %r (known: %s)",
+            configured, DEFAULT_CONFIG, KNOWN_CONFIGS,
+        )
+        return DEFAULT_CONFIG
+    return configured
+
+
+# ---------------------------------------------------------------------------
+# Candidate-generation primitives (mirroring experiments/retrieval)
+# ---------------------------------------------------------------------------
+
+_TOKEN_RE = re.compile(r"[a-z0-9][a-z0-9_+.\-]*")
+_STOPWORDS = {
+    "a", "an", "the", "is", "are", "was", "were", "be", "been", "being",
+    "i", "my", "me", "you", "your", "it", "its", "of", "to", "in", "on",
+    "for", "with", "and", "or", "do", "does", "did", "am",
+    "what", "which", "who", "whose", "where", "when", "how", "why",
+}
+
+
+def _tokenize(text: str) -> List[str]:
+    return [t for t in _TOKEN_RE.findall(text.lower()) if t not in _STOPWORDS]
+
+
+def _index_text(memory: Dict[str, Any]) -> str:
+    contextual = memory.get("contextual_text") or ""
+    return (
+        f"key: {memory.get('key', '')}\n"
+        f"type: {memory.get('type', '')}\n"
+        f"value: {memory.get('value', '')}\n"
+        f"contextualized source: {contextual}"
+    ).strip()
+
+
+def _rrf_fuse(result_lists: List[List[Dict]], k: int = 60, limit: int = 20) -> List[Dict]:
+    """Standard RRF: RRF(d) = sum over lists of 1/(k + rank_1based(d));
+    dedup by id; absent from a list contributes nothing."""
+    scores: Dict[str, float] = {}
+    candidates: Dict[str, Dict] = {}
+    for results in result_lists:
+        for rank, candidate in enumerate(results, start=1):
+            cid = candidate["id"]
+            scores[cid] = scores.get(cid, 0.0) + 1.0 / (k + rank)
+            if cid not in candidates:
+                candidates[cid] = dict(candidate)
+    fused = []
+    for cid, score in scores.items():
+        candidate = candidates[cid]
+        candidate["_rrf_score"] = score
+        fused.append(candidate)
+    fused.sort(key=lambda c: c["_rrf_score"], reverse=True)
+    return fused[:limit]
+
+
+class _Gate:
+    """Relevance-decision stage (mirrors experiments/retrieval/abstention.py):
+    abstain when the top score is below threshold; otherwise keep every
+    candidate at or above the threshold."""
+
+    def __init__(self, score_field: str, threshold: float):
+        self.score_field = score_field
+        self.threshold = threshold
+
+    def filter(self, results: List[Dict]) -> List[Dict]:
+        if not results:
+            return []
+        top = float(results[0].get(self.score_field, 0.0))
+        if top < self.threshold:
+            return []
+        return [r for r in results if float(r.get(self.score_field, 0.0)) >= self.threshold]
+
+
+# ---------------------------------------------------------------------------
+# Model singletons (loaded once per process, lazily)
+# ---------------------------------------------------------------------------
+
+_MODEL_CACHE: Dict[str, Any] = {}
+
+
+def _get_sentence_transformer():
+    if "st" not in _MODEL_CACHE:
+        from sentence_transformers import SentenceTransformer
+
+        local_path = Path(__file__).resolve().parent.parent.parent / "models" / "all-MiniLM-L6-v2"
+        source = str(local_path) if local_path.exists() else os.getenv(
+            "CHUNKDUP_EMBEDDING_MODEL", "all-MiniLM-L6-v2"
+        )
+        _MODEL_CACHE["st"] = SentenceTransformer(source)
+        _MODEL_CACHE["st_source"] = source
+    return _MODEL_CACHE["st"]
+
+
+def _get_cross_encoder():
+    if "ce" not in _MODEL_CACHE:
+        from sentence_transformers import CrossEncoder
+
+        _MODEL_CACHE["ce"] = CrossEncoder("cross-encoder/ms-marco-MiniLM-L-12-v2")
+    return _MODEL_CACHE["ce"]
+
+
+# ---------------------------------------------------------------------------
+# ProductionRetriever
+# ---------------------------------------------------------------------------
+
+
+class ProductionRetriever:
+    """The hardened production retrieval path.
+
+    Effective configuration resolution order:
+      1. explicit `config_name` argument
+      2. CHUNKDUP_RETRIEVAL_CONFIG environment variable
+      3. DEFAULT_CONFIG (hybrid_ce_abstain) per docs/round3-decision.md
+
+    Degradation chain: hybrid_ce_abstain -> dense_abstain (on CE load error,
+    inference error, or timeout) -> baseline_current (on embedding-model
+    failure). Every degradation is logged, never silent.
+    """
+
+    def __init__(
+        self,
+        repository,
+        config_name: Optional[str] = None,
+        ce_timeout_s: Optional[float] = None,
+        query_log_path: Optional[str] = None,
+    ):
+        self.repository = repository
+        self.config_name = config_name or select_config()
+        self.ce_timeout_s = float(
+            ce_timeout_s if ce_timeout_s is not None
+            else os.getenv("CHUNKDUP_CE_TIMEOUT_S", DEFAULT_CE_TIMEOUT_S)
+        )
+        self.query_log_path = query_log_path
+        env_log = os.getenv("CHUNKDUP_QUERY_LOG")
+        if env_log == "off":
+            self.query_log_path = None
+        elif env_log:
+            self.query_log_path = env_log
+
+        self.effective_config = self.config_name
+        self.fallback_events: List[Dict[str, Any]] = []
+        self._index_signature = None
+        self._dense_memories: List[Dict] = []
+        self._dense_matrix = None
+        self._bm25 = None
+        self._ce = None
+        self._ce_failed = False  # sticky: stop retrying a model that keeps failing
+        self.gate = _Gate("_rerank_score", FROZEN_CE_THRESHOLD)
+        self._dense_gate = _Gate("_similarity", FROZEN_COSINE_THRESHOLD)
+        self._executor = ThreadPoolExecutor(max_workers=1, thread_name_prefix="chunkdup-ce")
+
+        if self.config_name == "baseline_current":
+            from .retrieval_class import MemoryRetriever
+
+            self._legacy = MemoryRetriever(repository=self.repository, enable_cache=False)
+            self.effective_config = "baseline_current"
+        else:
+            self._legacy = None
+
+    # -- index maintenance ---------------------------------------------------
+
+    def _repository_signature(self):
+        memories = self.repository.get_all()
+        if not memories:
+            return (0, None)
+        latest = max(m.get("updated_at") or "" for m in memories)
+        return (len(memories), latest)
+
+    def _ensure_index(self) -> None:
+        signature = self._repository_signature()
+        if signature == self._index_signature:
+            return
+        active = self.repository.get_all()
+        for memory in active:
+            memory.setdefault(
+                "contextual_text",
+                ContextualTextBuilder.build(memory),
+            )
+        self._dense_memories = active
+        self._dense_matrix = None
+        self._bm25 = None
+        if active:
+            try:
+                import numpy as np
+                from rank_bm25 import BM25Okapi
+
+                corpus = [_tokenize(_index_text(m)) for m in active]
+                self._bm25 = BM25Okapi(corpus) if any(corpus) else None
+                texts = [_index_text(m) for m in active]
+                st = _get_sentence_transformer()
+                vectors = st.encode(texts, normalize_embeddings=True)
+                self._dense_matrix = vectors
+            except Exception as exc:  # embedding/BM25 unavailable -> degrade
+                self._degrade("embedding_model_failure", str(exc))
+        self._index_signature = signature
+
+    def _degrade(self, reason: str, detail: str) -> None:
+        if reason == "embedding_model_failure":
+            # Without embeddings the dense leg is dead: skip straight to the
+            # model-free baseline instead of stopping at dense_abstain.
+            new_config = "baseline_current"
+        else:
+            order = ["hybrid_ce_abstain", "dense_abstain", "baseline_current"]
+            idx = order.index(self.effective_config) if self.effective_config in order else 0
+            new_config = order[min(idx + 1, len(order) - 1)]
+        event = {
+            "timestamp": datetime.now(timezone.utc).isoformat(),
+            "reason": reason,
+            "detail": detail[:500],
+            "from_config": self.effective_config,
+            "to_config": new_config,
+        }
+        self.fallback_events.append(event)
+        logger.warning("Retrieval degradation: %s (%s): %s -> %s",
+                       reason, detail, self.effective_config, new_config)
+        self.effective_config = new_config
+        if reason == "embedding_model_failure":
+            from .retrieval_class import MemoryRetriever
+
+            self._legacy = MemoryRetriever(repository=self.repository, enable_cache=False)
+            self._dense_matrix = None
+            self._bm25 = None
+
+    # -- legs ------------------------------------------------------------------
+
+    def _dense_search(self, query: str, limit: int) -> List[Dict]:
+        if self._dense_matrix is None:
+            return []
+        import numpy as np
+
+        st = _get_sentence_transformer()
+        q_vec = st.encode(query, normalize_embeddings=True)
+        sims = self._dense_matrix @ q_vec
+        order = np.argsort(-sims)[:limit]
+        out = []
+        for i in order:
+            candidate = dict(self._dense_memories[int(i)])
+            candidate["_similarity"] = float(sims[int(i)])
+            out.append(candidate)
+        return out
+
+    def _bm25_search(self, query: str, limit: int) -> List[Dict]:
+        if self._bm25 is None:
+            return []
+        scores = self._bm25.get_scores(_tokenize(query))
+        paired = sorted(
+            zip(self._dense_memories, scores), key=lambda p: p[1], reverse=True
+        )
+        out = []
+        for memory, score in paired[:limit]:
+            if score <= 0.0:
+                break
+            candidate = dict(memory)
+            candidate["_bm25_score"] = float(score)
+            out.append(candidate)
+        return out
+
+    def _cross_encoder_rerank(self, query: str, candidates: List[Dict], limit: int) -> List[Dict]:
+        """CE rerank with explicit timeout. Raises on failure/timeout so the
+        caller can fall back; never falls back silently."""
+        if self._ce_failed:
+            raise RuntimeError("cross-encoder previously failed; sticky failure")
+        if self._ce is None:
+            self._ce = _get_cross_encoder()  # may raise -> handled by caller
+        pairs = [[query, _index_text(c)] for c in candidates[:limit]]
+        future = self._executor.submit(self._ce.predict, pairs)
+        scores = future.result(timeout=self.ce_timeout_s)  # raises TimeoutError
+        scored = []
+        for candidate, score in zip(candidates[:limit], scores):
+            candidate = dict(candidate)
+            candidate["_rerank_score"] = float(score)
+            scored.append(candidate)
+        scored.sort(key=lambda c: c["_rerank_score"], reverse=True)
+        return scored
+
+    # -- public API --------------------------------------------------------------
+
+    def retrieve(self, query: str, k: int = 5) -> List[Dict[str, Any]]:
+        t0 = time.perf_counter()
+        self._ensure_index()
+
+        if self.effective_config == "baseline_current":
+            results = self._legacy.retrieve(query, k=k)
+            self._log_query(query, results, [], (time.perf_counter() - t0) * 1000, not results)
+            return results
+
+        pool = max(10, 2 * k)
+        fused = []
+        if self.effective_config in ("hybrid_ce_abstain", "dense_abstain"):
+            try:
+                dense_results = self._dense_search(query, pool)
+            except Exception as exc:
+                self._degrade("embedding_model_failure", str(exc))
+                dense_results = []
+            if self.effective_config == "hybrid_ce_abstain":
+                try:
+                    bm25_results = self._bm25_search(query, pool)
+                except Exception as exc:
+                    logger.warning("BM25 leg failed (%s); continuing dense-only", exc)
+                    bm25_results = []
+                fused = _rrf_fuse([dense_results, bm25_results], k=60, limit=pool)
+            else:
+                fused = dense_results
+
+        if self.effective_config == "hybrid_ce_abstain":
+            try:
+                ranked = self._cross_encoder_rerank(query, fused, limit=pool)
+                gate = self.gate
+            except Exception as exc:
+                self._ce_failed = True  # sticky: never retry a failed CE mid-process
+                self._degrade(
+                    "timeout" if isinstance(exc, TimeoutError) else "cross_encoder_failure",
+                    str(exc),
+                )
+                ranked = fused
+                gate = self._dense_gate
+        else:
+            ranked = fused
+            gate = self._dense_gate
+
+        final = gate.filter(ranked)[:k]
+        latency_ms = (time.perf_counter() - t0) * 1000
+        self._log_query(query, final, ranked, latency_ms, not final)
+        return final
+
+    # -- logging (part 2.2) ------------------------------------------------------
+
+    def _log_query(self, query, final, ranked, latency_ms, abstained) -> None:
+        try:
+            if not self.query_log_path:
+                return
+            record = {
+                "timestamp": datetime.now(timezone.utc).isoformat(),
+                "query": query,
+                "config": self.effective_config,
+                "requested_config": self.config_name,
+                "returned_ids": [r.get("id") for r in final],
+                "top_scores": [
+                    {"id": c.get("id"),
+                     "similarity": round(c["_similarity"], 4) if "_similarity" in c else None,
+                     "bm25": round(c["_bm25_score"], 4) if "_bm25_score" in c else None,
+                     "rrf": round(c["_rrf_score"], 6) if "_rrf_score" in c else None,
+                     "rerank": round(c["_rerank_score"], 4) if "_rerank_score" in c else None}
+                    for c in ranked[:5]
+                ],
+                "latency_ms": round(latency_ms, 3),
+                "abstained": bool(abstained),
+                "fallback_events": list(self.fallback_events),
+            }
+            path = Path(self.query_log_path)
+            path.parent.mkdir(parents=True, exist_ok=True)
+            with open(path, "a", encoding="utf-8") as f:
+                f.write(json.dumps(record, ensure_ascii=False) + "\n")
+        except Exception as exc:  # logging must never break retrieval
+            logger.warning("Query log write failed: %s", exc)
+
+
+class ContextualTextBuilder:
+    """Mirrors chunkdup.retrieval.contextual.ContextualRetriever (kept local to
+    avoid a circular import with the legacy retrieval_class)."""
+
+    @staticmethod
+    def build(memory: Dict[str, Any]) -> str:
+        memory_type = memory.get("type", "unknown")
+        key = memory.get("key", "attribute")
+        value = memory.get("value", "")
+        topic = memory.get("conversation_topic", "general user context")
+        source = memory.get("source", "user preference")
+        return (
+            f"This memory is a {memory_type} regarding '{key}' from a conversation about {topic}. "
+            f"Source domain: {source}. The recorded user context state is: \"{value}\"."
+        ).strip()

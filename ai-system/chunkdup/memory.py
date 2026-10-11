@@ -31,6 +31,7 @@ try:
     from .policies import Decision, PolicyFactory
     from .prompt_builder import PromptBuilder
     from .retrieval_class import MemoryRetriever
+    from .retrieval_production import ProductionRetriever
     from .spacy_extractor import SpacyExtractor
     from .llm_extractor import LLMExtractor
     from .entity_extractor import EntityExtractor
@@ -38,6 +39,7 @@ except ImportError:
     from policies import Decision, PolicyFactory
     from prompt_builder import PromptBuilder
     from retrieval_class import MemoryRetriever
+    from retrieval_production import ProductionRetriever
     from spacy_extractor import SpacyExtractor
     from llm_extractor import LLMExtractor
     from entity_extractor import EntityExtractor
@@ -464,7 +466,13 @@ class Memory:
         self.scorer = MemoryScorer()
         self.manager = MemoryManager(self.repository, self.decision_engine, self.scorer)
         self.extractor = MemoryExtractor()
-        self.retriever = MemoryRetriever(self.repository)
+        # Production retrieval path (docs/round3-decision.md): config selected
+        # via CHUNKDUP_RETRIEVAL_CONFIG, CE failures degrade to the dense gate,
+        # embedding failures degrade to the legacy baseline path.
+        self.retriever = ProductionRetriever(
+            self.repository,
+            query_log_path=os.path.join(data_dir, "retrieval_log.jsonl"),
+        )
         self.prompt_builder = PromptBuilder()
 
         # Lazy-load LLM components
