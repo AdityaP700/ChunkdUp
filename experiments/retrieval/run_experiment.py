@@ -26,6 +26,7 @@ sys.path.insert(0, str(Path(__file__).parent))
 from ai_system_path import ai_system_path  # noqa: F401
 from abstention import AbstentionGate
 from config import BASELINE_CURRENT, CONFIGS, ExperimentConfig
+from entity_guard import apply_entity_demotion, apply_entity_guard
 from evaluate import K, aggregate, score_query
 from fixture import BASE_MEMORIES, all_memories
 from fusion import rrf_fuse
@@ -150,9 +151,26 @@ class ExperimentPipeline:
         timings["fuse_ms"] = (t3 - t2) * 1000
 
         if self.reranker:
+            fused_candidates = list(candidates)
             candidates = self.reranker.rerank(query, candidates, limit=cfg.rerank_pool)
+        else:
+            fused_candidates = list(candidates)
         t4 = time.perf_counter()
         timings["rerank_ms"] = (t4 - t3) * 1000
+
+        # Round-3 entity-aware stages (applied post-ranking, pre-gate)
+        if cfg.entity_demote:
+            if self.reranker:
+                field = "_rerank_score"
+            elif cfg.fusion == "rrf":
+                field = "_rrf_score"
+            elif self.dense:
+                field = "_similarity"
+            else:
+                field = "_bm25_score"
+            candidates = apply_entity_demotion(query, candidates, field)
+        if cfg.entity_guard and self.reranker:
+            candidates = apply_entity_guard(query, candidates, fused_candidates)
 
         abstained = False
         top_score = None

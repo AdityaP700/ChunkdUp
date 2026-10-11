@@ -22,6 +22,8 @@ class ExperimentConfig:
     k: int = 5                     # final result cap
     abstain_threshold: Optional[float] = None
     abstain_score_field: Optional[str] = None  # defaults derived from pipeline
+    entity_demote: bool = False    # round-3 experiment 6 (type-aware entity scoring)
+    entity_guard: bool = False     # round-3 experiment 7 (CE entity-guard)
     notes: str = ""
 
 
@@ -60,6 +62,27 @@ CONFIGS = {
         name="hybrid_ce_abstain", retriever="both", fusion="rrf", rerank="cross_encoder", abstain=True,
         abstain_score_field="_rerank_score",
         notes="Approach 5c: hybrid + cross-encoder + relevance threshold (cross-encoder logit semantics), calibrated on dev.",
+    ),
+    # Round-3 experiments (entity-aware scoring)
+    "hybrid_ce_abstain_ed": ExperimentConfig(
+        name="hybrid_ce_abstain_ed", retriever="both", fusion="rrf", rerank="cross_encoder", abstain=True,
+        abstain_score_field="_rerank_score", entity_demote=True,
+        notes="Experiment 6: hybrid_ce_abstain + type-aware entity demotion (round-2 risk-5 FP pattern).",
+    ),
+    "dense_abstain_ed": ExperimentConfig(
+        name="dense_abstain_ed", retriever="dense", abstain=True,
+        abstain_score_field="_similarity", entity_demote=True,
+        notes="Experiment 6 on the fast-path config: dense_abstain + type-aware entity demotion.",
+    ),
+    "hybrid_ce_abstain_eg": ExperimentConfig(
+        name="hybrid_ce_abstain_eg", retriever="both", fusion="rrf", rerank="cross_encoder", abstain=True,
+        abstain_score_field="_rerank_score", entity_guard=True,
+        notes="Experiment 7: hybrid_ce_abstain + CE entity-guard (CE may not demote fused top-3 on entity queries).",
+    ),
+    "hybrid_ce_abstain_ed_eg": ExperimentConfig(
+        name="hybrid_ce_abstain_ed_eg", retriever="both", fusion="rrf", rerank="cross_encoder", abstain=True,
+        abstain_score_field="_rerank_score", entity_demote=True, entity_guard=True,
+        notes="Experiments 6+7 combined on the default config.",
     ),
 }
 
