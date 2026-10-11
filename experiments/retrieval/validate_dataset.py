@@ -40,6 +40,7 @@ def main() -> int:
     extra_path = sys.argv[1] if len(sys.argv) > 1 else None
     rows = load_rows(extra_path)
     errors = []
+    allow_new_splits = extra_path is not None  # named slices may declare their own split
 
     ids = [r["id"] for r in rows]
     dupes = [i for i, c in Counter(ids).items() if c > 1]
@@ -60,7 +61,7 @@ def main() -> int:
             errors.append(f"{r['id']}: bad expected_behavior {r['expected_behavior']}")
         if r["category"] not in KNOWN_CATEGORIES:
             errors.append(f"{r['id']}: unknown category {r['category']}")
-        if r["split"] not in {"dev", "heldout"}:
+        if r["split"] not in {"dev", "heldout"} and not (allow_new_splits and r["split"] == "entity_focus"):
             errors.append(f"{r['id']}: unknown split {r['split']}")
 
     categories = Counter(r["category"] for r in rows)

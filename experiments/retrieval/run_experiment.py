@@ -58,7 +58,11 @@ def load_dataset(split: str, extra_path: Optional[str] = None) -> List[Dict]:
         )
     if split in ("dev", "heldout"):
         return [r for r in rows if r["split"] == split]
-    return rows
+    if split == "both":
+        return rows
+    # Named splits (e.g. "entity_focus") select rows explicitly tagged with
+    # that split, across the base dataset and any merged extra file.
+    return [r for r in rows if r["split"] == split]
 
 
 def load_calibration() -> Dict:
