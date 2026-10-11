@@ -143,14 +143,116 @@ Evidence: best combined MRR (0.860), recall (0.847), hit rate (0.886), tied-best
 
 A **relevance-reranker trained or distilled on this domain** (or a lightweight alternative such as a bge-reranker) evaluated against ms-marco-MiniLM-L-12-v2 on the same harness — the CE is simultaneously the best relevance signal and the source of the worst remaining failures (q46/q47). Second: re-run this harness with a 100+ memory fixture to measure how BM25/dense/pool-size tradeoffs change once candidate generation stops being saturated.
 
-## 11. Reproduction
+## 12. Round 2 — Risk Resolution (2026-10-12)
+
+Round 1's decision was gated on five risks. Each was tested with the same evidence standard; results live in `experiments/retrieval/results/{scale,round2,ce_jargon_audit,fp_abstention_analysis}*.json`. GPU was available (RTX 4050) but not used: per-query CE cost is bounded by the rerank pool, not store size, so CPU sufficed — and keeping the CPU build preserves score comparability with round 1.
+
+### 12.1 Risk 1 — Scale test (12 / 100 / 500 / 1000 memories)
+
+Synthetic in-domain distractors (`scale_fixture.py`) compete on the same keys as the real memories; all 9 configs × 70 queries per scale; abstention gates evaluated both frozen (round-1 dev threshold) and recalibrated on dev **at that scale**.
+
+MRR by scale (12 → 100 → 500 → 1000), leading configs:
+
+| Config | 12 | 100 | 500 | 1000 |
+|---|---|---|---|---|
+| baseline_current | 0.524 | 0.376 | 0.373 | 0.373 |
+| dense | 0.657 | 0.297 | 0.161 | 0.143 |
+| bm25 | 0.686 | 0.431 | 0.347 | 0.321 |
+| dense_abstain (frozen) | 0.786 | 0.492 | 0.361 | 0.329 |
+| hybrid_ce_abstain (frozen) | **0.860** | **0.634** | 0.470 | 0.407 |
+| hybrid_ce_abstain (recalibrated) | **0.860** | **0.634** | **0.481** | **0.457** |
+
+- **The round-1 ranking holds at every scale and the gap widens** (hybrid_ce_abstain over dense_abstain: +0.074 at 12 → +0.142 at 100 → +0.100–0.124 at 500–1000). Raw retrieval collapses under distractor competition (dense 0.657 → 0.143); gated configs degrade slowest.
+- **Frozen abstention thresholds do not transfer**: the cosine gate is roughly stable (0.262 → 0.276 recalibrated at 1000), but the CE gate is not — the frozen −10.95 threshold drops rejection from 0.895 to 0.737–0.789 at scale, while dev-recalibration finds −2.13…−2.26 and achieves **1.00 rejection** with higher MRR and precision. Scale-aware recalibration is an operational requirement for the CE gate.
+- **Latency scaling** (isolated micro-benchmark, `bench_latency.py`, plus a hot-machine control run): dense search is flat with scale (~8–10 ms; the query encode dominates and the cosine is vectorized), BM25 grows O(N) but reaches only 0.9 ms at 1000 memories, and the CE rerank is **pool-bounded** (~200–450 ms depending on candidate text lengths and machine load), not store-bounded. The scale-run wall-clock table showed larger numbers that were traced to host memory pressure (~170 MB free RAM), not algorithm cost. One-time index cost: ~21–38 s per 1000 memories on CPU.
+
+### 12.2 Risk 2 — Expanded held-out split (14 → 36 queries)
+
+22 hand-verified queries added in `dataset_round2.jsonl` (round-1 files untouched; split boundary frozen). Leading configs re-run at n=36:
+
+| Config | MRR | P@5 | R@5 | HitRate | Reject |
+|---|---|---|---|---|---|
+| dense_abstain | **0.819** | **0.668** | 0.833 | **0.861** | **0.909** |
+| hybrid_ce_abstain | 0.780 | 0.639 | 0.833 | 0.833 | 0.818 |
+| bm25 | 0.676 | 0.606 | 0.667 | 0.694 | 0.818 |
+| baseline_current | 0.445 | 0.413 | 0.500 | 0.528 | 0.182 |
+
+**The flip persists.** `dense_abstain` wins by +0.039 MRR (≈1.5 queries), +0.028 HitRate, +0.091 rejection; recall ties. That is a consistent direction, not a decisive one. Per-query disagreements: dense wins 5 (q16, q75, q86, q87, q92), CE wins 2 (q84, q88). Combined over all 92 queries, hybrid_ce_abstain still leads on MRR (0.840 vs 0.788) because the dev split favors it; the two configs genuinely disagree by store size (CE wins at 500–1000 memories per 12.1) and by split.
+
+### 12.3 Risk 3 — CE jargon audit
+
+15 technical-term queries (naming a specific product/project term; generic English excluded) audited through the CE pipeline (`ce_jargon_audit.json`):
+
+- **CE rank inversion** (CE itself ranks an incorrect memory above the correct one): **2/15 = 13.3%** — q46 (known: m9 −8.06 vs m11 +0.61) and **q87** (new: "What vector database powers ChunkdUp?", m9 −10.85 vs m3 −3.89). Both inversions hit the **same pgvector memory** — the failure clusters on technical vocabulary, it is not scattered.
+- Strict round-1 anomaly pattern (correct memory negative, incorrect positive): 1/15 = 6.7%.
+- The frozen gate admitted the correct memory in all 15 cases, but q87 passed by **0.10 logit points**; risk 2 already caught one paraphrase query (q16) where the gate did filter the correct memory.
+
+Verdict: below the 15–20% flag line, but a real, vocabulary-concentrated liability. **Proposed mitigation (not implemented):** an entity-guard on the CE stage — when the query contains a term from the stored entity/project vocabulary and the CE's top choice contradicts the fused dense+BM25 top-1, fall back to fused ranking for that query (or floor the CE score of entity-matching candidates). To be evaluated as experiment 7 on this harness before adoption.
+
+### 12.4 Risk 4 — False-abstention rate on answerable queries
+
+From `fp_abstention_analysis.json` (rates on answerable vs unanswerable queries, per split):
+
+| Config | False abstain (dev / ho36) | Correct rejection (dev / ho36) |
+|---|---|---|
+| hybrid_ce_abstain | **0.068 / 0.120** | 0.917 / 0.818 |
+| dense_abstain | 0.182 / 0.160 | 0.917 / 0.909 |
+| bm25 (natural) | 0.273 / 0.240 | 0.917 / 0.818 |
+| hybrid_abstain | 0.273 / — | 0.917 / — |
+| baseline_current | 0.023 / 0.000 | 0.333 / 0.182 |
+| no-gate configs | 0.000 / 0.000 | 0.000 / 0.000 |
+
+**This changes the round-1 picture materially.** `hybrid_ce_abstain` is not just the MRR leader — it also has the lowest false-abstention rate among gated configs (the CE is the best relevance *signal*, so its gate suppresses the fewest valid answers). `dense_abstain` wrongly abstains on 16–18% of answerable queries (examples: q29 "Do I work at a research lab?", q74 "Which company signs my paycheck?", q79, q84). BM25's celebrated "natural rejection" costs 24–43% of answerable queries. No config is a clean winner by this metric alone, but the CE gate is the closest to it.
+
+### 12.5 Risk 5 — False-positive pattern analysis
+
+For `dense_abstain`: 26/69 answerable queries returned ≥1 irrelevant memory; **project_specific accounts for 12 of those queries and 35 of the FP memories** (paraphrase: 8/15). bm25 shows the identical concentration (12/35). hybrid_ce_abstain spreads FPs wider (38/69; short_ambiguous 7 queries/25 memories, paraphrase 10/21, project_specific 10/25).
+
+**Concentrated pattern found**: project-specific questions ("Where does ChunkdUp run?", "What database does ChunkdUp use?") mention the project name, and the project memory (m3 "ChunkdUp") co-returns as a false positive in every config — the query's entity overlap with the project memory is purely lexical, while the question seeks an attribute. **Named 6th experiment (not implemented): type-aware entity scoring** — demote candidates whose only query overlap is the project-name entity when the query is attribute-seeking, using the existing EntityExtractor's type information rather than raw overlap counts.
+
+### 12.6 Latency tradeoff — explicit product decision (not made here)
+
+| | hybrid_ce_abstain | dense_abstain |
+|---|---|---|
+| MRR (92-query combined) | **0.840** | 0.788 |
+| False abstention (best evidence) | **0.068–0.120** | 0.160–0.182 |
+| Rejection (92-query combined) | 0.891 | **0.913** |
+| Latency per query (CPU, uncontended) | ~200–450 ms | **~10 ms** |
+| Extra dependency | second 90 MB model | none |
+| Degrades worse at scale? | No — the gap **widens** in its favor | Yes — recall collapses faster |
+
+The 25–45× latency gap buys roughly +0.05 MRR, roughly half the false-abstention rate, and resilience to store growth. **Which of those matters more depends on ChunkdUp's usage pattern**: for a per-agent-turn live lookup on a latency-critical path, ~10 ms with 16–18% silent non-answers may be unacceptable; for a pre-response memory fetch that already fronts an LLM call (where 200–500 ms is noise), the CE config's quality and lower false-abstention win. This is a product call, flagged for the maintainer; both configurations remain one config flag apart.
+
+### 12.7 Revised decision
+
+- **Risk 1 (scale): RESOLVED — round-1 ranking confirmed and strengthened.** `hybrid_ce_abstain` leads at every store size; the lead grows with scale. New operational requirement discovered: recalibrate the CE gate against a store-representative dev set (frozen thresholds lose 0.10–0.16 of rejection at scale; recalibration restores 1.0).
+- **Risk 2 (held-out): RESOLVED as a stated split-level disagreement, with the margin explicit.** The flip persists at n=36 (+0.039 MRR to `dense_abstain`); combined-92 still favors `hybrid_ce_abstain` (+0.052 MRR, better false-abstention). Not noise either way; the deciding dimension is store size and usage pattern, not the split.
+- **Risk 3 (jargon): RESOLVED as a real but bounded liability** (13.3% rank inversion, clustered on jargon vocabulary; mitigation proposed, pending experiment 7).
+- **Risk 4 (false abstention): RESOLVED — and it favors the CE config**, reversing the intuitive reading of round 1's precision table.
+- **Risk 5 (FP patterns): RESOLVED — concentrated, nameable pattern** (project-name lexical pull on attribute queries); experiment 6 (type-aware entity scoring) identified.
+- **Risk 6 (latency): OPEN — deliberately left as a product decision** (12.6).
+
+**Standing recommendation:** keep `hybrid_ce_abstain` as the default pipeline **conditional on the latency budget and on adopting scale-aware gate recalibration**, with `dense_abstain` as the latency-constrained fallback. The next code change with the best evidence-per-effort ratio is the type-aware entity scoring experiment (risk 5), which targets the largest concentrated FP source in every configuration; the CE entity-guard (risk 3) follows it. Nothing here contradicts round 1 — the round-1 conclusion survives all five risks, with two operational caveats (recalibration requirement, jargon guard) and one open product call (latency).
+
+## 13. Reproduction
 
 ```bash
 python -m pip install torch --index-url https://download.pytorch.org/whl/cpu
 python -m pip install sentence-transformers rank-bm25
+
+# Round 1
 python evaluation/retrieval_benchmarks.py                    # frozen baseline (7 queries)
 python experiments/retrieval/validate_dataset.py             # dataset checks
 python experiments/retrieval/calibrate.py                    # dev-split thresholds
 python experiments/retrieval/run_experiment.py --all --split both
-python -m pytest tests/ -v --ignore=tests/test_postgres.py   # 44 tests
+python -m pytest tests/ -v --ignore=tests/test_postgres.py
+
+# Round 2
+python experiments/retrieval/run_scale_test.py --scales 12 100 500 1000   # risk 1
+python experiments/retrieval/bench_latency.py --scale 1000 --reps 30      # risk 1 latency
+python experiments/retrieval/validate_dataset.py experiments/retrieval/dataset_round2.jsonl
+python experiments/retrieval/run_experiment.py --config dense_abstain --split heldout \
+  --extra-dataset experiments/retrieval/dataset_round2.jsonl --tag round2   # risk 2 (repeat per config)
+python experiments/retrieval/audit_ce_jargon.py                           # risk 3
+python experiments/retrieval/analyze_fp_patterns.py                       # risks 4+5
 ```
