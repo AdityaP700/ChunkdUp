@@ -1,0 +1,691 @@
+{
+  "config": "hybrid_ce_abstain",
+  "split": "heldout",
+  "k": 5,
+  "summary": {
+    "n_queries": 14,
+    "MRR": 0.7857,
+    "Precision@K": 0.7286,
+    "Recall@K": 0.7857,
+    "HitRate@K": 0.7857,
+    "answerable": {
+      "n": 7,
+      "MRR": 0.7143,
+      "HitRate@K": 0.7143,
+      "false_abstain_rate": 0.1429,
+      "relevant_memories_returned": 6
+    },
+    "unanswerable": {
+      "n": 7,
+      "correct_rejection_rate": 0.8571,
+      "false_positive_rate": 0.1429,
+      "irrelevant_memories_returned": 1
+    }
+  },
+  "latency_ms": {
+    "retrieve_dense_ms": {
+      "mean": 13.084,
+      "p50": 12.54,
+      "p95": 16.256
+    },
+    "retrieve_bm25_ms": {
+      "mean": 0.121,
+      "p50": 0.118,
+      "p95": 0.147
+    },
+    "fuse_ms": {
+      "mean": 0.037,
+      "p50": 0.036,
+      "p95": 0.042
+    },
+    "rerank_ms": {
+      "mean": 262.171,
+      "p50": 254.12,
+      "p95": 299.665
+    },
+    "abstain_ms": {
+      "mean": 0.012,
+      "p50": 0.012,
+      "p95": 0.018
+    },
+    "total_ms": {
+      "mean": 275.426,
+      "p50": 267.101,
+      "p95": 314.559
+    }
+  },
+  "environment": {
+    "python": "3.11.9",
+    "platform": "Windows-10-10.0.26200-SP0"
+  },
+  "per_query": [
+    {
+      "id": "q16",
+      "query": "What do I use to store vectors?",
+      "category": "paraphrase",
+      "expected": [
+        "m9"
+      ],
+      "returned": [
+        "m12"
+      ],
+      "returned_values": [
+        "all-MiniLM-L6-v2"
+      ],
+      "abstained": false,
+      "top_score_field": "_rerank_score",
+      "metrics": {
+        "precision": 0.0,
+        "recall": 0.0,
+        "reciprocal_rank": 0.0,
+        "hit": 0.0
+      },
+      "timings_ms": {
+        "retrieve_dense_ms": 17.3,
+        "retrieve_bm25_ms": 0.133,
+        "fuse_ms": 0.036,
+        "rerank_ms": 248.905,
+        "abstain_ms": 0.013,
+        "total_ms": 266.388
+      },
+      "candidates": [
+        {
+          "rank": 1,
+          "id": "m12",
+          "value": "all-MiniLM-L6-v2",
+          "_similarity": 0.3473,
+          "_bm25_score": null,
+          "_rrf_score": 0.016129,
+          "_rrf_parts": {
+            "dense": 0.016129032258064516
+          },
+          "_rerank_score": -9.3264
+        }
+      ]
+    },
+    {
+      "id": "q17",
+      "query": "What model converts my memories into embeddings?",
+      "category": "paraphrase",
+      "expected": [
+        "m12"
+      ],
+      "returned": [
+        "m12"
+      ],
+      "returned_values": [
+        "all-MiniLM-L6-v2"
+      ],
+      "abstained": false,
+      "top_score_field": "_rerank_score",
+      "metrics": {
+        "precision": 1.0,
+        "recall": 1.0,
+        "reciprocal_rank": 1.0,
+        "hit": 1.0
+      },
+      "timings_ms": {
+        "retrieve_dense_ms": 11.76,
+        "retrieve_bm25_ms": 0.129,
+        "fuse_ms": 0.032,
+        "rerank_ms": 234.819,
+        "abstain_ms": 0.01,
+        "total_ms": 246.75
+      },
+      "candidates": [
+        {
+          "rank": 1,
+          "id": "m12",
+          "value": "all-MiniLM-L6-v2",
+          "_similarity": 0.4708,
+          "_bm25_score": null,
+          "_rrf_score": 0.016393,
+          "_rrf_parts": {
+            "dense": 0.01639344262295082
+          },
+          "_rerank_score": 3.8493
+        }
+      ]
+    },
+    {
+      "id": "q22",
+      "query": "runtime",
+      "category": "short_ambiguous",
+      "expected": [
+        "m11"
+      ],
+      "returned": [
+        "m11"
+      ],
+      "returned_values": [
+        "Docker"
+      ],
+      "abstained": false,
+      "top_score_field": "_rerank_score",
+      "metrics": {
+        "precision": 1.0,
+        "recall": 1.0,
+        "reciprocal_rank": 1.0,
+        "hit": 1.0
+      },
+      "timings_ms": {
+        "retrieve_dense_ms": 12.534,
+        "retrieve_bm25_ms": 0.081,
+        "fuse_ms": 0.037,
+        "rerank_ms": 233.321,
+        "abstain_ms": 0.012,
+        "total_ms": 245.984
+      },
+      "candidates": [
+        {
+          "rank": 1,
+          "id": "m11",
+          "value": "Docker",
+          "_similarity": 0.2736,
+          "_bm25_score": null,
+          "_rrf_score": 0.032787,
+          "_rrf_parts": {
+            "dense": 0.01639344262295082,
+            "bm25": 0.01639344262295082
+          },
+          "_rerank_score": 3.856
+        }
+      ]
+    },
+    {
+      "id": "q29",
+      "query": "Do I work at a research lab?",
+      "category": "indirect_contextual",
+      "expected": [
+        "m7"
+      ],
+      "returned": [],
+      "returned_values": [],
+      "abstained": true,
+      "top_score_field": "_rerank_score",
+      "metrics": {
+        "precision": 0.0,
+        "recall": 0.0,
+        "reciprocal_rank": 0.0,
+        "hit": 0.0
+      },
+      "timings_ms": {
+        "retrieve_dense_ms": 12.545,
+        "retrieve_bm25_ms": 0.147,
+        "fuse_ms": 0.036,
+        "rerank_ms": 273.425,
+        "abstain_ms": 0.012,
+        "total_ms": 286.165
+      },
+      "candidates": []
+    },
+    {
+      "id": "q35",
+      "query": "Summarize my employment details.",
+      "category": "multi_memory",
+      "expected": [
+        "m7",
+        "m8"
+      ],
+      "returned": [
+        "m7",
+        "m8"
+      ],
+      "returned_values": [
+        "Google DeepMind",
+        "Senior AI Architect"
+      ],
+      "abstained": false,
+      "top_score_field": "_rerank_score",
+      "metrics": {
+        "precision": 1.0,
+        "recall": 1.0,
+        "reciprocal_rank": 1.0,
+        "hit": 1.0
+      },
+      "timings_ms": {
+        "retrieve_dense_ms": 14.74,
+        "retrieve_bm25_ms": 0.108,
+        "fuse_ms": 0.036,
+        "rerank_ms": 299.665,
+        "abstain_ms": 0.01,
+        "total_ms": 314.559
+      },
+      "candidates": [
+        {
+          "rank": 1,
+          "id": "m7",
+          "value": "Google DeepMind",
+          "_similarity": 0.3397,
+          "_bm25_score": null,
+          "_rrf_score": 0.032787,
+          "_rrf_parts": {
+            "dense": 0.01639344262295082,
+            "bm25": 0.01639344262295082
+          },
+          "_rerank_score": -7.6333
+        },
+        {
+          "rank": 2,
+          "id": "m8",
+          "value": "Senior AI Architect",
+          "_similarity": 0.3073,
+          "_bm25_score": null,
+          "_rrf_score": 0.016129,
+          "_rrf_parts": {
+            "dense": 0.016129032258064516
+          },
+          "_rerank_score": -10.7599
+        }
+      ]
+    },
+    {
+      "id": "q42",
+      "query": "What editor did I use before?",
+      "category": "updated_facts",
+      "expected": [],
+      "returned": [
+        "m5"
+      ],
+      "returned_values": [
+        "Neovim"
+      ],
+      "abstained": false,
+      "top_score_field": "_rerank_score",
+      "metrics": {
+        "precision": 0.0,
+        "recall": 0.0,
+        "reciprocal_rank": 0.0,
+        "hit": 0.0
+      },
+      "timings_ms": {
+        "retrieve_dense_ms": 14.456,
+        "retrieve_bm25_ms": 0.123,
+        "fuse_ms": 0.036,
+        "rerank_ms": 276.222,
+        "abstain_ms": 0.018,
+        "total_ms": 290.855
+      },
+      "candidates": [
+        {
+          "rank": 1,
+          "id": "m5",
+          "value": "Neovim",
+          "_similarity": 0.4975,
+          "_bm25_score": null,
+          "_rrf_score": 0.032787,
+          "_rrf_parts": {
+            "dense": 0.01639344262295082,
+            "bm25": 0.01639344262295082
+          },
+          "_rerank_score": -6.5011
+        }
+      ]
+    },
+    {
+      "id": "q51",
+      "query": "Is my memory layer containerized?",
+      "category": "project_specific",
+      "expected": [
+        "m11"
+      ],
+      "returned": [
+        "m11",
+        "m9",
+        "m12",
+        "m10",
+        "m1"
+      ],
+      "returned_values": [
+        "Docker",
+        "PostgreSQL with pgvector",
+        "all-MiniLM-L6-v2",
+        "AWS",
+        "Python"
+      ],
+      "abstained": false,
+      "top_score_field": "_rerank_score",
+      "metrics": {
+        "precision": 0.2,
+        "recall": 1.0,
+        "reciprocal_rank": 1.0,
+        "hit": 1.0
+      },
+      "timings_ms": {
+        "retrieve_dense_ms": 16.256,
+        "retrieve_bm25_ms": 0.115,
+        "fuse_ms": 0.042,
+        "rerank_ms": 312.829,
+        "abstain_ms": 0.011,
+        "total_ms": 329.254
+      },
+      "candidates": [
+        {
+          "rank": 1,
+          "id": "m11",
+          "value": "Docker",
+          "_similarity": 0.3999,
+          "_bm25_score": null,
+          "_rrf_score": 0.031545,
+          "_rrf_parts": {
+            "dense": 0.01639344262295082,
+            "bm25": 0.015151515151515152
+          },
+          "_rerank_score": -8.8087
+        },
+        {
+          "rank": 2,
+          "id": "m9",
+          "value": "PostgreSQL with pgvector",
+          "_similarity": 0.2966,
+          "_bm25_score": null,
+          "_rrf_score": 0.030415,
+          "_rrf_parts": {
+            "dense": 0.016129032258064516,
+            "bm25": 0.014285714285714285
+          },
+          "_rerank_score": -9.4402
+        },
+        {
+          "rank": 3,
+          "id": "m12",
+          "value": "all-MiniLM-L6-v2",
+          "_similarity": 0.2851,
+          "_bm25_score": null,
+          "_rrf_score": 0.03055,
+          "_rrf_parts": {
+            "dense": 0.015625,
+            "bm25": 0.014925373134328358
+          },
+          "_rerank_score": -9.9353
+        },
+        {
+          "rank": 4,
+          "id": "m10",
+          "value": "AWS",
+          "_similarity": 0.262,
+          "_bm25_score": null,
+          "_rrf_score": 0.030536,
+          "_rrf_parts": {
+            "dense": 0.015151515151515152,
+            "bm25": 0.015384615384615385
+          },
+          "_rerank_score": -9.9732
+        },
+        {
+          "rank": 5,
+          "id": "m1",
+          "value": "Python",
+          "_similarity": 0.1963,
+          "_bm25_score": null,
+          "_rrf_score": 0.030366,
+          "_rrf_parts": {
+            "dense": 0.014492753623188406,
+            "bm25": 0.015873015873015872
+          },
+          "_rerank_score": -10.206
+        },
+        {
+          "rank": 6,
+          "id": "m2",
+          "value": "Go",
+          "_similarity": 0.2538,
+          "_bm25_score": null,
+          "_rrf_score": 0.031054,
+          "_rrf_parts": {
+            "dense": 0.014925373134328358,
+            "bm25": 0.016129032258064516
+          },
+          "_rerank_score": -10.2718
+        },
+        {
+          "rank": 7,
+          "id": "m4",
+          "value": "Linux Ubuntu 22.04",
+          "_similarity": 0.2777,
+          "_bm25_score": null,
+          "_rrf_score": 0.029274,
+          "_rrf_parts": {
+            "dense": 0.015384615384615385,
+            "bm25": 0.013888888888888888
+          },
+          "_rerank_score": -10.3177
+        },
+        {
+          "rank": 8,
+          "id": "m5",
+          "value": "Neovim",
+          "_similarity": 0.1996,
+          "_bm25_score": null,
+          "_rrf_score": 0.030331,
+          "_rrf_parts": {
+            "dense": 0.014705882352941176,
+            "bm25": 0.015625
+          },
+          "_rerank_score": -10.3563
+        },
+        {
+          "rank": 9,
+          "id": "m3",
+          "value": "ChunkdUp",
+          "_similarity": 0.2939,
+          "_bm25_score": null,
+          "_rrf_score": 0.032266,
+          "_rrf_parts": {
+            "dense": 0.015873015873015872,
+            "bm25": 0.01639344262295082
+          },
+          "_rerank_score": -10.6818
+        },
+        {
+          "rank": 10,
+          "id": "m6",
+          "value": "Concise and technical",
+          "_similarity": 0.1909,
+          "_bm25_score": null,
+          "_rrf_score": 0.028778,
+          "_rrf_parts": {
+            "dense": 0.014285714285714285,
+            "bm25": 0.014492753623188406
+          },
+          "_rerank_score": -10.9253
+        }
+      ]
+    },
+    {
+      "id": "q52",
+      "query": "What backs the memory storage layer?",
+      "category": "project_specific",
+      "expected": [
+        "m9"
+      ],
+      "returned": [
+        "m9"
+      ],
+      "returned_values": [
+        "PostgreSQL with pgvector"
+      ],
+      "abstained": false,
+      "top_score_field": "_rerank_score",
+      "metrics": {
+        "precision": 1.0,
+        "recall": 1.0,
+        "reciprocal_rank": 1.0,
+        "hit": 1.0
+      },
+      "timings_ms": {
+        "retrieve_dense_ms": 14.763,
+        "retrieve_bm25_ms": 0.181,
+        "fuse_ms": 0.065,
+        "rerank_ms": 261.897,
+        "abstain_ms": 0.018,
+        "total_ms": 276.923
+      },
+      "candidates": [
+        {
+          "rank": 1,
+          "id": "m9",
+          "value": "PostgreSQL with pgvector",
+          "_similarity": 0.3896,
+          "_bm25_score": null,
+          "_rrf_score": 0.032787,
+          "_rrf_parts": {
+            "dense": 0.01639344262295082,
+            "bm25": 0.01639344262295082
+          },
+          "_rerank_score": -3.1725
+        }
+      ]
+    },
+    {
+      "id": "q57",
+      "query": "What time is it in Tokyo?",
+      "category": "out_of_domain",
+      "expected": [],
+      "returned": [],
+      "returned_values": [],
+      "abstained": true,
+      "top_score_field": "_rerank_score",
+      "metrics": {
+        "precision": 1.0,
+        "recall": 1.0,
+        "reciprocal_rank": 1.0,
+        "hit": 1.0
+      },
+      "timings_ms": {
+        "retrieve_dense_ms": 13.872,
+        "retrieve_bm25_ms": 0.119,
+        "fuse_ms": 0.034,
+        "rerank_ms": 249.927,
+        "abstain_ms": 0.009,
+        "total_ms": 263.96
+      },
+      "candidates": []
+    },
+    {
+      "id": "q59",
+      "query": "What is the capital of France?",
+      "category": "out_of_domain",
+      "expected": [],
+      "returned": [],
+      "returned_values": [],
+      "abstained": true,
+      "top_score_field": "_rerank_score",
+      "metrics": {
+        "precision": 1.0,
+        "recall": 1.0,
+        "reciprocal_rank": 1.0,
+        "hit": 1.0
+      },
+      "timings_ms": {
+        "retrieve_dense_ms": 12.151,
+        "retrieve_bm25_ms": 0.095,
+        "fuse_ms": 0.033,
+        "rerank_ms": 278.457,
+        "abstain_ms": 0.014,
+        "total_ms": 290.75
+      },
+      "candidates": []
+    },
+    {
+      "id": "q60",
+      "query": "Recommend a good romance movie.",
+      "category": "out_of_domain",
+      "expected": [],
+      "returned": [],
+      "returned_values": [],
+      "abstained": true,
+      "top_score_field": "_rerank_score",
+      "metrics": {
+        "precision": 1.0,
+        "recall": 1.0,
+        "reciprocal_rank": 1.0,
+        "hit": 1.0
+      },
+      "timings_ms": {
+        "retrieve_dense_ms": 12.02,
+        "retrieve_bm25_ms": 0.121,
+        "fuse_ms": 0.033,
+        "rerank_ms": 246.7,
+        "abstain_ms": 0.007,
+        "total_ms": 258.881
+      },
+      "candidates": []
+    },
+    {
+      "id": "q65",
+      "query": "What's my home address?",
+      "category": "absent_answer",
+      "expected": [],
+      "returned": [],
+      "returned_values": [],
+      "abstained": true,
+      "top_score_field": "_rerank_score",
+      "metrics": {
+        "precision": 1.0,
+        "recall": 1.0,
+        "reciprocal_rank": 1.0,
+        "hit": 1.0
+      },
+      "timings_ms": {
+        "retrieve_dense_ms": 10.787,
+        "retrieve_bm25_ms": 0.117,
+        "fuse_ms": 0.034,
+        "rerank_ms": 251.22,
+        "abstain_ms": 0.009,
+        "total_ms": 262.168
+      },
+      "candidates": []
+    },
+    {
+      "id": "q66",
+      "query": "Do I have any pets?",
+      "category": "absent_answer",
+      "expected": [],
+      "returned": [],
+      "returned_values": [],
+      "abstained": true,
+      "top_score_field": "_rerank_score",
+      "metrics": {
+        "precision": 1.0,
+        "recall": 1.0,
+        "reciprocal_rank": 1.0,
+        "hit": 1.0
+      },
+      "timings_ms": {
+        "retrieve_dense_ms": 9.353,
+        "retrieve_bm25_ms": 0.113,
+        "fuse_ms": 0.035,
+        "rerank_ms": 245.994,
+        "abstain_ms": 0.012,
+        "total_ms": 255.507
+      },
+      "candidates": []
+    },
+    {
+      "id": "q67",
+      "query": "What gym do I go to?",
+      "category": "absent_answer",
+      "expected": [],
+      "returned": [],
+      "returned_values": [],
+      "abstained": true,
+      "top_score_field": "_rerank_score",
+      "metrics": {
+        "precision": 1.0,
+        "recall": 1.0,
+        "reciprocal_rank": 1.0,
+        "hit": 1.0
+      },
+      "timings_ms": {
+        "retrieve_dense_ms": 10.633,
+        "retrieve_bm25_ms": 0.111,
+        "fuse_ms": 0.036,
+        "rerank_ms": 257.02,
+        "abstain_ms": 0.014,
+        "total_ms": 267.814
+      },
+      "candidates": []
+    }
+  ]
+}

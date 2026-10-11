@@ -1,0 +1,2314 @@
+{
+  "config": "hybrid_ce",
+  "split": "heldout",
+  "k": 5,
+  "summary": {
+    "n_queries": 14,
+    "MRR": 0.3929,
+    "Precision@K": 0.1,
+    "Recall@K": 0.4286,
+    "HitRate@K": 0.4286,
+    "answerable": {
+      "n": 7,
+      "MRR": 0.7857,
+      "HitRate@K": 0.8571,
+      "false_abstain_rate": 0.0,
+      "relevant_memories_returned": 7
+    },
+    "unanswerable": {
+      "n": 7,
+      "correct_rejection_rate": 0.0,
+      "false_positive_rate": 1.0,
+      "irrelevant_memories_returned": 35
+    }
+  },
+  "latency_ms": {
+    "retrieve_dense_ms": {
+      "mean": 10.295,
+      "p50": 9.911,
+      "p95": 13.112
+    },
+    "retrieve_bm25_ms": {
+      "mean": 0.125,
+      "p50": 0.107,
+      "p95": 0.182
+    },
+    "fuse_ms": {
+      "mean": 0.038,
+      "p50": 0.036,
+      "p95": 0.044
+    },
+    "rerank_ms": {
+      "mean": 256.181,
+      "p50": 252.609,
+      "p95": 267.279
+    },
+    "abstain_ms": {
+      "mean": 0.001,
+      "p50": 0.001,
+      "p95": 0.002
+    },
+    "total_ms": {
+      "mean": 266.641,
+      "p50": 263.381,
+      "p95": 277.829
+    }
+  },
+  "environment": {
+    "python": "3.11.9",
+    "platform": "Windows-10-10.0.26200-SP0"
+  },
+  "per_query": [
+    {
+      "id": "q16",
+      "query": "What do I use to store vectors?",
+      "category": "paraphrase",
+      "expected": [
+        "m9"
+      ],
+      "returned": [
+        "m12",
+        "m9",
+        "m4",
+        "m6",
+        "m7"
+      ],
+      "returned_values": [
+        "all-MiniLM-L6-v2",
+        "PostgreSQL with pgvector",
+        "Linux Ubuntu 22.04",
+        "Concise and technical",
+        "Google DeepMind"
+      ],
+      "abstained": false,
+      "top_score_field": null,
+      "metrics": {
+        "precision": 0.2,
+        "recall": 1.0,
+        "reciprocal_rank": 0.5,
+        "hit": 1.0
+      },
+      "timings_ms": {
+        "retrieve_dense_ms": 14.466,
+        "retrieve_bm25_ms": 0.29,
+        "fuse_ms": 0.078,
+        "rerank_ms": 309.892,
+        "abstain_ms": 0.001,
+        "total_ms": 324.727
+      },
+      "candidates": [
+        {
+          "rank": 1,
+          "id": "m12",
+          "value": "all-MiniLM-L6-v2",
+          "_similarity": 0.3473,
+          "_bm25_score": null,
+          "_rrf_score": 0.016129,
+          "_rrf_parts": {
+            "dense": 0.016129032258064516
+          },
+          "_rerank_score": -9.3264
+        },
+        {
+          "rank": 2,
+          "id": "m9",
+          "value": "PostgreSQL with pgvector",
+          "_similarity": 0.3749,
+          "_bm25_score": null,
+          "_rrf_score": 0.016393,
+          "_rrf_parts": {
+            "dense": 0.01639344262295082
+          },
+          "_rerank_score": -11.274
+        },
+        {
+          "rank": 3,
+          "id": "m4",
+          "value": "Linux Ubuntu 22.04",
+          "_similarity": 0.1348,
+          "_bm25_score": null,
+          "_rrf_score": 0.014493,
+          "_rrf_parts": {
+            "dense": 0.014492753623188406
+          },
+          "_rerank_score": -11.3209
+        },
+        {
+          "rank": 4,
+          "id": "m6",
+          "value": "Concise and technical",
+          "_similarity": 0.1273,
+          "_bm25_score": null,
+          "_rrf_score": 0.014085,
+          "_rrf_parts": {
+            "dense": 0.014084507042253521
+          },
+          "_rerank_score": -11.321
+        },
+        {
+          "rank": 5,
+          "id": "m7",
+          "value": "Google DeepMind",
+          "_similarity": 0.1907,
+          "_bm25_score": null,
+          "_rrf_score": 0.015625,
+          "_rrf_parts": {
+            "dense": 0.015625
+          },
+          "_rerank_score": -11.3277
+        },
+        {
+          "rank": 6,
+          "id": "m5",
+          "value": "Neovim",
+          "_similarity": 0.2323,
+          "_bm25_score": null,
+          "_rrf_score": 0.015873,
+          "_rrf_parts": {
+            "dense": 0.015873015873015872
+          },
+          "_rerank_score": -11.328
+        },
+        {
+          "rank": 7,
+          "id": "m8",
+          "value": "Senior AI Architect",
+          "_similarity": 0.1006,
+          "_bm25_score": null,
+          "_rrf_score": 0.013889,
+          "_rrf_parts": {
+            "dense": 0.013888888888888888
+          },
+          "_rerank_score": -11.3295
+        },
+        {
+          "rank": 8,
+          "id": "m2",
+          "value": "Go",
+          "_similarity": 0.15,
+          "_bm25_score": null,
+          "_rrf_score": 0.015152,
+          "_rrf_parts": {
+            "dense": 0.015151515151515152
+          },
+          "_rerank_score": -11.3305
+        },
+        {
+          "rank": 9,
+          "id": "m1",
+          "value": "Python",
+          "_similarity": 0.139,
+          "_bm25_score": null,
+          "_rrf_score": 0.014925,
+          "_rrf_parts": {
+            "dense": 0.014925373134328358
+          },
+          "_rerank_score": -11.3316
+        },
+        {
+          "rank": 10,
+          "id": "m11",
+          "value": "Docker",
+          "_similarity": 0.1378,
+          "_bm25_score": null,
+          "_rrf_score": 0.014706,
+          "_rrf_parts": {
+            "dense": 0.014705882352941176
+          },
+          "_rerank_score": -11.3327
+        }
+      ]
+    },
+    {
+      "id": "q17",
+      "query": "What model converts my memories into embeddings?",
+      "category": "paraphrase",
+      "expected": [
+        "m12"
+      ],
+      "returned": [
+        "m12",
+        "m9",
+        "m10",
+        "m4",
+        "m2"
+      ],
+      "returned_values": [
+        "all-MiniLM-L6-v2",
+        "PostgreSQL with pgvector",
+        "AWS",
+        "Linux Ubuntu 22.04",
+        "Go"
+      ],
+      "abstained": false,
+      "top_score_field": null,
+      "metrics": {
+        "precision": 0.2,
+        "recall": 1.0,
+        "reciprocal_rank": 1.0,
+        "hit": 1.0
+      },
+      "timings_ms": {
+        "retrieve_dense_ms": 10.389,
+        "retrieve_bm25_ms": 0.128,
+        "fuse_ms": 0.031,
+        "rerank_ms": 267.279,
+        "abstain_ms": 0.002,
+        "total_ms": 277.829
+      },
+      "candidates": [
+        {
+          "rank": 1,
+          "id": "m12",
+          "value": "all-MiniLM-L6-v2",
+          "_similarity": 0.4708,
+          "_bm25_score": null,
+          "_rrf_score": 0.016393,
+          "_rrf_parts": {
+            "dense": 0.01639344262295082
+          },
+          "_rerank_score": 3.8493
+        },
+        {
+          "rank": 2,
+          "id": "m9",
+          "value": "PostgreSQL with pgvector",
+          "_similarity": 0.3035,
+          "_bm25_score": null,
+          "_rrf_score": 0.015625,
+          "_rrf_parts": {
+            "dense": 0.015625
+          },
+          "_rerank_score": -11.1303
+        },
+        {
+          "rank": 3,
+          "id": "m10",
+          "value": "AWS",
+          "_similarity": 0.2178,
+          "_bm25_score": null,
+          "_rrf_score": 0.014706,
+          "_rrf_parts": {
+            "dense": 0.014705882352941176
+          },
+          "_rerank_score": -11.1798
+        },
+        {
+          "rank": 4,
+          "id": "m4",
+          "value": "Linux Ubuntu 22.04",
+          "_similarity": 0.2331,
+          "_bm25_score": null,
+          "_rrf_score": 0.015152,
+          "_rrf_parts": {
+            "dense": 0.015151515151515152
+          },
+          "_rerank_score": -11.1857
+        },
+        {
+          "rank": 5,
+          "id": "m2",
+          "value": "Go",
+          "_similarity": 0.187,
+          "_bm25_score": null,
+          "_rrf_score": 0.013889,
+          "_rrf_parts": {
+            "dense": 0.013888888888888888
+          },
+          "_rerank_score": -11.1988
+        },
+        {
+          "rank": 6,
+          "id": "m1",
+          "value": "Python",
+          "_similarity": 0.187,
+          "_bm25_score": null,
+          "_rrf_score": 0.014085,
+          "_rrf_parts": {
+            "dense": 0.014084507042253521
+          },
+          "_rerank_score": -11.2107
+        },
+        {
+          "rank": 7,
+          "id": "m6",
+          "value": "Concise and technical",
+          "_similarity": 0.2467,
+          "_bm25_score": null,
+          "_rrf_score": 0.015385,
+          "_rrf_parts": {
+            "dense": 0.015384615384615385
+          },
+          "_rerank_score": -11.2277
+        },
+        {
+          "rank": 8,
+          "id": "m5",
+          "value": "Neovim",
+          "_similarity": 0.232,
+          "_bm25_score": null,
+          "_rrf_score": 0.014925,
+          "_rrf_parts": {
+            "dense": 0.014925373134328358
+          },
+          "_rerank_score": -11.2344
+        },
+        {
+          "rank": 9,
+          "id": "m3",
+          "value": "ChunkdUp",
+          "_similarity": 0.323,
+          "_bm25_score": null,
+          "_rrf_score": 0.016129,
+          "_rrf_parts": {
+            "dense": 0.016129032258064516
+          },
+          "_rerank_score": -11.2376
+        },
+        {
+          "rank": 10,
+          "id": "m11",
+          "value": "Docker",
+          "_similarity": 0.2051,
+          "_bm25_score": null,
+          "_rrf_score": 0.014286,
+          "_rrf_parts": {
+            "dense": 0.014285714285714285
+          },
+          "_rerank_score": -11.2466
+        }
+      ]
+    },
+    {
+      "id": "q22",
+      "query": "runtime",
+      "category": "short_ambiguous",
+      "expected": [
+        "m11"
+      ],
+      "returned": [
+        "m11",
+        "m4",
+        "m9",
+        "m1",
+        "m2"
+      ],
+      "returned_values": [
+        "Docker",
+        "Linux Ubuntu 22.04",
+        "PostgreSQL with pgvector",
+        "Python",
+        "Go"
+      ],
+      "abstained": false,
+      "top_score_field": null,
+      "metrics": {
+        "precision": 0.2,
+        "recall": 1.0,
+        "reciprocal_rank": 1.0,
+        "hit": 1.0
+      },
+      "timings_ms": {
+        "retrieve_dense_ms": 8.272,
+        "retrieve_bm25_ms": 0.072,
+        "fuse_ms": 0.034,
+        "rerank_ms": 248.685,
+        "abstain_ms": 0.001,
+        "total_ms": 257.065
+      },
+      "candidates": [
+        {
+          "rank": 1,
+          "id": "m11",
+          "value": "Docker",
+          "_similarity": 0.2736,
+          "_bm25_score": null,
+          "_rrf_score": 0.032787,
+          "_rrf_parts": {
+            "dense": 0.01639344262295082,
+            "bm25": 0.01639344262295082
+          },
+          "_rerank_score": 3.856
+        },
+        {
+          "rank": 2,
+          "id": "m4",
+          "value": "Linux Ubuntu 22.04",
+          "_similarity": 0.1932,
+          "_bm25_score": null,
+          "_rrf_score": 0.015873,
+          "_rrf_parts": {
+            "dense": 0.015873015873015872
+          },
+          "_rerank_score": -11.0171
+        },
+        {
+          "rank": 3,
+          "id": "m9",
+          "value": "PostgreSQL with pgvector",
+          "_similarity": 0.1693,
+          "_bm25_score": null,
+          "_rrf_score": 0.015385,
+          "_rrf_parts": {
+            "dense": 0.015384615384615385
+          },
+          "_rerank_score": -11.0857
+        },
+        {
+          "rank": 4,
+          "id": "m1",
+          "value": "Python",
+          "_similarity": 0.1747,
+          "_bm25_score": null,
+          "_rrf_score": 0.015625,
+          "_rrf_parts": {
+            "dense": 0.015625
+          },
+          "_rerank_score": -11.1169
+        },
+        {
+          "rank": 5,
+          "id": "m2",
+          "value": "Go",
+          "_similarity": 0.2593,
+          "_bm25_score": null,
+          "_rrf_score": 0.016129,
+          "_rrf_parts": {
+            "dense": 0.016129032258064516
+          },
+          "_rerank_score": -11.1223
+        },
+        {
+          "rank": 6,
+          "id": "m10",
+          "value": "AWS",
+          "_similarity": 0.0295,
+          "_bm25_score": null,
+          "_rrf_score": 0.013889,
+          "_rrf_parts": {
+            "dense": 0.013888888888888888
+          },
+          "_rerank_score": -11.1226
+        },
+        {
+          "rank": 7,
+          "id": "m12",
+          "value": "all-MiniLM-L6-v2",
+          "_similarity": 0.1229,
+          "_bm25_score": null,
+          "_rrf_score": 0.014706,
+          "_rrf_parts": {
+            "dense": 0.014705882352941176
+          },
+          "_rerank_score": -11.1348
+        },
+        {
+          "rank": 8,
+          "id": "m3",
+          "value": "ChunkdUp",
+          "_similarity": 0.152,
+          "_bm25_score": null,
+          "_rrf_score": 0.015152,
+          "_rrf_parts": {
+            "dense": 0.015151515151515152
+          },
+          "_rerank_score": -11.1695
+        },
+        {
+          "rank": 9,
+          "id": "m6",
+          "value": "Concise and technical",
+          "_similarity": 0.0671,
+          "_bm25_score": null,
+          "_rrf_score": 0.014286,
+          "_rrf_parts": {
+            "dense": 0.014285714285714285
+          },
+          "_rerank_score": -11.2088
+        },
+        {
+          "rank": 10,
+          "id": "m5",
+          "value": "Neovim",
+          "_similarity": 0.1368,
+          "_bm25_score": null,
+          "_rrf_score": 0.014925,
+          "_rrf_parts": {
+            "dense": 0.014925373134328358
+          },
+          "_rerank_score": -11.2095
+        }
+      ]
+    },
+    {
+      "id": "q29",
+      "query": "Do I work at a research lab?",
+      "category": "indirect_contextual",
+      "expected": [
+        "m7"
+      ],
+      "returned": [
+        "m12",
+        "m8",
+        "m6",
+        "m4",
+        "m9"
+      ],
+      "returned_values": [
+        "all-MiniLM-L6-v2",
+        "Senior AI Architect",
+        "Concise and technical",
+        "Linux Ubuntu 22.04",
+        "PostgreSQL with pgvector"
+      ],
+      "abstained": false,
+      "top_score_field": null,
+      "metrics": {
+        "precision": 0.0,
+        "recall": 0.0,
+        "reciprocal_rank": 0.0,
+        "hit": 0.0
+      },
+      "timings_ms": {
+        "retrieve_dense_ms": 10.985,
+        "retrieve_bm25_ms": 0.123,
+        "fuse_ms": 0.035,
+        "rerank_ms": 257.954,
+        "abstain_ms": 0.001,
+        "total_ms": 269.097
+      },
+      "candidates": [
+        {
+          "rank": 1,
+          "id": "m12",
+          "value": "all-MiniLM-L6-v2",
+          "_similarity": 0.0082,
+          "_bm25_score": null,
+          "_rrf_score": 0.015152,
+          "_rrf_parts": {
+            "dense": 0.015151515151515152
+          },
+          "_rerank_score": -11.2696
+        },
+        {
+          "rank": 2,
+          "id": "m8",
+          "value": "Senior AI Architect",
+          "_similarity": 0.1484,
+          "_bm25_score": null,
+          "_rrf_score": 0.016393,
+          "_rrf_parts": {
+            "dense": 0.01639344262295082
+          },
+          "_rerank_score": -11.2904
+        },
+        {
+          "rank": 3,
+          "id": "m6",
+          "value": "Concise and technical",
+          "_similarity": -0.0277,
+          "_bm25_score": null,
+          "_rrf_score": 0.014286,
+          "_rrf_parts": {
+            "dense": 0.014285714285714285
+          },
+          "_rerank_score": -11.3055
+        },
+        {
+          "rank": 4,
+          "id": "m4",
+          "value": "Linux Ubuntu 22.04",
+          "_similarity": -0.0396,
+          "_bm25_score": null,
+          "_rrf_score": 0.014085,
+          "_rrf_parts": {
+            "dense": 0.014084507042253521
+          },
+          "_rerank_score": -11.3101
+        },
+        {
+          "rank": 5,
+          "id": "m9",
+          "value": "PostgreSQL with pgvector",
+          "_similarity": 0.0721,
+          "_bm25_score": null,
+          "_rrf_score": 0.015625,
+          "_rrf_parts": {
+            "dense": 0.015625
+          },
+          "_rerank_score": -11.3129
+        },
+        {
+          "rank": 6,
+          "id": "m3",
+          "value": "ChunkdUp",
+          "_similarity": 0.0814,
+          "_bm25_score": null,
+          "_rrf_score": 0.015873,
+          "_rrf_parts": {
+            "dense": 0.015873015873015872
+          },
+          "_rerank_score": -11.3152
+        },
+        {
+          "rank": 7,
+          "id": "m5",
+          "value": "Neovim",
+          "_similarity": 0.0037,
+          "_bm25_score": null,
+          "_rrf_score": 0.014925,
+          "_rrf_parts": {
+            "dense": 0.014925373134328358
+          },
+          "_rerank_score": -11.3189
+        },
+        {
+          "rank": 8,
+          "id": "m1",
+          "value": "Python",
+          "_similarity": 0.0507,
+          "_bm25_score": null,
+          "_rrf_score": 0.015385,
+          "_rrf_parts": {
+            "dense": 0.015384615384615385
+          },
+          "_rerank_score": -11.3218
+        },
+        {
+          "rank": 9,
+          "id": "m11",
+          "value": "Docker",
+          "_similarity": -0.0526,
+          "_bm25_score": null,
+          "_rrf_score": 0.013889,
+          "_rrf_parts": {
+            "dense": 0.013888888888888888
+          },
+          "_rerank_score": -11.3225
+        },
+        {
+          "rank": 10,
+          "id": "m2",
+          "value": "Go",
+          "_similarity": -0.025,
+          "_bm25_score": null,
+          "_rrf_score": 0.014493,
+          "_rrf_parts": {
+            "dense": 0.014492753623188406
+          },
+          "_rerank_score": -11.3234
+        }
+      ]
+    },
+    {
+      "id": "q35",
+      "query": "Summarize my employment details.",
+      "category": "multi_memory",
+      "expected": [
+        "m7",
+        "m8"
+      ],
+      "returned": [
+        "m7",
+        "m8",
+        "m12",
+        "m6",
+        "m4"
+      ],
+      "returned_values": [
+        "Google DeepMind",
+        "Senior AI Architect",
+        "all-MiniLM-L6-v2",
+        "Concise and technical",
+        "Linux Ubuntu 22.04"
+      ],
+      "abstained": false,
+      "top_score_field": null,
+      "metrics": {
+        "precision": 0.4,
+        "recall": 1.0,
+        "reciprocal_rank": 1.0,
+        "hit": 1.0
+      },
+      "timings_ms": {
+        "retrieve_dense_ms": 9.191,
+        "retrieve_bm25_ms": 0.103,
+        "fuse_ms": 0.034,
+        "rerank_ms": 251.093,
+        "abstain_ms": 0.001,
+        "total_ms": 260.422
+      },
+      "candidates": [
+        {
+          "rank": 1,
+          "id": "m7",
+          "value": "Google DeepMind",
+          "_similarity": 0.3397,
+          "_bm25_score": null,
+          "_rrf_score": 0.032787,
+          "_rrf_parts": {
+            "dense": 0.01639344262295082,
+            "bm25": 0.01639344262295082
+          },
+          "_rerank_score": -7.6333
+        },
+        {
+          "rank": 2,
+          "id": "m8",
+          "value": "Senior AI Architect",
+          "_similarity": 0.3073,
+          "_bm25_score": null,
+          "_rrf_score": 0.016129,
+          "_rrf_parts": {
+            "dense": 0.016129032258064516
+          },
+          "_rerank_score": -10.7599
+        },
+        {
+          "rank": 3,
+          "id": "m12",
+          "value": "all-MiniLM-L6-v2",
+          "_similarity": 0.061,
+          "_bm25_score": null,
+          "_rrf_score": 0.013889,
+          "_rrf_parts": {
+            "dense": 0.013888888888888888
+          },
+          "_rerank_score": -11.3056
+        },
+        {
+          "rank": 4,
+          "id": "m6",
+          "value": "Concise and technical",
+          "_similarity": 0.1338,
+          "_bm25_score": null,
+          "_rrf_score": 0.015625,
+          "_rrf_parts": {
+            "dense": 0.015625
+          },
+          "_rerank_score": -11.3253
+        },
+        {
+          "rank": 5,
+          "id": "m4",
+          "value": "Linux Ubuntu 22.04",
+          "_similarity": 0.1391,
+          "_bm25_score": null,
+          "_rrf_score": 0.015873,
+          "_rrf_parts": {
+            "dense": 0.015873015873015872
+          },
+          "_rerank_score": -11.3315
+        },
+        {
+          "rank": 6,
+          "id": "m9",
+          "value": "PostgreSQL with pgvector",
+          "_similarity": 0.0941,
+          "_bm25_score": null,
+          "_rrf_score": 0.014493,
+          "_rrf_parts": {
+            "dense": 0.014492753623188406
+          },
+          "_rerank_score": -11.3321
+        },
+        {
+          "rank": 7,
+          "id": "m1",
+          "value": "Python",
+          "_similarity": 0.0962,
+          "_bm25_score": null,
+          "_rrf_score": 0.014706,
+          "_rrf_parts": {
+            "dense": 0.014705882352941176
+          },
+          "_rerank_score": -11.3341
+        },
+        {
+          "rank": 8,
+          "id": "m5",
+          "value": "Neovim",
+          "_similarity": 0.0731,
+          "_bm25_score": null,
+          "_rrf_score": 0.014085,
+          "_rrf_parts": {
+            "dense": 0.014084507042253521
+          },
+          "_rerank_score": -11.3342
+        },
+        {
+          "rank": 9,
+          "id": "m10",
+          "value": "AWS",
+          "_similarity": 0.0983,
+          "_bm25_score": null,
+          "_rrf_score": 0.014925,
+          "_rrf_parts": {
+            "dense": 0.014925373134328358
+          },
+          "_rerank_score": -11.3348
+        },
+        {
+          "rank": 10,
+          "id": "m11",
+          "value": "Docker",
+          "_similarity": 0.0766,
+          "_bm25_score": null,
+          "_rrf_score": 0.014286,
+          "_rrf_parts": {
+            "dense": 0.014285714285714285
+          },
+          "_rerank_score": -11.3363
+        }
+      ]
+    },
+    {
+      "id": "q42",
+      "query": "What editor did I use before?",
+      "category": "updated_facts",
+      "expected": [],
+      "returned": [
+        "m5",
+        "m9",
+        "m1",
+        "m11",
+        "m12"
+      ],
+      "returned_values": [
+        "Neovim",
+        "PostgreSQL with pgvector",
+        "Python",
+        "Docker",
+        "all-MiniLM-L6-v2"
+      ],
+      "abstained": false,
+      "top_score_field": null,
+      "metrics": {
+        "precision": 0.0,
+        "recall": 0.0,
+        "reciprocal_rank": 0.0,
+        "hit": 0.0
+      },
+      "timings_ms": {
+        "retrieve_dense_ms": 9.386,
+        "retrieve_bm25_ms": 0.102,
+        "fuse_ms": 0.032,
+        "rerank_ms": 259.478,
+        "abstain_ms": 0.001,
+        "total_ms": 268.999
+      },
+      "candidates": [
+        {
+          "rank": 1,
+          "id": "m5",
+          "value": "Neovim",
+          "_similarity": 0.4975,
+          "_bm25_score": null,
+          "_rrf_score": 0.032787,
+          "_rrf_parts": {
+            "dense": 0.01639344262295082,
+            "bm25": 0.01639344262295082
+          },
+          "_rerank_score": -6.5011
+        },
+        {
+          "rank": 2,
+          "id": "m9",
+          "value": "PostgreSQL with pgvector",
+          "_similarity": 0.2087,
+          "_bm25_score": null,
+          "_rrf_score": 0.015625,
+          "_rrf_parts": {
+            "dense": 0.015625
+          },
+          "_rerank_score": -11.127
+        },
+        {
+          "rank": 3,
+          "id": "m1",
+          "value": "Python",
+          "_similarity": 0.2085,
+          "_bm25_score": null,
+          "_rrf_score": 0.015385,
+          "_rrf_parts": {
+            "dense": 0.015384615384615385
+          },
+          "_rerank_score": -11.16
+        },
+        {
+          "rank": 4,
+          "id": "m11",
+          "value": "Docker",
+          "_similarity": 0.1414,
+          "_bm25_score": null,
+          "_rrf_score": 0.014085,
+          "_rrf_parts": {
+            "dense": 0.014084507042253521
+          },
+          "_rerank_score": -11.1731
+        },
+        {
+          "rank": 5,
+          "id": "m12",
+          "value": "all-MiniLM-L6-v2",
+          "_similarity": 0.2449,
+          "_bm25_score": null,
+          "_rrf_score": 0.016129,
+          "_rrf_parts": {
+            "dense": 0.016129032258064516
+          },
+          "_rerank_score": -11.1743
+        },
+        {
+          "rank": 6,
+          "id": "m4",
+          "value": "Linux Ubuntu 22.04",
+          "_similarity": 0.1925,
+          "_bm25_score": null,
+          "_rrf_score": 0.014925,
+          "_rrf_parts": {
+            "dense": 0.014925373134328358
+          },
+          "_rerank_score": -11.1977
+        },
+        {
+          "rank": 7,
+          "id": "m6",
+          "value": "Concise and technical",
+          "_similarity": 0.1653,
+          "_bm25_score": null,
+          "_rrf_score": 0.014286,
+          "_rrf_parts": {
+            "dense": 0.014285714285714285
+          },
+          "_rerank_score": -11.1994
+        },
+        {
+          "rank": 8,
+          "id": "m2",
+          "value": "Go",
+          "_similarity": 0.2091,
+          "_bm25_score": null,
+          "_rrf_score": 0.015873,
+          "_rrf_parts": {
+            "dense": 0.015873015873015872
+          },
+          "_rerank_score": -11.2465
+        },
+        {
+          "rank": 9,
+          "id": "m3",
+          "value": "ChunkdUp",
+          "_similarity": 0.1869,
+          "_bm25_score": null,
+          "_rrf_score": 0.014706,
+          "_rrf_parts": {
+            "dense": 0.014705882352941176
+          },
+          "_rerank_score": -11.2709
+        },
+        {
+          "rank": 10,
+          "id": "m8",
+          "value": "Senior AI Architect",
+          "_similarity": 0.2063,
+          "_bm25_score": null,
+          "_rrf_score": 0.015152,
+          "_rrf_parts": {
+            "dense": 0.015151515151515152
+          },
+          "_rerank_score": -11.2714
+        }
+      ]
+    },
+    {
+      "id": "q51",
+      "query": "Is my memory layer containerized?",
+      "category": "project_specific",
+      "expected": [
+        "m11"
+      ],
+      "returned": [
+        "m11",
+        "m9",
+        "m12",
+        "m10",
+        "m1"
+      ],
+      "returned_values": [
+        "Docker",
+        "PostgreSQL with pgvector",
+        "all-MiniLM-L6-v2",
+        "AWS",
+        "Python"
+      ],
+      "abstained": false,
+      "top_score_field": null,
+      "metrics": {
+        "precision": 0.2,
+        "recall": 1.0,
+        "reciprocal_rank": 1.0,
+        "hit": 1.0
+      },
+      "timings_ms": {
+        "retrieve_dense_ms": 9.626,
+        "retrieve_bm25_ms": 0.105,
+        "fuse_ms": 0.039,
+        "rerank_ms": 245.01,
+        "abstain_ms": 0.002,
+        "total_ms": 254.781
+      },
+      "candidates": [
+        {
+          "rank": 1,
+          "id": "m11",
+          "value": "Docker",
+          "_similarity": 0.3999,
+          "_bm25_score": null,
+          "_rrf_score": 0.031545,
+          "_rrf_parts": {
+            "dense": 0.01639344262295082,
+            "bm25": 0.015151515151515152
+          },
+          "_rerank_score": -8.8087
+        },
+        {
+          "rank": 2,
+          "id": "m9",
+          "value": "PostgreSQL with pgvector",
+          "_similarity": 0.2966,
+          "_bm25_score": null,
+          "_rrf_score": 0.030415,
+          "_rrf_parts": {
+            "dense": 0.016129032258064516,
+            "bm25": 0.014285714285714285
+          },
+          "_rerank_score": -9.4402
+        },
+        {
+          "rank": 3,
+          "id": "m12",
+          "value": "all-MiniLM-L6-v2",
+          "_similarity": 0.2851,
+          "_bm25_score": null,
+          "_rrf_score": 0.03055,
+          "_rrf_parts": {
+            "dense": 0.015625,
+            "bm25": 0.014925373134328358
+          },
+          "_rerank_score": -9.9353
+        },
+        {
+          "rank": 4,
+          "id": "m10",
+          "value": "AWS",
+          "_similarity": 0.262,
+          "_bm25_score": null,
+          "_rrf_score": 0.030536,
+          "_rrf_parts": {
+            "dense": 0.015151515151515152,
+            "bm25": 0.015384615384615385
+          },
+          "_rerank_score": -9.9732
+        },
+        {
+          "rank": 5,
+          "id": "m1",
+          "value": "Python",
+          "_similarity": 0.1963,
+          "_bm25_score": null,
+          "_rrf_score": 0.030366,
+          "_rrf_parts": {
+            "dense": 0.014492753623188406,
+            "bm25": 0.015873015873015872
+          },
+          "_rerank_score": -10.206
+        },
+        {
+          "rank": 6,
+          "id": "m2",
+          "value": "Go",
+          "_similarity": 0.2538,
+          "_bm25_score": null,
+          "_rrf_score": 0.031054,
+          "_rrf_parts": {
+            "dense": 0.014925373134328358,
+            "bm25": 0.016129032258064516
+          },
+          "_rerank_score": -10.2718
+        },
+        {
+          "rank": 7,
+          "id": "m4",
+          "value": "Linux Ubuntu 22.04",
+          "_similarity": 0.2777,
+          "_bm25_score": null,
+          "_rrf_score": 0.029274,
+          "_rrf_parts": {
+            "dense": 0.015384615384615385,
+            "bm25": 0.013888888888888888
+          },
+          "_rerank_score": -10.3177
+        },
+        {
+          "rank": 8,
+          "id": "m5",
+          "value": "Neovim",
+          "_similarity": 0.1996,
+          "_bm25_score": null,
+          "_rrf_score": 0.030331,
+          "_rrf_parts": {
+            "dense": 0.014705882352941176,
+            "bm25": 0.015625
+          },
+          "_rerank_score": -10.3563
+        },
+        {
+          "rank": 9,
+          "id": "m3",
+          "value": "ChunkdUp",
+          "_similarity": 0.2939,
+          "_bm25_score": null,
+          "_rrf_score": 0.032266,
+          "_rrf_parts": {
+            "dense": 0.015873015873015872,
+            "bm25": 0.01639344262295082
+          },
+          "_rerank_score": -10.6818
+        },
+        {
+          "rank": 10,
+          "id": "m6",
+          "value": "Concise and technical",
+          "_similarity": 0.1909,
+          "_bm25_score": null,
+          "_rrf_score": 0.028778,
+          "_rrf_parts": {
+            "dense": 0.014285714285714285,
+            "bm25": 0.014492753623188406
+          },
+          "_rerank_score": -10.9253
+        }
+      ]
+    },
+    {
+      "id": "q52",
+      "query": "What backs the memory storage layer?",
+      "category": "project_specific",
+      "expected": [
+        "m9"
+      ],
+      "returned": [
+        "m9",
+        "m12",
+        "m4",
+        "m1",
+        "m10"
+      ],
+      "returned_values": [
+        "PostgreSQL with pgvector",
+        "all-MiniLM-L6-v2",
+        "Linux Ubuntu 22.04",
+        "Python",
+        "AWS"
+      ],
+      "abstained": false,
+      "top_score_field": null,
+      "metrics": {
+        "precision": 0.2,
+        "recall": 1.0,
+        "reciprocal_rank": 1.0,
+        "hit": 1.0
+      },
+      "timings_ms": {
+        "retrieve_dense_ms": 8.872,
+        "retrieve_bm25_ms": 0.124,
+        "fuse_ms": 0.039,
+        "rerank_ms": 249.35,
+        "abstain_ms": 0.002,
+        "total_ms": 258.386
+      },
+      "candidates": [
+        {
+          "rank": 1,
+          "id": "m9",
+          "value": "PostgreSQL with pgvector",
+          "_similarity": 0.3896,
+          "_bm25_score": null,
+          "_rrf_score": 0.032787,
+          "_rrf_parts": {
+            "dense": 0.01639344262295082,
+            "bm25": 0.01639344262295082
+          },
+          "_rerank_score": -3.1725
+        },
+        {
+          "rank": 2,
+          "id": "m12",
+          "value": "all-MiniLM-L6-v2",
+          "_similarity": 0.2716,
+          "_bm25_score": null,
+          "_rrf_score": 0.029412,
+          "_rrf_parts": {
+            "dense": 0.014705882352941176,
+            "bm25": 0.014705882352941176
+          },
+          "_rerank_score": -10.9662
+        },
+        {
+          "rank": 3,
+          "id": "m4",
+          "value": "Linux Ubuntu 22.04",
+          "_similarity": 0.3358,
+          "_bm25_score": null,
+          "_rrf_score": 0.029762,
+          "_rrf_parts": {
+            "dense": 0.015873015873015872,
+            "bm25": 0.013888888888888888
+          },
+          "_rerank_score": -10.9832
+        },
+        {
+          "rank": 4,
+          "id": "m1",
+          "value": "Python",
+          "_similarity": 0.2439,
+          "_bm25_score": null,
+          "_rrf_score": 0.029911,
+          "_rrf_parts": {
+            "dense": 0.014285714285714285,
+            "bm25": 0.015625
+          },
+          "_rerank_score": -11.0548
+        },
+        {
+          "rank": 5,
+          "id": "m10",
+          "value": "AWS",
+          "_similarity": 0.2935,
+          "_bm25_score": null,
+          "_rrf_score": 0.030303,
+          "_rrf_parts": {
+            "dense": 0.015151515151515152,
+            "bm25": 0.015151515151515152
+          },
+          "_rerank_score": -11.0568
+        },
+        {
+          "rank": 6,
+          "id": "m2",
+          "value": "Go",
+          "_similarity": 0.2965,
+          "_bm25_score": null,
+          "_rrf_score": 0.031258,
+          "_rrf_parts": {
+            "dense": 0.015384615384615385,
+            "bm25": 0.015873015873015872
+          },
+          "_rerank_score": -11.0638
+        },
+        {
+          "rank": 7,
+          "id": "m5",
+          "value": "Neovim",
+          "_similarity": 0.2147,
+          "_bm25_score": null,
+          "_rrf_score": 0.029469,
+          "_rrf_parts": {
+            "dense": 0.014084507042253521,
+            "bm25": 0.015384615384615385
+          },
+          "_rerank_score": -11.1229
+        },
+        {
+          "rank": 8,
+          "id": "m11",
+          "value": "Docker",
+          "_similarity": 0.2991,
+          "_bm25_score": null,
+          "_rrf_score": 0.03055,
+          "_rrf_parts": {
+            "dense": 0.015625,
+            "bm25": 0.014925373134328358
+          },
+          "_rerank_score": -11.1272
+        },
+        {
+          "rank": 9,
+          "id": "m3",
+          "value": "ChunkdUp",
+          "_similarity": 0.3438,
+          "_bm25_score": null,
+          "_rrf_score": 0.032258,
+          "_rrf_parts": {
+            "dense": 0.016129032258064516,
+            "bm25": 0.016129032258064516
+          },
+          "_rerank_score": -11.1378
+        },
+        {
+          "rank": 10,
+          "id": "m6",
+          "value": "Concise and technical",
+          "_similarity": 0.2902,
+          "_bm25_score": null,
+          "_rrf_score": 0.029211,
+          "_rrf_parts": {
+            "dense": 0.014925373134328358,
+            "bm25": 0.014285714285714285
+          },
+          "_rerank_score": -11.2154
+        }
+      ]
+    },
+    {
+      "id": "q57",
+      "query": "What time is it in Tokyo?",
+      "category": "out_of_domain",
+      "expected": [],
+      "returned": [
+        "m12",
+        "m6",
+        "m9",
+        "m8",
+        "m4"
+      ],
+      "returned_values": [
+        "all-MiniLM-L6-v2",
+        "Concise and technical",
+        "PostgreSQL with pgvector",
+        "Senior AI Architect",
+        "Linux Ubuntu 22.04"
+      ],
+      "abstained": false,
+      "top_score_field": null,
+      "metrics": {
+        "precision": 0.0,
+        "recall": 0.0,
+        "reciprocal_rank": 0.0,
+        "hit": 0.0
+      },
+      "timings_ms": {
+        "retrieve_dense_ms": 10.469,
+        "retrieve_bm25_ms": 0.1,
+        "fuse_ms": 0.036,
+        "rerank_ms": 255.487,
+        "abstain_ms": 0.001,
+        "total_ms": 266.093
+      },
+      "candidates": [
+        {
+          "rank": 1,
+          "id": "m12",
+          "value": "all-MiniLM-L6-v2",
+          "_similarity": -0.0439,
+          "_bm25_score": null,
+          "_rrf_score": 0.013889,
+          "_rrf_parts": {
+            "dense": 0.013888888888888888
+          },
+          "_rerank_score": -11.2877
+        },
+        {
+          "rank": 2,
+          "id": "m6",
+          "value": "Concise and technical",
+          "_similarity": -0.0303,
+          "_bm25_score": null,
+          "_rrf_score": 0.014085,
+          "_rrf_parts": {
+            "dense": 0.014084507042253521
+          },
+          "_rerank_score": -11.3144
+        },
+        {
+          "rank": 3,
+          "id": "m9",
+          "value": "PostgreSQL with pgvector",
+          "_similarity": 0.0043,
+          "_bm25_score": null,
+          "_rrf_score": 0.014493,
+          "_rrf_parts": {
+            "dense": 0.014492753623188406
+          },
+          "_rerank_score": -11.3205
+        },
+        {
+          "rank": 4,
+          "id": "m8",
+          "value": "Senior AI Architect",
+          "_similarity": 0.0069,
+          "_bm25_score": null,
+          "_rrf_score": 0.014706,
+          "_rrf_parts": {
+            "dense": 0.014705882352941176
+          },
+          "_rerank_score": -11.3216
+        },
+        {
+          "rank": 5,
+          "id": "m4",
+          "value": "Linux Ubuntu 22.04",
+          "_similarity": 0.0612,
+          "_bm25_score": null,
+          "_rrf_score": 0.016129,
+          "_rrf_parts": {
+            "dense": 0.016129032258064516
+          },
+          "_rerank_score": -11.3233
+        },
+        {
+          "rank": 6,
+          "id": "m1",
+          "value": "Python",
+          "_similarity": 0.0083,
+          "_bm25_score": null,
+          "_rrf_score": 0.015152,
+          "_rrf_parts": {
+            "dense": 0.015151515151515152
+          },
+          "_rerank_score": -11.3239
+        },
+        {
+          "rank": 7,
+          "id": "m5",
+          "value": "Neovim",
+          "_similarity": 0.0077,
+          "_bm25_score": null,
+          "_rrf_score": 0.014925,
+          "_rrf_parts": {
+            "dense": 0.014925373134328358
+          },
+          "_rerank_score": -11.3253
+        },
+        {
+          "rank": 8,
+          "id": "m2",
+          "value": "Go",
+          "_similarity": 0.0311,
+          "_bm25_score": null,
+          "_rrf_score": 0.015385,
+          "_rrf_parts": {
+            "dense": 0.015384615384615385
+          },
+          "_rerank_score": -11.3256
+        },
+        {
+          "rank": 9,
+          "id": "m10",
+          "value": "AWS",
+          "_similarity": -0.0048,
+          "_bm25_score": null,
+          "_rrf_score": 0.014286,
+          "_rrf_parts": {
+            "dense": 0.014285714285714285
+          },
+          "_rerank_score": -11.326
+        },
+        {
+          "rank": 10,
+          "id": "m3",
+          "value": "ChunkdUp",
+          "_similarity": 0.0515,
+          "_bm25_score": null,
+          "_rrf_score": 0.015873,
+          "_rrf_parts": {
+            "dense": 0.015873015873015872
+          },
+          "_rerank_score": -11.3264
+        }
+      ]
+    },
+    {
+      "id": "q59",
+      "query": "What is the capital of France?",
+      "category": "out_of_domain",
+      "expected": [],
+      "returned": [
+        "m12",
+        "m6",
+        "m4",
+        "m9",
+        "m8"
+      ],
+      "returned_values": [
+        "all-MiniLM-L6-v2",
+        "Concise and technical",
+        "Linux Ubuntu 22.04",
+        "PostgreSQL with pgvector",
+        "Senior AI Architect"
+      ],
+      "abstained": false,
+      "top_score_field": null,
+      "metrics": {
+        "precision": 0.0,
+        "recall": 0.0,
+        "reciprocal_rank": 0.0,
+        "hit": 0.0
+      },
+      "timings_ms": {
+        "retrieve_dense_ms": 9.329,
+        "retrieve_bm25_ms": 0.109,
+        "fuse_ms": 0.033,
+        "rerank_ms": 256.826,
+        "abstain_ms": 0.001,
+        "total_ms": 266.297
+      },
+      "candidates": [
+        {
+          "rank": 1,
+          "id": "m12",
+          "value": "all-MiniLM-L6-v2",
+          "_similarity": 0.0803,
+          "_bm25_score": null,
+          "_rrf_score": 0.015625,
+          "_rrf_parts": {
+            "dense": 0.015625
+          },
+          "_rerank_score": -11.2749
+        },
+        {
+          "rank": 2,
+          "id": "m6",
+          "value": "Concise and technical",
+          "_similarity": 0.0185,
+          "_bm25_score": null,
+          "_rrf_score": 0.014085,
+          "_rrf_parts": {
+            "dense": 0.014084507042253521
+          },
+          "_rerank_score": -11.3102
+        },
+        {
+          "rank": 3,
+          "id": "m4",
+          "value": "Linux Ubuntu 22.04",
+          "_similarity": 0.0509,
+          "_bm25_score": null,
+          "_rrf_score": 0.014925,
+          "_rrf_parts": {
+            "dense": 0.014925373134328358
+          },
+          "_rerank_score": -11.318
+        },
+        {
+          "rank": 4,
+          "id": "m9",
+          "value": "PostgreSQL with pgvector",
+          "_similarity": 0.0118,
+          "_bm25_score": null,
+          "_rrf_score": 0.013889,
+          "_rrf_parts": {
+            "dense": 0.013888888888888888
+          },
+          "_rerank_score": -11.3184
+        },
+        {
+          "rank": 5,
+          "id": "m8",
+          "value": "Senior AI Architect",
+          "_similarity": 0.0436,
+          "_bm25_score": null,
+          "_rrf_score": 0.014706,
+          "_rrf_parts": {
+            "dense": 0.014705882352941176
+          },
+          "_rerank_score": -11.3202
+        },
+        {
+          "rank": 6,
+          "id": "m5",
+          "value": "Neovim",
+          "_similarity": 0.0969,
+          "_bm25_score": null,
+          "_rrf_score": 0.016129,
+          "_rrf_parts": {
+            "dense": 0.016129032258064516
+          },
+          "_rerank_score": -11.3236
+        },
+        {
+          "rank": 7,
+          "id": "m1",
+          "value": "Python",
+          "_similarity": 0.1234,
+          "_bm25_score": null,
+          "_rrf_score": 0.016393,
+          "_rrf_parts": {
+            "dense": 0.01639344262295082
+          },
+          "_rerank_score": -11.3247
+        },
+        {
+          "rank": 8,
+          "id": "m2",
+          "value": "Go",
+          "_similarity": 0.0647,
+          "_bm25_score": null,
+          "_rrf_score": 0.015152,
+          "_rrf_parts": {
+            "dense": 0.015151515151515152
+          },
+          "_rerank_score": -11.3261
+        },
+        {
+          "rank": 9,
+          "id": "m3",
+          "value": "ChunkdUp",
+          "_similarity": 0.0896,
+          "_bm25_score": null,
+          "_rrf_score": 0.015873,
+          "_rrf_parts": {
+            "dense": 0.015873015873015872
+          },
+          "_rerank_score": -11.3278
+        },
+        {
+          "rank": 10,
+          "id": "m10",
+          "value": "AWS",
+          "_similarity": 0.0765,
+          "_bm25_score": null,
+          "_rrf_score": 0.015385,
+          "_rrf_parts": {
+            "dense": 0.015384615384615385
+          },
+          "_rerank_score": -11.3287
+        }
+      ]
+    },
+    {
+      "id": "q60",
+      "query": "Recommend a good romance movie.",
+      "category": "out_of_domain",
+      "expected": [],
+      "returned": [
+        "m12",
+        "m9",
+        "m4",
+        "m6",
+        "m5"
+      ],
+      "returned_values": [
+        "all-MiniLM-L6-v2",
+        "PostgreSQL with pgvector",
+        "Linux Ubuntu 22.04",
+        "Concise and technical",
+        "Neovim"
+      ],
+      "abstained": false,
+      "top_score_field": null,
+      "metrics": {
+        "precision": 0.0,
+        "recall": 0.0,
+        "reciprocal_rank": 0.0,
+        "hit": 0.0
+      },
+      "timings_ms": {
+        "retrieve_dense_ms": 10.196,
+        "retrieve_bm25_ms": 0.182,
+        "fuse_ms": 0.044,
+        "rerank_ms": 250.87,
+        "abstain_ms": 0.001,
+        "total_ms": 261.294
+      },
+      "candidates": [
+        {
+          "rank": 1,
+          "id": "m12",
+          "value": "all-MiniLM-L6-v2",
+          "_similarity": 0.0106,
+          "_bm25_score": null,
+          "_rrf_score": 0.015873,
+          "_rrf_parts": {
+            "dense": 0.015873015873015872
+          },
+          "_rerank_score": -11.2581
+        },
+        {
+          "rank": 2,
+          "id": "m9",
+          "value": "PostgreSQL with pgvector",
+          "_similarity": -0.026,
+          "_bm25_score": null,
+          "_rrf_score": 0.014925,
+          "_rrf_parts": {
+            "dense": 0.014925373134328358
+          },
+          "_rerank_score": -11.309
+        },
+        {
+          "rank": 3,
+          "id": "m4",
+          "value": "Linux Ubuntu 22.04",
+          "_similarity": -0.0298,
+          "_bm25_score": null,
+          "_rrf_score": 0.014493,
+          "_rrf_parts": {
+            "dense": 0.014492753623188406
+          },
+          "_rerank_score": -11.3097
+        },
+        {
+          "rank": 4,
+          "id": "m6",
+          "value": "Concise and technical",
+          "_similarity": 0.0241,
+          "_bm25_score": null,
+          "_rrf_score": 0.016129,
+          "_rrf_parts": {
+            "dense": 0.016129032258064516
+          },
+          "_rerank_score": -11.3116
+        },
+        {
+          "rank": 5,
+          "id": "m5",
+          "value": "Neovim",
+          "_similarity": -0.0365,
+          "_bm25_score": null,
+          "_rrf_score": 0.014286,
+          "_rrf_parts": {
+            "dense": 0.014285714285714285
+          },
+          "_rerank_score": -11.314
+        },
+        {
+          "rank": 6,
+          "id": "m1",
+          "value": "Python",
+          "_similarity": -0.0285,
+          "_bm25_score": null,
+          "_rrf_score": 0.014706,
+          "_rrf_parts": {
+            "dense": 0.014705882352941176
+          },
+          "_rerank_score": -11.3152
+        },
+        {
+          "rank": 7,
+          "id": "m8",
+          "value": "Senior AI Architect",
+          "_similarity": -0.0081,
+          "_bm25_score": null,
+          "_rrf_score": 0.015385,
+          "_rrf_parts": {
+            "dense": 0.015384615384615385
+          },
+          "_rerank_score": -11.3162
+        },
+        {
+          "rank": 8,
+          "id": "m10",
+          "value": "AWS",
+          "_similarity": -0.0538,
+          "_bm25_score": null,
+          "_rrf_score": 0.014085,
+          "_rrf_parts": {
+            "dense": 0.014084507042253521
+          },
+          "_rerank_score": -11.3166
+        },
+        {
+          "rank": 9,
+          "id": "m11",
+          "value": "Docker",
+          "_similarity": -0.1353,
+          "_bm25_score": null,
+          "_rrf_score": 0.013889,
+          "_rrf_parts": {
+            "dense": 0.013888888888888888
+          },
+          "_rerank_score": -11.3185
+        },
+        {
+          "rank": 10,
+          "id": "m2",
+          "value": "Go",
+          "_similarity": -0.0129,
+          "_bm25_score": null,
+          "_rrf_score": 0.015152,
+          "_rrf_parts": {
+            "dense": 0.015151515151515152
+          },
+          "_rerank_score": -11.3199
+        }
+      ]
+    },
+    {
+      "id": "q65",
+      "query": "What's my home address?",
+      "category": "absent_answer",
+      "expected": [],
+      "returned": [
+        "m12",
+        "m8",
+        "m10",
+        "m7",
+        "m6"
+      ],
+      "returned_values": [
+        "all-MiniLM-L6-v2",
+        "Senior AI Architect",
+        "AWS",
+        "Google DeepMind",
+        "Concise and technical"
+      ],
+      "abstained": false,
+      "top_score_field": null,
+      "metrics": {
+        "precision": 0.0,
+        "recall": 0.0,
+        "reciprocal_rank": 0.0,
+        "hit": 0.0
+      },
+      "timings_ms": {
+        "retrieve_dense_ms": 11.767,
+        "retrieve_bm25_ms": 0.116,
+        "fuse_ms": 0.036,
+        "rerank_ms": 253.548,
+        "abstain_ms": 0.001,
+        "total_ms": 265.468
+      },
+      "candidates": [
+        {
+          "rank": 1,
+          "id": "m12",
+          "value": "all-MiniLM-L6-v2",
+          "_similarity": 0.0496,
+          "_bm25_score": null,
+          "_rrf_score": 0.013889,
+          "_rrf_parts": {
+            "dense": 0.013888888888888888
+          },
+          "_rerank_score": -11.2615
+        },
+        {
+          "rank": 2,
+          "id": "m8",
+          "value": "Senior AI Architect",
+          "_similarity": 0.1004,
+          "_bm25_score": null,
+          "_rrf_score": 0.014706,
+          "_rrf_parts": {
+            "dense": 0.014705882352941176
+          },
+          "_rerank_score": -11.2896
+        },
+        {
+          "rank": 3,
+          "id": "m10",
+          "value": "AWS",
+          "_similarity": 0.1927,
+          "_bm25_score": null,
+          "_rrf_score": 0.016129,
+          "_rrf_parts": {
+            "dense": 0.016129032258064516
+          },
+          "_rerank_score": -11.2916
+        },
+        {
+          "rank": 4,
+          "id": "m7",
+          "value": "Google DeepMind",
+          "_similarity": 0.1754,
+          "_bm25_score": null,
+          "_rrf_score": 0.015873,
+          "_rrf_parts": {
+            "dense": 0.015873015873015872
+          },
+          "_rerank_score": -11.2935
+        },
+        {
+          "rank": 5,
+          "id": "m6",
+          "value": "Concise and technical",
+          "_similarity": 0.1022,
+          "_bm25_score": null,
+          "_rrf_score": 0.014925,
+          "_rrf_parts": {
+            "dense": 0.014925373134328358
+          },
+          "_rerank_score": -11.2955
+        },
+        {
+          "rank": 6,
+          "id": "m9",
+          "value": "PostgreSQL with pgvector",
+          "_similarity": 0.0646,
+          "_bm25_score": null,
+          "_rrf_score": 0.014085,
+          "_rrf_parts": {
+            "dense": 0.014084507042253521
+          },
+          "_rerank_score": -11.3031
+        },
+        {
+          "rank": 7,
+          "id": "m5",
+          "value": "Neovim",
+          "_similarity": 0.0877,
+          "_bm25_score": null,
+          "_rrf_score": 0.014286,
+          "_rrf_parts": {
+            "dense": 0.014285714285714285
+          },
+          "_rerank_score": -11.3066
+        },
+        {
+          "rank": 8,
+          "id": "m4",
+          "value": "Linux Ubuntu 22.04",
+          "_similarity": 0.247,
+          "_bm25_score": null,
+          "_rrf_score": 0.016393,
+          "_rrf_parts": {
+            "dense": 0.01639344262295082
+          },
+          "_rerank_score": -11.3075
+        },
+        {
+          "rank": 9,
+          "id": "m11",
+          "value": "Docker",
+          "_similarity": 0.1598,
+          "_bm25_score": null,
+          "_rrf_score": 0.015625,
+          "_rrf_parts": {
+            "dense": 0.015625
+          },
+          "_rerank_score": -11.3117
+        },
+        {
+          "rank": 10,
+          "id": "m3",
+          "value": "ChunkdUp",
+          "_similarity": 0.0997,
+          "_bm25_score": null,
+          "_rrf_score": 0.014493,
+          "_rrf_parts": {
+            "dense": 0.014492753623188406
+          },
+          "_rerank_score": -11.3146
+        }
+      ]
+    },
+    {
+      "id": "q66",
+      "query": "Do I have any pets?",
+      "category": "absent_answer",
+      "expected": [],
+      "returned": [
+        "m12",
+        "m6",
+        "m4",
+        "m8",
+        "m9"
+      ],
+      "returned_values": [
+        "all-MiniLM-L6-v2",
+        "Concise and technical",
+        "Linux Ubuntu 22.04",
+        "Senior AI Architect",
+        "PostgreSQL with pgvector"
+      ],
+      "abstained": false,
+      "top_score_field": null,
+      "metrics": {
+        "precision": 0.0,
+        "recall": 0.0,
+        "reciprocal_rank": 0.0,
+        "hit": 0.0
+      },
+      "timings_ms": {
+        "retrieve_dense_ms": 8.069,
+        "retrieve_bm25_ms": 0.1,
+        "fuse_ms": 0.031,
+        "rerank_ms": 251.671,
+        "abstain_ms": 0.001,
+        "total_ms": 259.872
+      },
+      "candidates": [
+        {
+          "rank": 1,
+          "id": "m12",
+          "value": "all-MiniLM-L6-v2",
+          "_similarity": 0.0392,
+          "_bm25_score": null,
+          "_rrf_score": 0.016393,
+          "_rrf_parts": {
+            "dense": 0.01639344262295082
+          },
+          "_rerank_score": -11.2959
+        },
+        {
+          "rank": 2,
+          "id": "m6",
+          "value": "Concise and technical",
+          "_similarity": -0.0625,
+          "_bm25_score": null,
+          "_rrf_score": 0.013889,
+          "_rrf_parts": {
+            "dense": 0.013888888888888888
+          },
+          "_rerank_score": -11.3148
+        },
+        {
+          "rank": 3,
+          "id": "m4",
+          "value": "Linux Ubuntu 22.04",
+          "_similarity": 0.0191,
+          "_bm25_score": null,
+          "_rrf_score": 0.015873,
+          "_rrf_parts": {
+            "dense": 0.015873015873015872
+          },
+          "_rerank_score": -11.3187
+        },
+        {
+          "rank": 4,
+          "id": "m8",
+          "value": "Senior AI Architect",
+          "_similarity": -0.053,
+          "_bm25_score": null,
+          "_rrf_score": 0.014085,
+          "_rrf_parts": {
+            "dense": 0.014084507042253521
+          },
+          "_rerank_score": -11.323
+        },
+        {
+          "rank": 5,
+          "id": "m9",
+          "value": "PostgreSQL with pgvector",
+          "_similarity": 0.0075,
+          "_bm25_score": null,
+          "_rrf_score": 0.015385,
+          "_rrf_parts": {
+            "dense": 0.015384615384615385
+          },
+          "_rerank_score": -11.323
+        },
+        {
+          "rank": 6,
+          "id": "m1",
+          "value": "Python",
+          "_similarity": -0.0025,
+          "_bm25_score": null,
+          "_rrf_score": 0.014925,
+          "_rrf_parts": {
+            "dense": 0.014925373134328358
+          },
+          "_rerank_score": -11.3239
+        },
+        {
+          "rank": 7,
+          "id": "m2",
+          "value": "Go",
+          "_similarity": 0.0028,
+          "_bm25_score": null,
+          "_rrf_score": 0.015152,
+          "_rrf_parts": {
+            "dense": 0.015151515151515152
+          },
+          "_rerank_score": -11.3251
+        },
+        {
+          "rank": 8,
+          "id": "m5",
+          "value": "Neovim",
+          "_similarity": -0.0396,
+          "_bm25_score": null,
+          "_rrf_score": 0.014286,
+          "_rrf_parts": {
+            "dense": 0.014285714285714285
+          },
+          "_rerank_score": -11.3271
+        },
+        {
+          "rank": 9,
+          "id": "m3",
+          "value": "ChunkdUp",
+          "_similarity": -0.0354,
+          "_bm25_score": null,
+          "_rrf_score": 0.014493,
+          "_rrf_parts": {
+            "dense": 0.014492753623188406
+          },
+          "_rerank_score": -11.3274
+        },
+        {
+          "rank": 10,
+          "id": "m7",
+          "value": "Google DeepMind",
+          "_similarity": -0.0219,
+          "_bm25_score": null,
+          "_rrf_score": 0.014706,
+          "_rrf_parts": {
+            "dense": 0.014705882352941176
+          },
+          "_rerank_score": -11.3275
+        }
+      ]
+    },
+    {
+      "id": "q67",
+      "query": "What gym do I go to?",
+      "category": "absent_answer",
+      "expected": [],
+      "returned": [
+        "m12",
+        "m6",
+        "m2",
+        "m8",
+        "m4"
+      ],
+      "returned_values": [
+        "all-MiniLM-L6-v2",
+        "Concise and technical",
+        "Go",
+        "Senior AI Architect",
+        "Linux Ubuntu 22.04"
+      ],
+      "abstained": false,
+      "top_score_field": null,
+      "metrics": {
+        "precision": 0.0,
+        "recall": 0.0,
+        "reciprocal_rank": 0.0,
+        "hit": 0.0
+      },
+      "timings_ms": {
+        "retrieve_dense_ms": 13.112,
+        "retrieve_bm25_ms": 0.098,
+        "fuse_ms": 0.036,
+        "rerank_ms": 229.389,
+        "abstain_ms": 0.002,
+        "total_ms": 242.637
+      },
+      "candidates": [
+        {
+          "rank": 1,
+          "id": "m12",
+          "value": "all-MiniLM-L6-v2",
+          "_similarity": 0.0528,
+          "_bm25_score": null,
+          "_rrf_score": 0.015152,
+          "_rrf_parts": {
+            "dense": 0.015151515151515152
+          },
+          "_rerank_score": -11.2521
+        },
+        {
+          "rank": 2,
+          "id": "m6",
+          "value": "Concise and technical",
+          "_similarity": 0.0183,
+          "_bm25_score": null,
+          "_rrf_score": 0.013889,
+          "_rrf_parts": {
+            "dense": 0.013888888888888888
+          },
+          "_rerank_score": -11.2871
+        },
+        {
+          "rank": 3,
+          "id": "m2",
+          "value": "Go",
+          "_similarity": 0.0761,
+          "_bm25_score": null,
+          "_rrf_score": 0.032787,
+          "_rrf_parts": {
+            "dense": 0.01639344262295082,
+            "bm25": 0.01639344262295082
+          },
+          "_rerank_score": -11.2983
+        },
+        {
+          "rank": 4,
+          "id": "m8",
+          "value": "Senior AI Architect",
+          "_similarity": 0.0305,
+          "_bm25_score": null,
+          "_rrf_score": 0.014085,
+          "_rrf_parts": {
+            "dense": 0.014084507042253521
+          },
+          "_rerank_score": -11.3047
+        },
+        {
+          "rank": 5,
+          "id": "m4",
+          "value": "Linux Ubuntu 22.04",
+          "_similarity": 0.0354,
+          "_bm25_score": null,
+          "_rrf_score": 0.014493,
+          "_rrf_parts": {
+            "dense": 0.014492753623188406
+          },
+          "_rerank_score": -11.3072
+        },
+        {
+          "rank": 6,
+          "id": "m9",
+          "value": "PostgreSQL with pgvector",
+          "_similarity": 0.0507,
+          "_bm25_score": null,
+          "_rrf_score": 0.014925,
+          "_rrf_parts": {
+            "dense": 0.014925373134328358
+          },
+          "_rerank_score": -11.3095
+        },
+        {
+          "rank": 7,
+          "id": "m5",
+          "value": "Neovim",
+          "_similarity": 0.0731,
+          "_bm25_score": null,
+          "_rrf_score": 0.016129,
+          "_rrf_parts": {
+            "dense": 0.016129032258064516
+          },
+          "_rerank_score": -11.3137
+        },
+        {
+          "rank": 8,
+          "id": "m1",
+          "value": "Python",
+          "_similarity": 0.0419,
+          "_bm25_score": null,
+          "_rrf_score": 0.014706,
+          "_rrf_parts": {
+            "dense": 0.014705882352941176
+          },
+          "_rerank_score": -11.321
+        },
+        {
+          "rank": 9,
+          "id": "m11",
+          "value": "Docker",
+          "_similarity": 0.0324,
+          "_bm25_score": null,
+          "_rrf_score": 0.014286,
+          "_rrf_parts": {
+            "dense": 0.014285714285714285
+          },
+          "_rerank_score": -11.3221
+        },
+        {
+          "rank": 10,
+          "id": "m3",
+          "value": "ChunkdUp",
+          "_similarity": 0.0707,
+          "_bm25_score": null,
+          "_rrf_score": 0.015873,
+          "_rrf_parts": {
+            "dense": 0.015873015873015872
+          },
+          "_rerank_score": -11.3263
+        }
+      ]
+    }
+  ]
+}
