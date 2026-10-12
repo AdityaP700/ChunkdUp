@@ -1,7 +1,7 @@
 # Remaining Work — Retrieval Pipeline Task (ChunkdUp)
 
 > Companion documents: [CONTEXT-CHECK.md](CONTEXT-CHECK.md) · [IMPLEMENTATION-PLAN.md](IMPLEMENTATION-PLAN.md)
-> Status: round 1 (M1–M8) complete; **round 2 (five-risk verification) complete** — scale test, held-out expansion, CE jargon audit, false-abstention accounting, FP pattern analysis; decision confirmed with caveats (see retrieval-experiments.md §12). Milestone numbers refer to IMPLEMENTATION-PLAN.md §8.
+> Status: round 1 (M1–M8) complete; round 2 (five-risk verification) complete; **round 3 complete** — decision memo, production hardening (fallback/logging/rollback/recalibration), entity experiments (exp 6 adopted with zero regressions, exp 7 rejected with evidence). Suite at end of round 3: **74 passed**. See retrieval-experiments.md §13 and round3-decision.md.
 
 ## M1 — Environment & Baseline Reproduction ✅
 
@@ -61,10 +61,11 @@
 
 - [x] ~~Re-run with a 100+ memory fixture~~ **DONE in round 2 (risk 1)**: scales 100/500/1000 tested; hybrid_ce_abstain confirmed at scale; scale-aware gate recalibration identified as an operational requirement (`results/scale/`)
 - [x] ~~Held-out flip at n=14~~ **RESOLVED in round 2 (risk 2)**: persists at n=36 with an explicit margin (+0.039 MRR to dense_abstain); combined-92 still favors hybrid_ce_abstain (`results/round2.*.json`)
-- [ ] **Experiment 6 — type-aware entity scoring** (named by round-2 risk 5): demote candidates whose only query overlap is the project-name entity on attribute-seeking queries; targets the largest concentrated FP source (project_specific: 12/69 queries, 35 FP memories)
-- [ ] **Experiment 7 — CE entity-guard** (named by round-2 risk 3): when the query contains stored entity/project vocabulary and the CE contradicts the fused top-1, fall back to fused ranking; targets the 13.3% jargon rank-inversion rate
-- [ ] **Product decision — latency vs quality** (round-2 §12.6): hybrid_ce_abstain (~200–450 ms, fewer false abstentions) vs dense_abstain (~10 ms, 16–18% false abstention) — maintainer's call
-- [ ] **Operational — scale-aware gate recalibration**: CE abstention threshold must be recalibrated against a store-representative dev set (frozen −10.95 loses 0.10–0.16 rejection at 500–1000 memories; recalibrated −2.1…−2.3 achieves 1.0)
+- [x] ~~**Experiment 6 — type-aware entity scoring**~~ **DONE in round 3, ADOPTED for the experiment configs** (`6efd36c`): sink-below demotion of project_name memories matching attribute-seeking entity queries purely on the entity token; pooled-92 MRR/P improved on both leading configs, per-query 7 better / **0 worse**, abstention unchanged
+- [x] ~~**Experiment 7 — CE entity-guard**~~ **TESTED in round 3, REJECTED with evidence**: fixes q46/q87 but breaks q45 (1.00→0.50) and costs precision broadly (dev P −0.042); a future variant must distinguish jargon miscalibration from legitimate CE correction
+- [ ] **Product decision — latency vs quality** (round-2 §12.6, unchanged by round 3): hybrid_ce_abstain (~200–450 ms, fewer false abstentions) vs dense_abstain (~10 ms, 16–18% false abstention, and now stronger with exp 6) — maintainer's call
+- [x] ~~**Operational — scale-aware gate recalibration**~~ **BUILT in round 3** (`26d96e3`): `ProductionRetriever.recalibrate(sample)` + `should_recalibrate()` (~50% store-growth trigger); README documents the schedule tied to round-2 drift data
+- [ ] Wire experiment 6's demotion into `ProductionRetriever` (validated but experiment-scoped this round)
 - [ ] Domain-tuned or alternative reranker (e.g. bge-reranker) vs ms-marco-MiniLM-L-12-v2 on this harness
 - [ ] Query-type / answerability detection for historically-phrased questions ("Did I ever work at X?")
 - [ ] Pin new dependencies in `requirements.txt` (deliberately deferred — decision belongs to the maintainer)

@@ -234,7 +234,46 @@ The 25–45× latency gap buys roughly +0.05 MRR, roughly half the false-abstent
 
 **Standing recommendation:** keep `hybrid_ce_abstain` as the default pipeline **conditional on the latency budget and on adopting scale-aware gate recalibration**, with `dense_abstain` as the latency-constrained fallback. The next code change with the best evidence-per-effort ratio is the type-aware entity scoring experiment (risk 5), which targets the largest concentrated FP source in every configuration; the CE entity-guard (risk 3) follows it. Nothing here contradicts round 1 — the round-1 conclusion survives all five risks, with two operational caveats (recalibration requirement, jargon guard) and one open product call (latency).
 
-## 13. Reproduction
+## 13. Round 3 — Decision, Production Hardening, Entity Experiments (2026-10-12)
+
+Three-part round, committed checkpoint-by-checkpoint. Part 1 made the pending decision with no new code; part 2 built layer-2 operational safety (no caching/queues/sharding — explicitly out of scope); part 3 ran the two entity experiments scoped by round 2. Full test suite at end of round: **74 passed**.
+
+### 13.1 Part 1 — Decision memo (`docs/round3-decision.md`)
+
+**`hybrid_ce_abstain` ships as the default.** The deciding factor, stated in the memo and traceable to round-2 risk 4: false abstention is a silent failure, and the CE gate abstains wrongly on 6.8–12.0% of answerable queries versus dense_abstain's 16.0–18.2% — the held-out MRR flip (+0.039, ~1.5 queries) does not outweigh that. The memo also fixes the fast-path rule: `dense_abstain` is preferred only for latency budgets (<~100 ms) or CE deployment constraints — **the round-2 scale data shows no store size where the CE gap is negligible** (+0.074 MRR at 12 memories is the smallest measured gap), so a size-based cutoff would be unsupported. Scale-aware recalibration was declared a hard shipping dependency; it shipped in part 2 (commit `26d96e3`), so the memo's fallback disclosure ("shipped without recalibration…") never came into force.
+
+### 13.2 Part 2 — Production hardening (4 checkpoints, all with tests)
+
+New module `ai-system/chunkdup/retrieval_production.py`; the `Memory` SDK now routes `retrieve`/`search` through it. Round-1/2 experiment files untouched; the module mirrors the experiment logic and is kept consistent by tests.
+
+1. **CE fallback chain** (`090b55d`): cross-encoder load failure, inference error, or timeout (default 1.0 s = 2× the round-1 p95 of ~268 ms, plus headroom for the ~450 ms observed under host pressure; `CHUNKDUP_CE_TIMEOUT_S` overridable) degrades to the dense gate; embedding failure degrades to the frozen baseline (skipping the dense leg, which is dead without embeddings). Every degradation is logged (`fallback_events` + warnings) and sticky within the process. Tests simulate a raising model and a hung `predict` (returns via fallback in <3 s).
+2. **JSONL query logging** (`ea1230d`): every production query appends one line to `<data_dir>/retrieval_log.jsonl` (`CHUNKDUP_QUERY_LOG` to override or `off`) with timestamp, query, requested + effective config, returned ids, per-candidate scores, latency, abstention flag, fallback events. Decoupled from the eval harness; write failures never break retrieval.
+3. **Rollback** (`c3f85d1`): `CHUNKDUP_RETRIEVAL_CONFIG=baseline_current` forces the frozen round-1 path for every `Memory` instance without a code change; documented in the README incident section together with the degradation chain.
+4. **Scale-aware recalibration** (`26d96e3`) — the memo's hard dependency: `ProductionRetriever.recalibrate(sample)` computes the gate threshold from a hand-labeled, store-representative sample against the current store (same objective as round-2 calibration); `should_recalibrate()` flips when the store grows ~50 % past the last calibration. README documents the schedule tied to round-2 drift (measurable ~100 memories, material ~500; recalibrate before doubling).
+
+### 13.3 Part 3 — Entity experiments (validated on the 92-query set + a 15-query entity-focus slice)
+
+Slice `dataset_entity_focus.jsonl` (15 hand-verified queries): 8 project-name+attribute queries (the round-2 FP pattern) and 7 jargon queries including two traps that must abstain; `e12` deliberately probes that the demotion rule never hits the correct answer whose value contains an identity token ("PostgreSQL or MongoDB…").
+
+**Experiment 6 — type-aware entity demotion: ADOPTED (zero regressions).**
+Mechanism: when a query names a stored identity entity (proper-name vocabulary only; generic terms like "database" excluded) and asks about something beyond it, `project_name`-typed candidates whose value IS the entity sink below every non-demoted candidate. Type-awareness is load-bearing: for "Where does ChunkdUp run?" the correct Docker memory also matches only on the "ChunkdUp" token — it is protected because it is not the project memory. A first multiplicative design (×0.25) was **structurally ineffective on CE logits** (0.34 → 0.086 still outranks the −5.17 correct answer) and was replaced by sink-below semantics after the first evaluation run showed zero effect.
+
+| Config | 92-query pooled MRR | 92-query P@5 | Slice MRR | Slice P@5 | Per-query regressions |
+|---|---|---|---|---|---|
+| hybrid_ce_abstain → +ED | 0.8397 → **0.8424** | 0.6366 → **0.6475** | 0.6167 → **0.6889** | 0.4189 → **0.5244** | **0** (2 better, 90 same) |
+| dense_abstain → +ED | 0.7880 → **0.8152** | 0.6962* → 0.7178* | 0.6111 → **0.7333** | 0.4189 → **0.5244** | **0** (5 better, 87 same) |
+
+*dev/heldout detail: dense_abstain_ed dev MRR 0.7946 (+0.027), heldout 0.8472 (+0.028); hybrid_ce_abstain_ed dev 0.8810 (+0.003), heldout 0.7824 (+0.002). Abstention behavior unchanged (HitRates identical). With exp 6, `dense_abstain_ed` now also wins the held-out split (0.847 vs 0.782) — the pooled ranking still favors the CE config, so the part-1 decision stands, with the fast path now strictly stronger than before.
+
+**Experiment 7 — CE entity-guard: REJECTED in current form.** The guard (fused top-3 lead in fused order on entity queries; CE orders the remainder) fixes both targeted inversions (q46 RR 0.33 → 0.50, q87 0.25 → 0.50) but **breaks q45** (1.00 → 0.50 — the CE had correctly promoted the Docker memory there, and the guard's fused fallback undoes it) and costs precision broadly (dev P@5 −0.042, slice P@5 −0.039). Exp 6 captures most of the benefit at no measured cost. A future variant would need a way to distinguish "CE demotion caused by jargon miscalibration" from "CE correction of entity-token over-pull" — this one cannot.
+
+### 13.4 Standing state after round 3
+
+- Default pipeline: `hybrid_ce_abstain` (decision memo), now with fallback chain, logging, rollback switch, and recalibration built in. Recommended next operational step: wire experiment 6's demotion into `ProductionRetriever` (validated, zero-regression; not wired this round to keep part 3 experiment-scoped).
+- Rejected/deferred with evidence: exp 7 as specified; graph-based retrieval (round-3 brief — no multi-hop failures exist in the eval set); caching/queues/sharding (out of scope).
+- Open product decision: latency vs quality (round-2 §12.6, unchanged).
+
+## 14. Reproduction
 
 ```bash
 python -m pip install torch --index-url https://download.pytorch.org/whl/cpu
@@ -255,4 +294,11 @@ python experiments/retrieval/run_experiment.py --config dense_abstain --split he
   --extra-dataset experiments/retrieval/dataset_round2.jsonl --tag round2   # risk 2 (repeat per config)
 python experiments/retrieval/audit_ce_jargon.py                           # risk 3
 python experiments/retrieval/analyze_fp_patterns.py                       # risks 4+5
+
+# Round 3
+python -m pytest tests/ -q --ignore=tests/test_postgres.py               # 74 tests incl. production + entity-guard
+python experiments/retrieval/run_experiment.py --config hybrid_ce_abstain_ed --split both \
+  --extra-dataset experiments/retrieval/dataset_round2.jsonl --tag round3exp   # experiment 6
+python experiments/retrieval/run_experiment.py --config hybrid_ce_abstain_ed --split entity_focus \
+  --extra-dataset experiments/retrieval/dataset_entity_focus.jsonl --tag round3exp
 ```
