@@ -358,5 +358,39 @@ class TestCEScaleTimeout(unittest.TestCase):
         self.assertTrue(results)
 
 
+
+class TestFastMode(unittest.TestCase):
+    """Closeout part 3: the fast path is an explicit, planned opt-in -
+    separate from the failure-driven degradation chain."""
+
+    def test_fast_mode_selects_dense_ed(self):
+        retriever = ProductionRetriever(make_repo(), fast_mode=True)
+        self.assertEqual(retriever.config_name, "dense_abstain_ed")
+        self.assertEqual(retriever.effective_config, "dense_abstain_ed")
+        self.assertTrue(retriever.demote_enabled, "the fast path includes the exp-6 fix")
+        self.assertIsNone(retriever._ce, "the fast path has no cross-encoder stage")
+        results = retriever.retrieve("What database does ChunkdUp use?", k=5)
+        self.assertTrue(results)
+
+    def test_memory_fast_mode_end_to_end(self):
+        import tempfile
+
+        from chunkdup import Memory
+
+        data_dir = tempfile.mkdtemp()
+        memory = Memory(store="memory", data_dir=data_dir, fast_mode=True)
+        self.assertEqual(memory.retriever.config_name, "dense_abstain_ed")
+        memory.remember("I use Python")
+        results = memory.retrieve("What language do I use?")
+        self.assertTrue(results)
+
+    def test_explicit_config_beats_fast_mode(self):
+        retriever = ProductionRetriever(make_repo(), config_name="hybrid_ce_abstain", fast_mode=True)
+        self.assertEqual(retriever.config_name, "hybrid_ce_abstain")
+
+    def test_default_is_still_hybrid(self):
+        retriever = ProductionRetriever(make_repo())
+        self.assertEqual(retriever.config_name, "hybrid_ce_abstain")
+
 if __name__ == "__main__":
     unittest.main()

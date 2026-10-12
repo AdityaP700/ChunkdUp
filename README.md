@@ -229,6 +229,15 @@ CHUNKDUP_RETRIEVAL_CONFIG=dense_abstain      # or the fast path (~10ms, no cross
 
 This exists because a retrieval regression is best handled by falling back to the last known-good configuration in one move, not by debugging in production; the flag is read at retriever construction, so a restart applies it. Additionally, the pipeline degrades automatically and logs every degradation: if the cross-encoder fails to load, errors, or exceeds its timeout (`CHUNKDUP_CE_TIMEOUT_S`, default 1.0s), retrieval continues on the dense gate; if embeddings are unavailable it continues on the baseline path. Every query is appended to `<data_dir>/retrieval_log.jsonl` (disable with `CHUNKDUP_QUERY_LOG=off`) for post-hoc inspection.
 
+### Fast path vs. failure degradation — two different concepts
+
+There are two ways the retrieval pipeline can end up running the fast dense configuration, and they mean different things:
+
+1. **Planned fast path (you asked for it):** construct `Memory(store=..., fast_mode=True)`. This selects `dense_abstain_ed` — dense retrieval + BM25-free cosine gate + the round-3 entity-demotion fix — which answers in ~10 ms with no cross-encoder model. Choose this deliberately when your caller is latency-sensitive (per-agent-turn hot path) or the CE model cannot be deployed; see `docs/round3-decision.md` for the measured tradeoff (lower quality on aggregate, and a higher false-abstention rate on valid questions).
+2. **Unplanned degradation (something broke):** the default `hybrid_ce_abstain` pipeline degrades automatically and logs the event when the cross-encoder fails or times out (→ `dense_abstain`), or when embeddings are unavailable (→ `baseline_current`). You did not choose this; check the query log and `fallback_events` when it happens.
+
+`CHUNKDUP_RETRIEVAL_CONFIG` (rollback/selection by environment) overrides both; an explicit `config_name` argument overrides that. Selection precedence: explicit argument > `fast_mode` flag > environment variable > default.
+
 ### Abstention-gate recalibration
 
 The abstention gate's threshold is calibrated on a small labeled query sample (`ProductionRetriever.recalibrate(sample)` — each entry `{"query", "relevant_memory_ids", "answerable"}`, hand-labeled the same way as the evaluation dataset). **This is a required maintenance step, not an optimization**: the shipped threshold was calibrated on a 12-memory dev set and round-2 measurements show its rejection accuracy degrading from ~0.90 to ~0.74 once the store passes ~500 memories. Re-run `recalibrate()` on startup, and again whenever `should_recalibrate()` returns `True` — it flips once the store has grown ~50% past the last calibration size. Round-2 drift data shows threshold drift is measurable from ~100 memories and material by ~500, so do not let the store more than double past the calibration point. A manual call is enough; no background service is required.

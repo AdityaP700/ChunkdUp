@@ -251,9 +251,20 @@ class ProductionRetriever:
         config_name: Optional[str] = None,
         ce_timeout_s: Optional[float] = None,
         query_log_path: Optional[str] = None,
+        fast_mode: bool = False,
     ):
         self.repository = repository
-        self.config_name = config_name or select_config()
+        # Selection precedence: explicit config_name > fast_mode request >
+        # CHUNKDUP_RETRIEVAL_CONFIG env var > default. fast_mode is a PLANNED
+        # choice of the exp-6-enhanced fast path (dense_abstain_ed, ~10 ms,
+        # no cross-encoder) and is independent of the failure-driven
+        # degradation chain (CE failure -> dense_abstain -> baseline_current).
+        if config_name:
+            self.config_name = config_name
+        elif fast_mode:
+            self.config_name = "dense_abstain_ed"
+        else:
+            self.config_name = select_config()
         self.ce_timeout_s = float(
             ce_timeout_s if ce_timeout_s is not None
             else os.getenv("CHUNKDUP_CE_TIMEOUT_S", DEFAULT_CE_TIMEOUT_S)

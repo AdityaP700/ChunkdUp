@@ -406,6 +406,7 @@ class Memory:
         llm_provider: str = "gemini",
         labs_dir: Optional[str] = None,
         repository: Optional[MemoryRepository] = None,
+        fast_mode: bool = False,
         **kwargs
     ):
         """
@@ -418,6 +419,10 @@ class Memory:
             llm_provider: LLM provider to use ("gemini", "openai", etc.)
             labs_dir: Path to the labs directory containing LLM implementations
             repository: Custom MemoryRepository instance
+            fast_mode: request the documented fast path (dense_abstain_ed,
+                ~10 ms, no cross-encoder) instead of the default
+                hybrid_ce_abstain pipeline. A planned choice, separate from
+                the automatic failure-driven degradation chain.
         """
         self._store_type = store
 
@@ -472,6 +477,7 @@ class Memory:
         self.retriever = ProductionRetriever(
             self.repository,
             query_log_path=os.path.join(data_dir, "retrieval_log.jsonl"),
+            fast_mode=fast_mode,
         )
         self.prompt_builder = PromptBuilder()
 
