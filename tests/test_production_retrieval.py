@@ -6,6 +6,7 @@ and timeout must fall back to the dense gate (dense_abstain) and embedding
 failures to the frozen baseline, with every fallback logged, never silent.
 """
 import json
+import os
 import sys
 import time
 import unittest
@@ -238,6 +239,67 @@ class TestScaleAwareRecalibration(unittest.TestCase):
                        "conversation_topic": "study plan", "status": "active"})
         self.assertTrue(retriever.should_recalibrate(), "store grew past 1.5x calibration size")
 
+
+
+
+def make_repo_with_project():
+    repo = InMemoryRepository()
+    memories = [
+        {"id": "m3", "type": "project_name", "key": "project", "value": "ChunkdUp", "conversation_topic": "AI memory project", "status": "active"},
+        {"id": "m9", "type": "tool", "key": "database", "value": "PostgreSQL with pgvector", "conversation_topic": "backend storage infrastructure", "status": "active"},
+        {"id": "m11", "type": "environment", "key": "runtime_environment", "value": "Docker", "conversation_topic": "ChunkdUp runtime environment", "status": "active"},
+    ]
+    for memory in memories:
+        repo.save(dict(memory))
+    return repo
+
+
+class TestEntityDemotionConsistency(unittest.TestCase):
+    """Closeout Part 1: the production demotion must be behaviorally
+    identical to the validated experiment implementation (same rule, same
+    sink-below semantics), and the default production path must apply it."""
+
+    def _ranked(self):
+        return [
+            {"id": "m3", "type": "project_name", "key": "project", "value": "ChunkdUp",
+             "contextual_text": "This memory is a project_name regarding 'project' from a conversation about AI memory project. Source domain: user preference. The recorded user context state is: \"ChunkdUp\".",
+             "_rerank_score": 5.0, "_similarity": 0.55},
+            {"id": "m9", "type": "tool", "key": "database", "value": "PostgreSQL with pgvector",
+             "contextual_text": "This memory is a tool regarding 'database' from a conversation about backend storage infrastructure. Source domain: user preference. The recorded user context state is: \"PostgreSQL with pgvector\".",
+             "_rerank_score": 2.0, "_similarity": 0.40},
+        ]
+
+    def test_production_demotion_matches_experiment(self):
+        exp_path = os.path.join(os.path.dirname(__file__), "..", "experiments", "retrieval")
+        sys.path.insert(0, os.path.abspath(exp_path))
+        import entity_guard as exp_guard
+        import chunkdup.retrieval_production as prod_mod
+
+        for query, field in (("What database does ChunkdUp use?", "_rerank_score"),
+                             ("PostgreSQL or MongoDB for my vector storage?", "_similarity"),
+                             ("What is ChunkdUp?", "_rerank_score")):
+            exp_out = exp_guard.apply_entity_demotion(query, self._ranked(), field)
+            prod_out = prod_mod._apply_entity_demotion(query, self._ranked(), field)
+            self.assertEqual([c["id"] for c in exp_out], [c["id"] for c in prod_out], query)
+            for e, p in zip(exp_out, prod_out):
+                self.assertAlmostEqual(e[field], p[field], places=9, msg=query)
+                self.assertEqual(e.get("_entity_demoted", False), p.get("_entity_demoted", False), query)
+        self.assertEqual(exp_guard._IDENTITY_VOCAB, prod_mod._IDENTITY_VOCAB)
+
+    def test_default_production_path_applies_demotion(self):
+        retriever = ProductionRetriever(make_repo_with_project(), config_name="hybrid_ce_abstain")
+        self.assertTrue(retriever.demote_enabled)
+        results = retriever.retrieve("What database does ChunkdUp use?", k=5)
+        ids = [r["id"] for r in results]
+        self.assertIn("m9", ids, "attribute answer must be returned")
+        if "m3" in ids:
+            self.assertLess(ids.index("m9"), ids.index("m3"),
+                            "entity-only project match must sink below the attribute answer")
+
+    def test_failure_fallback_config_has_no_demotion(self):
+        retriever = ProductionRetriever(make_repo(), config_name="dense_abstain")
+        self.assertFalse(retriever.demote_enabled,
+                         "the failure fallback (plain dense_abstain) keeps round-3 semantics")
 
 if __name__ == "__main__":
     unittest.main()

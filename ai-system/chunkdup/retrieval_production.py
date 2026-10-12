@@ -1,3 +1,4 @@
+# CLOSEOUT-EDIT-CHECK
 # ai-system/chunkdup/retrieval_production.py
 """
 Production retrieval pipeline — the hardened, selected configuration from
@@ -33,7 +34,13 @@ logger = logging.getLogger(__name__)
 # ---------------------------------------------------------------------------
 
 DEFAULT_CONFIG = "hybrid_ce_abstain"
-KNOWN_CONFIGS = ("hybrid_ce_abstain", "dense_abstain", "baseline_current")
+KNOWN_CONFIGS = ("hybrid_ce_abstain", "dense_abstain", "dense_abstain_ed", "baseline_current")
+
+# Configs whose retrieval path includes the round-3 experiment-6 entity
+# demotion (validated: pooled-92 MRR/P improved, zero per-query regressions).
+# The FAILURE fallback (plain dense_abstain) keeps its round-3 semantics
+# unchanged - demotion is a quality feature, not part of degradation.
+ENTITY_DEMOTION_CONFIGS = ("hybrid_ce_abstain", "dense_abstain_ed")
 
 # Round-1 dev-split calibrated thresholds (docs/retrieval-experiments.md §4).
 # The CE threshold is a starting point ONLY — scale-aware recalibration
@@ -105,6 +112,68 @@ def _rrf_fuse(result_lists: List[List[Dict]], k: int = 60, limit: int = 20) -> L
         fused.append(candidate)
     fused.sort(key=lambda c: c["_rrf_score"], reverse=True)
     return fused[:limit]
+
+
+# Identity-entity vocabulary (proper names only - "ChunkdUp", "Docker",
+# "PostgreSQL", ...). Generic domain words ("database", "backend") are
+# deliberately excluded: treating them as identities would demote correct
+# attribute answers. Mirrors experiments/retrieval/entity_guard.py; kept in
+# sync by tests/test_production_retrieval.py.
+from .entity_extractor import EntityExtractor  # noqa: E402
+
+_IDENTITY_VOCAB = set()
+for _value in EntityExtractor.CUSTOM_ENTITIES.values():
+    _IDENTITY_VOCAB.update(_tokenize(_value))
+
+
+def _apply_entity_demotion(query: str, ranked: List[Dict], score_field: str) -> List[Dict]:
+    """Round-3 experiment 6, production wiring (sink-below semantics).
+
+    When the query names a stored identity entity AND asks about something
+    beyond it, project_name-typed candidates whose value IS the entity sink
+    below every non-demoted candidate (CE logits are unbounded, so a
+    multiplicative penalty cannot cross the ~10-logit gap to irrelevant
+    candidates - observed and replaced during round 3). Type-awareness is
+    load-bearing: the correct Docker memory for "Where does ChunkdUp run?"
+    also matches only on the entity token, but it is not the project memory.
+    Mirrors experiments/retrieval/entity_guard.apply_entity_demotion.
+    """
+    query_tokens = set(_tokenize(query))
+    identity = query_tokens & _IDENTITY_VOCAB
+    non_entity = query_tokens - identity
+    if not identity or not non_entity:
+        return ranked
+
+    demoted_flags = []
+    for candidate in ranked:
+        is_demoted = False
+        if candidate.get("type") == "project_name":
+            candidate_tokens = set(_tokenize(_index_text(candidate)))
+            substantive = (query_tokens & candidate_tokens) - identity
+            value_tokens = set(_tokenize(str(candidate.get("value", "")).lower()))
+            if not substantive and value_tokens and value_tokens <= identity:
+                is_demoted = True
+        demoted_flags.append(is_demoted)
+
+    if not any(demoted_flags):
+        return ranked
+
+    live_scores = [float(c.get(score_field, 0.0)) for c, d in zip(ranked, demoted_flags) if not d]
+    sink_floor = (min(live_scores) - 1.0) if live_scores else 0.0
+
+    adjusted = []
+    sink_offset = 0
+    for candidate, is_demoted in zip(ranked, demoted_flags):
+        candidate = dict(candidate)
+        if is_demoted:
+            candidate[f"_pre_demotion_{score_field}"] = candidate.get(score_field)
+            candidate[score_field] = sink_floor - 0.001 * sink_offset
+            candidate["_entity_demoted"] = True
+            sink_offset += 1
+        adjusted.append(candidate)
+
+    adjusted.sort(key=lambda c: c.get(score_field, 0.0), reverse=True)
+    return adjusted
 
 
 class _Gate:
@@ -204,6 +273,7 @@ class ProductionRetriever:
         self._executor = ThreadPoolExecutor(max_workers=1, thread_name_prefix="chunkdup-ce")
         self.last_calibration_size = None
         self.last_calibration = None
+        self.demote_enabled = self.config_name in ENTITY_DEMOTION_CONFIGS
 
         if self.config_name == "baseline_current":
             from .retrieval_class import MemoryRetriever
@@ -340,7 +410,11 @@ class ProductionRetriever:
         if self.effective_config == "baseline_current":
             return None, None
 
-        pool = max(10, 2 * k)
+        # Candidate pool mirrors the validated experiment configuration
+        # (ExperimentConfig.pool_size=20, rerank_pool=20): every round-1/2/3
+        # number was produced with a 20-candidate pool, so the production
+        # path must see the same candidates to reproduce those numbers.
+        pool = max(20, 2 * k)
         try:
             dense_results = self._dense_search(query, pool)
         except Exception as exc:
@@ -375,6 +449,13 @@ class ProductionRetriever:
             results = self._legacy.retrieve(query, k=k)
             self._log_query(query, results, [], (time.perf_counter() - t0) * 1000, not results)
             return results
+
+        # Round-3 experiment 6, production wiring (see ENTITY_DEMOTION_CONFIGS)
+        if self.demote_enabled and (
+            (score_field == "_rerank_score" and self.effective_config == "hybrid_ce_abstain")
+            or (score_field == "_similarity" and self.effective_config == "dense_abstain_ed")
+        ):
+            ranked = _apply_entity_demotion(query, ranked, score_field)
 
         gate = self.gate if score_field == "_rerank_score" else self._dense_gate
         final = gate.filter(ranked)[:k]

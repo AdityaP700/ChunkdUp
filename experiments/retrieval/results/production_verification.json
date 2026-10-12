@@ -1,0 +1,27 @@
+{
+  "all_match": true,
+  "variants": {
+    "with_demotion": {
+      "expected": {
+        "MRR": 0.8424,
+        "Precision@K": 0.6475
+      },
+      "actual": {
+        "MRR": 0.8424,
+        "Precision@K": 0.6475
+      },
+      "match": true
+    },
+    "without_demotion": {
+      "expected": {
+        "MRR": 0.8397,
+        "Precision@K": 0.6366
+      },
+      "actual": {
+        "MRR": 0.8397,
+        "Precision@K": 0.6366
+      },
+      "match": true
+    }
+  }
+}
