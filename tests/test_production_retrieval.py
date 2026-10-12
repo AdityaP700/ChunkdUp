@@ -301,5 +301,62 @@ class TestEntityDemotionConsistency(unittest.TestCase):
         self.assertFalse(retriever.demote_enabled,
                          "the failure fallback (plain dense_abstain) keeps round-3 semantics")
 
+
+class TestCEScaleTimeout(unittest.TestCase):
+    """Closeout part 2: sanity check that the CE completes within the chosen
+    timeout at the largest tested scale (1000 memories) under normal
+    operation - i.e. the timeout is not tighter than legitimate worst-case
+    latency. The dense leg uses deterministic fake vectors (the CE is the
+    stage under test; its cost depends on the pair texts, which are real)."""
+
+    def test_ce_completes_within_timeout_at_1000_memories(self):
+        import time as _time
+
+        sys.path.insert(0, os.path.abspath(
+            os.path.join(os.path.dirname(__file__), "..", "experiments", "retrieval")))
+        from scale_fixture import generate_scale_memories, validate_scale_fixture
+
+        memories = generate_scale_memories(1000)
+        validate_scale_fixture(memories)
+        repo = InMemoryRepository()
+        for memory in memories:
+            repo.save(dict(memory))
+
+        retriever = ProductionRetriever(repo, config_name="hybrid_ce_abstain", query_log_path=None)
+        self.assertEqual(retriever.effective_config, "hybrid_ce_abstain")
+
+        import numpy as np
+
+        rng = np.random.default_rng(42)
+
+        class FakeST:
+            def encode(self, texts, normalize_embeddings=False):
+                single = isinstance(texts, str)
+                vecs = rng.standard_normal((1 if single else len(texts), 384)).astype("float32")
+                if normalize_embeddings:
+                    vecs /= np.linalg.norm(vecs, axis=1, keepdims=True)
+                return vecs[0] if single else vecs
+
+        with mock.patch.object(rp, "_get_sentence_transformer", return_value=FakeST()):
+            # Warmup call: one-time CE model load + index build are correctly
+            # NOT subject to the per-query predict timeout. The timed call
+            # below measures steady-state retrieval at 1000 memories.
+            retriever.retrieve("What database does ChunkdUp use?", k=5)
+
+            t0 = _time.perf_counter()
+            results = retriever.retrieve("What editor or IDE do I prefer?", k=5)
+            elapsed = _time.perf_counter() - t0
+
+        self.assertEqual(retriever.effective_config, "hybrid_ce_abstain",
+                         "CE must complete without degradation at 1000 memories")
+        self.assertEqual([e["reason"] for e in retriever.fallback_events], [],
+                         "no fallback may fire under normal operation")
+        self.assertLess(elapsed, retriever.ce_timeout_s,
+                        f"steady-state retrieval took {elapsed:.3f}s, over the "
+                        f"{retriever.ce_timeout_s}s timeout - the timeout is tighter "
+                        f"than legitimate worst-case latency")
+        self.assertTrue(results)
+
+
 if __name__ == "__main__":
     unittest.main()

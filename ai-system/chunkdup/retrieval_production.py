@@ -48,10 +48,15 @@ ENTITY_DEMOTION_CONFIGS = ("hybrid_ce_abstain", "dense_abstain_ed")
 FROZEN_COSINE_THRESHOLD = 0.262475
 FROZEN_CE_THRESHOLD = -10.947404
 
-# CE rerank timeout. Derivation: round-1 dev p95 rerank latency was 264-268 ms
-# (results/dense_ce.dev.json), so 2x p95 = ~530 ms; round-2 isolated benchmark
-# observed up to ~450 ms under host memory pressure, so 1.0 s covers
-# contention with margin while still bounding a hung model.
+# CE rerank timeout, traced to a named benchmark (closeout round, part 2):
+# the round-2 ISOLATED micro-benchmark (experiments/retrieval/bench_latency.py,
+# results/scale/latency_bench_{12,100,500,1000}.json - the run that separated
+# algorithmic cost from host noise via a hot-machine control), whose worst
+# observed pool-bound median CE rerank latency is 452.6 ms (scale 500; scale
+# 1000 re-bench: 453.2 ms). 2x that worst case = ~905 ms, rounded to 1.0 s.
+# (The value was ORIGINALLY derived from the round-1 harness p95 of 264-268 ms
+# in results/dense_ce.dev.json - a valid but less isolated basis; the
+# recomputation from the isolated benchmark lands on the same 1.0 s.)
 DEFAULT_CE_TIMEOUT_S = 1.0
 
 
