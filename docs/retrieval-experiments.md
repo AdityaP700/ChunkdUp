@@ -273,6 +273,24 @@ Mechanism: when a query names a stored identity entity (proper-name vocabulary o
 - Rejected/deferred with evidence: exp 7 as specified; graph-based retrieval (round-3 brief — no multi-hop failures exist in the eval set); caching/queues/sharding (out of scope).
 - Open product decision: latency vs quality (round-2 §12.6, unchanged).
 
+## 15. Final Summary — the Complete Arc (closeout round, 2026-10-12)
+
+This closes the project phase. Everything below was reproduced in the closeout round, not carried forward: the production-path numbers by `verify_production.py` (results/production_verification.json), the timeout basis from the stored round-2 isolated benchmark files, and the test suite (82 passed, run at closeout).
+
+**Starting state.** A persistent-memory SDK whose retrieval was keyword substring matching plus hand-written type/intent boosts, evaluated on a 7-query benchmark (MRR 0.7857 / P 0.3821 / R 0.8571) with no dense leg reachable from the in-memory store, no BM25, a simulated "LLM" reranker, and an unevaluated cross-encoder mode.
+
+**Round 1 — methods tested, winner found.** Built a 70-query reviewed dataset (9 categories), real dense (local MiniLM) and BM25 retrievers, standard RRF, cross-encoder reranking, and per-score-type calibrated abstention; evaluated the 8 spec configurations plus the frozen baseline. Winner: `hybrid_ce_abstain` (pooled-70 MRR 0.8595). Key finding: the abstention stage dominated everything else (confirming the task's original hypothesis), and the legacy boosted baseline overfit its old benchmark (worst on the new set).
+
+**Round 2 — winner stress-tested, two real limitations found.** Scale test (12/100/500/1000 synthetic in-domain memories): the ranking held at every scale and the CE advantage grew, but the frozen CE threshold does not transfer across store size (rejection 0.895 → 0.737; recalibration restores 1.0). Held-out expansion to 36: the split-level flip to `dense_abstain` persisted with an explicit +0.039 margin. CE jargon audit: 2/15 (13.3%) rank inversions, clustered on the pgvector memory. False-abstention accounting favored the CE gate (0.068–0.12 vs 0.16–0.18) — the decisive input to the round-3 decision. FP-pattern analysis found the concentrated project-name pull and named experiment 6.
+
+**Round 3 — decision made, hardening built, entity bug found and fixed.** Decision memo (`docs/round3-decision.md`): `hybrid_ce_abstain` ships as default on the false-abstention evidence, with a latency-only fast-path rule (the data supports no size-based cutoff) and recalibration as a hard dependency. Hardening shipped as four tested checkpoints: CE fallback chain with a 1.0 s predict timeout, JSONL query logging, the `CHUNKDUP_RETRIEVAL_CONFIG` rollback switch, and scale-aware recalibration (`recalibrate`/`should_recalibrate`). The entity-focus slice exposed the project-memory FP mechanism; experiment 6 (type-aware entity demotion, sink-below) was adopted with zero per-query regressions across 92 queries on both leading configs; experiment 7 (CE entity-guard) was rejected with evidence (fixes q46/q87, breaks q45, costs precision broadly).
+
+**Closeout — production wiring completed, timeout verified, fast path exposed.** Exp 6 is now inside `retrieval_production.py` (the module the SDK calls), and the production path reproduces the round-3 numbers exactly on the 92-query set: pooled MRR 0.8397 → **0.8424** and P@5 0.6366 → **0.6475** with demotion (0.8397/0.6366 without — both MATCH). One real transfer bug was caught by that verification (pool size 10 vs the validated 20; plus a fixture-status artifact in the verification harness itself) — fixed, not papered over. The CE timeout (1.0 s) is now traced to the round-2 isolated micro-benchmark: worst observed pool-bound median 452.6 ms (scale 500; scale-1000 re-bench 453.2 ms), 2× → ~905 ms → 1.0 s, with a scale-1000 steady-state test proving no fallback fires under normal operation. The fast path is an explicit, documented opt-in (`Memory(fast_mode=True)` → `dense_abstain_ed`, demotion included) — deliberately separate from the failure-driven degradation chain. Final test suite: **82 passed** (`tests/` minus the PostgreSQL suite, which needs a live database).
+
+**What ships today.** Default `hybrid_ce_abstain` (dense + BM25 → RRF → cross-encoder → calibrated gate → entity demotion), explicit `fast_mode`, automatic logged degradation, one-move rollback, store-aware recalibration, per-query JSONL logging — with every headline number traceable to a committed results file.
+
+---
+
 ## 14. Reproduction
 
 ```bash

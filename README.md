@@ -220,11 +220,11 @@ We will be moving forward toward new horizons and different learnings. Keep buil
 
 ## Retrieval configuration & incident rollback
 
-ChunkdUp's default retrieval pipeline is `hybrid_ce_abstain` (dense + BM25 → RRF → cross-encoder rerank → calibrated abstention gate; see `docs/round3-decision.md` for the evidence behind this choice). If the pipeline misbehaves in production — bad answers, latency spikes, model problems — you can force the frozen, pre-experiment baseline (keyword + entity + heuristic reranking, no ML models) for every `Memory` instance without touching code, by setting one environment variable before the process starts:
+ChunkdUp's default retrieval pipeline is `hybrid_ce_abstain` (dense + BM25 → RRF → cross-encoder rerank → type-aware entity demotion → calibrated abstention gate; see `docs/round3-decision.md` for the evidence behind this choice). If the pipeline misbehaves in production — bad answers, latency spikes, model problems — you can force the frozen, pre-experiment baseline (keyword + entity + heuristic reranking, no ML models) for every `Memory` instance without touching code, by setting one environment variable before the process starts:
 
 ```bash
 CHUNKDUP_RETRIEVAL_CONFIG=baseline_current   # force the frozen round-1 baseline
-CHUNKDUP_RETRIEVAL_CONFIG=dense_abstain      # or the fast path (~10ms, no cross-encoder)
+CHUNKDUP_RETRIEVAL_CONFIG=dense_abstain_ed   # or the fast path (~10ms, no cross-encoder, entity fix included)
 ```
 
 This exists because a retrieval regression is best handled by falling back to the last known-good configuration in one move, not by debugging in production; the flag is read at retriever construction, so a restart applies it. Additionally, the pipeline degrades automatically and logs every degradation: if the cross-encoder fails to load, errors, or exceeds its timeout (`CHUNKDUP_CE_TIMEOUT_S`, default 1.0s), retrieval continues on the dense gate; if embeddings are unavailable it continues on the baseline path. Every query is appended to `<data_dir>/retrieval_log.jsonl` (disable with `CHUNKDUP_QUERY_LOG=off`) for post-hoc inspection.

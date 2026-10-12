@@ -1,7 +1,7 @@
 # Remaining Work — Retrieval Pipeline Task (ChunkdUp)
 
 > Companion documents: [CONTEXT-CHECK.md](CONTEXT-CHECK.md) · [IMPLEMENTATION-PLAN.md](IMPLEMENTATION-PLAN.md)
-> Status: round 1 (M1–M8) complete; round 2 (five-risk verification) complete; **round 3 complete** — decision memo, production hardening (fallback/logging/rollback/recalibration), entity experiments (exp 6 adopted with zero regressions, exp 7 rejected with evidence). Suite at end of round 3: **74 passed**. See retrieval-experiments.md §13 and round3-decision.md.
+> **PROJECT PHASE CLOSED** (closeout round, 2026-10-12). Rounds 1–3 complete plus closeout: exp 6 wired into the production path and verified against the 92-query set (pooled MRR 0.8424 / P 0.6475 — exact match with round-3), CE timeout traced to the round-2 isolated benchmark (452.6 ms worst median × 2 → 1.0 s), fast path exposed as an explicit opt-in (`Memory(fast_mode=True)`). Final suite: **82 passed**. Full arc: retrieval-experiments.md §15.
 
 ## M1 — Environment & Baseline Reproduction ✅
 
@@ -65,11 +65,20 @@
 - [x] ~~**Experiment 7 — CE entity-guard**~~ **TESTED in round 3, REJECTED with evidence**: fixes q46/q87 but breaks q45 (1.00→0.50) and costs precision broadly (dev P −0.042); a future variant must distinguish jargon miscalibration from legitimate CE correction
 - [ ] **Product decision — latency vs quality** (round-2 §12.6, unchanged by round 3): hybrid_ce_abstain (~200–450 ms, fewer false abstentions) vs dense_abstain (~10 ms, 16–18% false abstention, and now stronger with exp 6) — maintainer's call
 - [x] ~~**Operational — scale-aware gate recalibration**~~ **BUILT in round 3** (`26d96e3`): `ProductionRetriever.recalibrate(sample)` + `should_recalibrate()` (~50% store-growth trigger); README documents the schedule tied to round-2 drift data
-- [ ] Wire experiment 6's demotion into `ProductionRetriever` (validated but experiment-scoped this round)
+- [x] ~~Wire experiment 6's demotion into `ProductionRetriever`~~ **DONE in closeout** (`be31673`): production path reproduces round-3 numbers exactly (verify_production.py: 0.8424/0.6475 with demotion, 0.8397/0.6366 without — both MATCH); caught and fixed a pool-size transfer bug (10 vs validated 20) and a fixture-status artifact in the verification harness
 - [ ] Domain-tuned or alternative reranker (e.g. bge-reranker) vs ms-marco-MiniLM-L-12-v2 on this harness
 - [ ] Query-type / answerability detection for historically-phrased questions ("Did I ever work at X?")
 - [ ] Pin new dependencies in `requirements.txt` (deliberately deferred — decision belongs to the maintainer)
 - [ ] Cache invalidation on memory writes (pre-existing production gap, out of task scope)
+
+## Future Work (not started — ideas surfaced during this work, nothing planned or scheduled)
+
+- Alternative reranker evaluated on this harness (e.g. a bge-reranker): the ms-marco CE is simultaneously the best relevance signal and the source of the jargon miscalibration (13.3% rank inversions); a domain-tuned reranker could remove the need for the rejected guard entirely.
+- Experiment 7 variant that can distinguish jargon miscalibration from legitimate CE correction (e.g. a small in-domain calibration set for the CE) — the rejected guard was too blunt.
+- Query-type / answerability detection for historically-phrased questions ("Did I ever work at X?") — the one unanswerable class no threshold can reject.
+- Incremental index maintenance (the production reindex rebuilds on store-signature change; fine at tested scales, worth revisiting past a few thousand memories).
+- Dependency pinning for the production stack (torch/sentence-transformers/rank-bm25) in `requirements.txt` — maintainer decision, deferred since round 1.
+- Cache invalidation on memory writes (pre-existing production gap, out of task scope since round 1).
 
 ## Standing Constraints — compliance notes
 
