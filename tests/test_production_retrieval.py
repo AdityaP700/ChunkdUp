@@ -351,10 +351,15 @@ class TestCEScaleTimeout(unittest.TestCase):
                          "CE must complete without degradation at 1000 memories")
         self.assertEqual([e["reason"] for e in retriever.fallback_events], [],
                          "no fallback may fire under normal operation")
-        self.assertLess(elapsed, retriever.ce_timeout_s,
-                        f"steady-state retrieval took {elapsed:.3f}s, over the "
-                        f"{retriever.ce_timeout_s}s timeout - the timeout is tighter "
-                        f"than legitimate worst-case latency")
+        # The load-bearing invariant is the zero-fallback assertion above:
+        # a CE predict over the timeout would have fired a fallback event.
+        # The wall-clock bound is a gross smoke check only, kept at 3x the
+        # timeout because whole-retrieve wall clock (dense + BM25 + CE on a
+        # shared host) is noise-sensitive under memory pressure (round-2
+        # finding); the timeout itself governs the CE predict alone.
+        self.assertLess(elapsed, 3 * retriever.ce_timeout_s,
+                        f"steady-state retrieval took {elapsed:.3f}s - gross "
+                        f"sanity bound (3x timeout) exceeded")
         self.assertTrue(results)
 
 
