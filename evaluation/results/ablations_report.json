@@ -1,6 +1,6 @@
 {
-  "timestamp": "2026-10-13T20:39:31.487667Z",
-  "commit_hash": "113e080ddddd63433fcded59a4363f06ab488665",
+  "timestamp": "2026-10-13T22:15:43.825405Z",
+  "commit_hash": "873ea537f3f0384f20c431cbc7604b483d67b8a6",
   "frozen_92_query_suite": {
     "legacy_baseline": {
       "config_key": "legacy_baseline",
@@ -9,9 +9,11 @@
       "P@5": 0.4442,
       "recall_at_5": 0.5567,
       "abstain_count": 0,
-      "total_duration_seconds": 0.06,
-      "avg_latency_ms": 0.59,
-      "p95_latency_ms": 1.77
+      "total_duration_seconds": 0.03,
+      "cold_start_latency_ms": 1.59,
+      "warm_p50_latency_ms": 0.2,
+      "warm_p95_latency_ms": 1.15,
+      "warm_avg_latency_ms": 0.32
     },
     "dense_abstain_ed": {
       "config_key": "dense_abstain_ed",
@@ -20,9 +22,11 @@
       "P@5": 0.7005,
       "recall_at_5": 0.8007,
       "abstain_count": 0,
-      "total_duration_seconds": 45.07,
-      "avg_latency_ms": 489.88,
-      "p95_latency_ms": 32.13
+      "total_duration_seconds": 1.5,
+      "cold_start_latency_ms": 25479.76,
+      "warm_p50_latency_ms": 15.27,
+      "warm_p95_latency_ms": 25.81,
+      "warm_avg_latency_ms": 16.28
     },
     "hybrid_ce_abstain": {
       "config_key": "hybrid_ce_abstain",
@@ -31,9 +35,11 @@
       "P@5": 0.6475,
       "recall_at_5": 0.8509,
       "abstain_count": 0,
-      "total_duration_seconds": 61.45,
-      "avg_latency_ms": 667.89,
-      "p95_latency_ms": 753.28
+      "total_duration_seconds": 41.04,
+      "cold_start_latency_ms": 13018.41,
+      "warm_p50_latency_ms": 445.3,
+      "warm_p95_latency_ms": 676.2,
+      "warm_avg_latency_ms": 446.06
     }
   },
   "locomo_track_a": {
@@ -41,33 +47,177 @@
     "results": {
       "bm25": {
         "config_name": "bm25",
-        "MRR@5": 0.0,
-        "Recall@5": 0.0,
-        "Precision@5": 0.0,
+        "MRR@5": 0.4134,
+        "Recall@5": 0.4966,
+        "Precision@5": 0.1113,
         "abstain_rate": 0.0,
-        "duration_seconds": 24.9,
+        "duration_seconds": 20.33,
         "adversarial_rejection_rate": 0.0,
-        "category_breakdown": {}
+        "category_breakdown": {
+          "Single-hop / Factual": {
+            "category_id": 1,
+            "n_queries": 43,
+            "abstain_rate": 0.0,
+            "Recall@5": 0.1326,
+            "PartialRecall@5": 0.3256,
+            "FullRecall@5": 0.0,
+            "Precision@5": 0.0698,
+            "MRR@5": 0.1694
+          },
+          "Temporal reasoning": {
+            "category_id": 2,
+            "n_queries": 63,
+            "abstain_rate": 0.0,
+            "Recall@5": 0.7778,
+            "PartialRecall@5": 0.7778,
+            "FullRecall@5": 0.7778,
+            "Precision@5": 0.1556,
+            "MRR@5": 0.6653
+          },
+          "Multi-hop reasoning": {
+            "category_id": 3,
+            "n_queries": 13,
+            "abstain_rate": 0.0,
+            "Recall@5": 0.2308,
+            "PartialRecall@5": 0.3077,
+            "FullRecall@5": 0.1538,
+            "Precision@5": 0.0769,
+            "MRR@5": 0.1051
+          },
+          "Open-domain / Inference": {
+            "category_id": 4,
+            "n_queries": 114,
+            "abstain_rate": 0.0,
+            "Recall@5": 0.5088,
+            "PartialRecall@5": 0.5175,
+            "FullRecall@5": 0.5,
+            "Precision@5": 0.1064,
+            "MRR@5": 0.4015
+          },
+          "Adversarial / Unanswerable": {
+            "category_id": 5,
+            "n_queries": 71,
+            "correct_rejection_rate": 0.0,
+            "false_positive_rate": 1.0,
+            "avg_returned_candidates": 5.0
+          }
+        }
       },
       "dense_abstain_ed": {
         "config_name": "dense_abstain_ed",
-        "MRR@5": 0.0,
-        "Recall@5": 0.0,
-        "Precision@5": 0.0,
-        "abstain_rate": 0.0,
-        "duration_seconds": 33.78,
-        "adversarial_rejection_rate": 0.0,
-        "category_breakdown": {}
+        "MRR@5": 0.3474,
+        "Recall@5": 0.4429,
+        "Precision@5": 0.1038,
+        "abstain_rate": 0.0043,
+        "duration_seconds": 25.12,
+        "adversarial_rejection_rate": 0.0141,
+        "category_breakdown": {
+          "Single-hop / Factual": {
+            "category_id": 1,
+            "n_queries": 43,
+            "abstain_rate": 0.0233,
+            "Recall@5": 0.2256,
+            "PartialRecall@5": 0.4651,
+            "FullRecall@5": 0.0465,
+            "Precision@5": 0.0977,
+            "MRR@5": 0.2527
+          },
+          "Temporal reasoning": {
+            "category_id": 2,
+            "n_queries": 63,
+            "abstain_rate": 0.0,
+            "Recall@5": 0.6825,
+            "PartialRecall@5": 0.6825,
+            "FullRecall@5": 0.6825,
+            "Precision@5": 0.1394,
+            "MRR@5": 0.4754
+          },
+          "Multi-hop reasoning": {
+            "category_id": 3,
+            "n_queries": 13,
+            "abstain_rate": 0.0,
+            "Recall@5": 0.2308,
+            "PartialRecall@5": 0.3077,
+            "FullRecall@5": 0.1538,
+            "Precision@5": 0.0769,
+            "MRR@5": 0.2115
+          },
+          "Open-domain / Inference": {
+            "category_id": 4,
+            "n_queries": 114,
+            "abstain_rate": 0.0,
+            "Recall@5": 0.4167,
+            "PartialRecall@5": 0.4211,
+            "FullRecall@5": 0.4123,
+            "Precision@5": 0.0895,
+            "MRR@5": 0.3278
+          },
+          "Adversarial / Unanswerable": {
+            "category_id": 5,
+            "n_queries": 71,
+            "correct_rejection_rate": 0.0141,
+            "false_positive_rate": 0.9859,
+            "avg_returned_candidates": 4.859
+          }
+        }
       },
       "hybrid_ce_abstain": {
         "config_name": "hybrid_ce_abstain",
-        "MRR@5": 0.0,
-        "Recall@5": 0.0,
-        "Precision@5": 0.0,
-        "abstain_rate": 0.0,
-        "duration_seconds": 1099.5,
+        "MRR@5": 0.598,
+        "Recall@5": 0.6459,
+        "Precision@5": 0.1745,
+        "abstain_rate": 0.0129,
+        "duration_seconds": 627.89,
         "adversarial_rejection_rate": 0.0,
-        "category_breakdown": {}
+        "category_breakdown": {
+          "Single-hop / Factual": {
+            "category_id": 1,
+            "n_queries": 43,
+            "abstain_rate": 0.0233,
+            "Recall@5": 0.3484,
+            "PartialRecall@5": 0.5814,
+            "FullRecall@5": 0.1395,
+            "Precision@5": 0.1535,
+            "MRR@5": 0.469
+          },
+          "Temporal reasoning": {
+            "category_id": 2,
+            "n_queries": 63,
+            "abstain_rate": 0.0,
+            "Recall@5": 0.9524,
+            "PartialRecall@5": 0.9524,
+            "FullRecall@5": 0.9524,
+            "Precision@5": 0.2053,
+            "MRR@5": 0.8505
+          },
+          "Multi-hop reasoning": {
+            "category_id": 3,
+            "n_queries": 13,
+            "abstain_rate": 0.1538,
+            "Recall@5": 0.2692,
+            "PartialRecall@5": 0.3077,
+            "FullRecall@5": 0.2308,
+            "Precision@5": 0.1026,
+            "MRR@5": 0.25
+          },
+          "Open-domain / Inference": {
+            "category_id": 4,
+            "n_queries": 114,
+            "abstain_rate": 0.0,
+            "Recall@5": 0.6316,
+            "PartialRecall@5": 0.6404,
+            "FullRecall@5": 0.6228,
+            "Precision@5": 0.1737,
+            "MRR@5": 0.5468
+          },
+          "Adversarial / Unanswerable": {
+            "category_id": 5,
+            "n_queries": 71,
+            "correct_rejection_rate": 0.0,
+            "false_positive_rate": 1.0,
+            "avg_returned_candidates": 4.183
+          }
+        }
       }
     }
   },
@@ -76,17 +226,23 @@
       "legacy_baseline": {
         "MRR": 0.5185,
         "P@5": 0.4442,
-        "avg_latency_ms": 0.59
+        "warm_p50_ms": 0.2,
+        "warm_p95_ms": 1.15,
+        "avg_latency_ms": 0.32
       },
       "dense_abstain_ed": {
         "MRR": 0.8152,
         "P@5": 0.7005,
-        "avg_latency_ms": 489.88
+        "warm_p50_ms": 15.27,
+        "warm_p95_ms": 25.81,
+        "avg_latency_ms": 16.28
       },
       "hybrid_ce_abstain": {
         "MRR": 0.8424,
         "P@5": 0.6475,
-        "avg_latency_ms": 667.89
+        "warm_p50_ms": 445.3,
+        "warm_p95_ms": 676.2,
+        "avg_latency_ms": 446.06
       }
     }
   }

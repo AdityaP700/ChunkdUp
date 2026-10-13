@@ -1,0 +1,219 @@
+{
+  "timestamp": "2026-10-13T22:12:50.369557Z",
+  "groq_api_available": true,
+  "groq_model": "openai/gpt-oss-20b",
+  "synthetic_benchmark": {
+    "rules_baseline": {
+      "extractor_mode": "rules",
+      "total_turns": 6,
+      "active_memory_count": 4,
+      "ingest_duration_seconds": 0.22,
+      "queries_evaluated": 4,
+      "queries_successful": 4,
+      "success_rate": 1.0,
+      "point_in_time_reconstruction_correct": false,
+      "query_results": [
+        {
+          "query": "Where do I work and what is my role?",
+          "success": true,
+          "keys_found": true,
+          "values_found": true,
+          "provenance_valid": false,
+          "retrieved_count": 1
+        },
+        {
+          "query": "What cloud provider do I use currently?",
+          "success": true,
+          "keys_found": true,
+          "values_found": true,
+          "provenance_valid": false,
+          "retrieved_count": 2
+        },
+        {
+          "query": "What programming language do I use now?",
+          "success": true,
+          "keys_found": true,
+          "values_found": true,
+          "provenance_valid": false,
+          "retrieved_count": 3
+        },
+        {
+          "query": "What open source project am I building?",
+          "success": true,
+          "keys_found": true,
+          "values_found": true,
+          "provenance_valid": false,
+          "retrieved_count": 1
+        }
+      ],
+      "active_keys": [
+        "company",
+        "project_name",
+        "cloud_provider",
+        "programming_language"
+      ]
+    },
+    "groq_llm": {
+      "extractor_mode": "groq",
+      "total_turns": 6,
+      "active_memory_count": 6,
+      "ingest_duration_seconds": 7.27,
+      "queries_evaluated": 4,
+      "queries_successful": 4,
+      "success_rate": 1.0,
+      "point_in_time_reconstruction_correct": false,
+      "query_results": [
+        {
+          "query": "Where do I work and what is my role?",
+          "success": true,
+          "keys_found": true,
+          "values_found": true,
+          "provenance_valid": false,
+          "retrieved_count": 2
+        },
+        {
+          "query": "What cloud provider do I use currently?",
+          "success": true,
+          "keys_found": true,
+          "values_found": true,
+          "provenance_valid": false,
+          "retrieved_count": 1
+        },
+        {
+          "query": "What programming language do I use now?",
+          "success": true,
+          "keys_found": true,
+          "values_found": true,
+          "provenance_valid": false,
+          "retrieved_count": 2
+        },
+        {
+          "query": "What open source project am I building?",
+          "success": true,
+          "keys_found": true,
+          "values_found": true,
+          "provenance_valid": false,
+          "retrieved_count": 1
+        }
+      ],
+      "active_keys": [
+        "company",
+        "role",
+        "containerization_tool",
+        "project_name",
+        "cloud_provider",
+        "programming_language"
+      ]
+    }
+  },
+  "locomo_benchmark": {
+    "rules_baseline": {
+      "extractor_mode": "rules",
+      "turns_ingested": 18,
+      "active_memory_count": 0,
+      "ingest_duration_seconds": 0.33,
+      "questions_evaluated": [
+        {
+          "question": "When did Caroline go to the LGBTQ support group?",
+          "category": "Temporal reasoning",
+          "evidence_dia_ids": [
+            "D1:3"
+          ],
+          "evidence_statuses": [
+            "RETENTION_NEVER_EXTRACTED"
+          ],
+          "retrieved_count": 0
+        },
+        {
+          "question": "When did Melanie paint a sunrise?",
+          "category": "Temporal reasoning",
+          "evidence_dia_ids": [
+            "D1:12"
+          ],
+          "evidence_statuses": [
+            "RETENTION_NEVER_EXTRACTED"
+          ],
+          "retrieved_count": 0
+        },
+        {
+          "question": "What fields would Caroline be likely to pursue in her educaton?",
+          "category": "Multi-hop reasoning",
+          "evidence_dia_ids": [
+            "D1:9",
+            "D1:11"
+          ],
+          "evidence_statuses": [
+            "RETENTION_NEVER_EXTRACTED",
+            "RETENTION_NEVER_EXTRACTED"
+          ],
+          "retrieved_count": 0
+        },
+        {
+          "question": "What did Caroline research?",
+          "category": "Single-hop / Factual",
+          "evidence_dia_ids": [
+            "D2:8"
+          ],
+          "evidence_statuses": [
+            "EVIDENCE_NOT_IN_SESSION_WINDOW"
+          ],
+          "retrieved_count": 0
+        }
+      ]
+    },
+    "groq_llm": {
+      "extractor_mode": "groq",
+      "turns_ingested": 18,
+      "active_memory_count": 7,
+      "ingest_duration_seconds": 60.01,
+      "questions_evaluated": [
+        {
+          "question": "When did Caroline go to the LGBTQ support group?",
+          "category": "Temporal reasoning",
+          "evidence_dia_ids": [
+            "D1:3"
+          ],
+          "evidence_statuses": [
+            "RETENTION_NEVER_EXTRACTED"
+          ],
+          "retrieved_count": 0
+        },
+        {
+          "question": "When did Melanie paint a sunrise?",
+          "category": "Temporal reasoning",
+          "evidence_dia_ids": [
+            "D1:12"
+          ],
+          "evidence_statuses": [
+            "RETENTION_NEVER_EXTRACTED"
+          ],
+          "retrieved_count": 1
+        },
+        {
+          "question": "What fields would Caroline be likely to pursue in her educaton?",
+          "category": "Multi-hop reasoning",
+          "evidence_dia_ids": [
+            "D1:9",
+            "D1:11"
+          ],
+          "evidence_statuses": [
+            "RETRIEVAL_RANKED_TOO_LOW",
+            "RETRIEVAL_RANKED_TOO_LOW"
+          ],
+          "retrieved_count": 0
+        },
+        {
+          "question": "What did Caroline research?",
+          "category": "Single-hop / Factual",
+          "evidence_dia_ids": [
+            "D2:8"
+          ],
+          "evidence_statuses": [
+            "EVIDENCE_NOT_IN_SESSION_WINDOW"
+          ],
+          "retrieved_count": 0
+        }
+      ]
+    }
+  }
+}
