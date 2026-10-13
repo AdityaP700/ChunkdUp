@@ -1,0 +1,246 @@
+{
+  "benchmark": "LoCoMo",
+  "dataset_metadata": {
+    "name": "LoCoMo",
+    "paper": "Evaluating Very Long-Term Conversational Memory of LLM Agents (ACL 2024)",
+    "authors": "Maharana, Lee, Tulyakov, Bansal, Barbieri, Fang",
+    "source_url": "https://github.com/snap-research/locomo",
+    "license": "CC BY-NC 4.0 (Creative Commons Attribution-NonCommercial 4.0 International)",
+    "default_file": "evaluation/data/locomo10.json"
+  },
+  "commit_hash": "54c1d108cb3299322f37cc0956acea3fd0eba691",
+  "timestamp": "2026-10-13T15:33:02.354232+00:00",
+  "is_smoke": false,
+  "config_name": "hybrid_ce_abstain",
+  "validation_report": {
+    "total_conversations_in_file": 10,
+    "loaded_conversations": 10,
+    "total_turns": 5882,
+    "total_questions": 1986,
+    "questions_by_category": {
+      "1": 282,
+      "2": 321,
+      "3": 96,
+      "4": 841,
+      "5": 446
+    },
+    "malformed_evidence_records": [
+      {
+        "sample_id": "conv-42",
+        "question_idx": 88,
+        "raw_evidence": [
+          "D1:18",
+          "D",
+          "D1:20"
+        ],
+        "reason": "Unparseable evidence token: 'D'"
+      }
+    ],
+    "unsupported_category_records": [],
+    "duplicate_sample_ids": [],
+    "missing_field_records": []
+  },
+  "track_a": {
+    "total_queries": 1986,
+    "overall_answerable": {
+      "n_queries": 1540,
+      "abstain_rate": 0.0,
+      "Recall@1": 0.4657,
+      "PartialRecall@1": 0.537,
+      "FullRecall@1": 0.4175,
+      "Precision@1": 0.537,
+      "MRR@1": 0.537,
+      "Recall@3": 0.6071,
+      "PartialRecall@3": 0.6818,
+      "FullRecall@3": 0.5468,
+      "Precision@3": 0.2512,
+      "MRR@3": 0.6026,
+      "Recall@5": 0.6552,
+      "PartialRecall@5": 0.7279,
+      "FullRecall@5": 0.5955,
+      "Precision@5": 0.1671,
+      "MRR@5": 0.6132,
+      "Recall@10": 0.6948,
+      "PartialRecall@10": 0.7695,
+      "FullRecall@10": 0.6279,
+      "Precision@10": 0.0918,
+      "MRR@10": 0.619
+    },
+    "overall_adversarial": {
+      "n_queries": 446,
+      "correct_rejection_rate": 0.0,
+      "false_positive_rate": 1.0
+    },
+    "categories": {
+      "Single-hop / Factual": {
+        "category_id": 1,
+        "n_queries": 282,
+        "abstain_rate": 0.0,
+        "Recall@1": 0.1708,
+        "PartialRecall@1": 0.4433,
+        "FullRecall@1": 0.0071,
+        "Precision@1": 0.4433,
+        "MRR@1": 0.4433,
+        "Recall@3": 0.3438,
+        "PartialRecall@3": 0.6418,
+        "FullRecall@3": 0.1241,
+        "Precision@3": 0.3061,
+        "MRR@3": 0.5361,
+        "Recall@5": 0.4016,
+        "PartialRecall@5": 0.6844,
+        "FullRecall@5": 0.1809,
+        "Precision@5": 0.2239,
+        "MRR@5": 0.5456,
+        "Recall@10": 0.4575,
+        "PartialRecall@10": 0.7518,
+        "FullRecall@10": 0.1986,
+        "Precision@10": 0.1343,
+        "MRR@10": 0.5551
+      },
+      "Temporal reasoning": {
+        "category_id": 2,
+        "n_queries": 321,
+        "abstain_rate": 0.0,
+        "Recall@1": 0.5724,
+        "PartialRecall@1": 0.6106,
+        "FullRecall@1": 0.5421,
+        "Precision@1": 0.6106,
+        "MRR@1": 0.6106,
+        "Recall@3": 0.7053,
+        "PartialRecall@3": 0.7352,
+        "FullRecall@3": 0.676,
+        "Precision@3": 0.2586,
+        "MRR@3": 0.6656,
+        "Recall@5": 0.7355,
+        "PartialRecall@5": 0.7664,
+        "FullRecall@5": 0.7072,
+        "Precision@5": 0.1626,
+        "MRR@5": 0.6729,
+        "Recall@10": 0.7718,
+        "PartialRecall@10": 0.8037,
+        "FullRecall@10": 0.7383,
+        "Precision@10": 0.0866,
+        "MRR@10": 0.6781
+      },
+      "Multi-hop reasoning": {
+        "category_id": 3,
+        "n_queries": 96,
+        "abstain_rate": 0.0,
+        "Recall@1": 0.1675,
+        "PartialRecall@1": 0.2292,
+        "FullRecall@1": 0.1146,
+        "Precision@1": 0.2292,
+        "MRR@1": 0.2292,
+        "Recall@3": 0.2448,
+        "PartialRecall@3": 0.3333,
+        "FullRecall@3": 0.1667,
+        "Precision@3": 0.1233,
+        "MRR@3": 0.2778,
+        "Recall@5": 0.3305,
+        "PartialRecall@5": 0.4271,
+        "FullRecall@5": 0.2604,
+        "Precision@5": 0.1094,
+        "MRR@5": 0.2986,
+        "Recall@10": 0.3739,
+        "PartialRecall@10": 0.4792,
+        "FullRecall@10": 0.3021,
+        "Precision@10": 0.0668,
+        "MRR@10": 0.3059
+      },
+      "Open-domain / Inference": {
+        "category_id": 4,
+        "n_queries": 841,
+        "abstain_rate": 0.0,
+        "Recall@1": 0.5579,
+        "PartialRecall@1": 0.5755,
+        "FullRecall@1": 0.5422,
+        "Precision@1": 0.5755,
+        "MRR@1": 0.5755,
+        "Recall@3": 0.6992,
+        "PartialRecall@3": 0.7146,
+        "FullRecall@3": 0.6825,
+        "Precision@3": 0.2446,
+        "MRR@3": 0.6379,
+        "Recall@5": 0.7467,
+        "PartialRecall@5": 0.7622,
+        "FullRecall@5": 0.7301,
+        "Precision@5": 0.1563,
+        "MRR@5": 0.649,
+        "Recall@10": 0.7816,
+        "PartialRecall@10": 0.7955,
+        "FullRecall@10": 0.7669,
+        "Precision@10": 0.0823,
+        "MRR@10": 0.6536
+      },
+      "Adversarial / Unanswerable": {
+        "category_id": 5,
+        "n_queries": 446,
+        "correct_rejection_rate": 0.0,
+        "false_positive_rate": 1.0,
+        "avg_returned_candidates": 9.984
+      }
+    },
+    "unmappable_queries_count": 4,
+    "unmappable_queries": [
+      {
+        "sample_id": "conv-26",
+        "question_idx": 30,
+        "category": 3,
+        "question": "Would Melanie be considered a member of the LGBTQ community?",
+        "raw_evidence": []
+      },
+      {
+        "sample_id": "conv-26",
+        "question_idx": 46,
+        "category": 3,
+        "question": "Would Melanie be considered an ally to the transgender community?",
+        "raw_evidence": []
+      },
+      {
+        "sample_id": "conv-50",
+        "question_idx": 39,
+        "category": 3,
+        "question": "Would Dave prefer working on a Dodge Charger or a Subaru Forester?",
+        "raw_evidence": []
+      },
+      {
+        "sample_id": "conv-50",
+        "question_idx": 42,
+        "category": 3,
+        "question": "Based on the conversation, did Calvin and Dave have a meeting in Boston between August and November 2023? Answer in yes or no.",
+        "raw_evidence": []
+      }
+    ],
+    "total_duration_seconds": 3051.1,
+    "config_name": "hybrid_ce_abstain"
+  },
+  "track_b": {
+    "duration_seconds": 382.47,
+    "ingestion_stats": {
+      "total_turns_fed": 5882,
+      "decisions": {
+        "STORE": 9,
+        "MERGE": 0,
+        "UPDATE": 1,
+        "IGNORE": 5872
+      },
+      "total_stored_keys": 9
+    },
+    "lifecycle_breakdown": {
+      "RETENTION_NEVER_EXTRACTED": 2349,
+      "RETENTION_IGNORED_LOW_SCORE": 0,
+      "RETENTION_MERGED": 0,
+      "RETENTION_OVERWRITTEN": 0,
+      "RETRIEVAL_RANKED_TOO_LOW": 0,
+      "RETRIEVAL_ABSTAINED": 0,
+      "SUCCESS": 13
+    },
+    "total_evaluated_evidence_turns": 2362,
+    "retention_failure_count": 2349,
+    "retention_failure_rate": 0.9945,
+    "retrieval_failure_count": 0,
+    "retrieval_failure_rate": 0.0,
+    "success_count": 13,
+    "success_rate": 0.0055
+  }
+}
