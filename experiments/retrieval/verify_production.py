@@ -66,7 +66,11 @@ def run_production(rows: List[Dict], demote: bool) -> Dict:
     retriever.demote_enabled = demote
 
     per_query = []
+    degraded_queries = []
     for row in rows:
+        if retriever.effective_config != "hybrid_ce_abstain":
+            degraded_queries.append((row["id"], retriever.effective_config,
+                                     [e["reason"] for e in retriever.fallback_events]))
         results = retriever.retrieve(row["query"], k=5)
         returned_ids = [r["id"] for r in results]
         sq = score_query(row, returned_ids)
@@ -77,7 +81,11 @@ def run_production(rows: List[Dict], demote: bool) -> Dict:
             "abstained": not returned_ids,
         })
         per_query.append(sq)
-    return aggregate(per_query, rows)
+    summary = aggregate(per_query, rows)
+    # A degraded run (CE timeout under host load) is an ENVIRONMENT failure,
+    # not a logic mismatch - report it as such instead of a silent MISMATCH.
+    summary["_degraded_queries"] = degraded_queries
+    return summary
 
 
 def main() -> int:
@@ -91,7 +99,11 @@ def main() -> int:
         expected = EXPECTED[variant]
         mrr_ok = abs(summary["MRR"] - expected["MRR"]) < 5e-4
         p_ok = abs(summary["Precision@K"] - expected["Precision@K"]) < 5e-4
-        match = mrr_ok and p_ok
+        match = mrr_ok and p_ok and not summary["_degraded_queries"]
+        if summary["_degraded_queries"]:
+            print(f"  {variant:<18} DEGRADED RUN (environment, not logic): "
+                  f"{len(summary['_degraded_queries'])} queries ran on a fallen-back config: "
+                  f"{summary['_degraded_queries'][:3]}")
         all_match = all_match and match
         outcomes[variant] = {
             "expected": expected,

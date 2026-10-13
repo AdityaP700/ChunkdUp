@@ -24,14 +24,14 @@
   },
   "latency_ms": {
     "total_ms": {
-      "mean": 0.172,
-      "p50": 0.147,
-      "p95": 0.352
+      "mean": 0.177,
+      "p50": 0.169,
+      "p95": 0.239
     }
   },
   "environment": {
-    "python": "3.11.9",
-    "platform": "Windows-10-10.0.26200-SP0"
+    "python": "3.13.5",
+    "platform": "Windows-11-10.0.26200-SP0"
   },
   "per_query": [
     {
@@ -56,7 +56,7 @@
         "hit": 0.0
       },
       "timings_ms": {
-        "total_ms": 0.374
+        "total_ms": 0.239
       },
       "candidates": [
         {
@@ -93,7 +93,7 @@
         "hit": 1.0
       },
       "timings_ms": {
-        "total_ms": 0.352
+        "total_ms": 0.531
       },
       "candidates": [
         {
@@ -130,7 +130,7 @@
         "hit": 1.0
       },
       "timings_ms": {
-        "total_ms": 0.062
+        "total_ms": 0.077
       },
       "candidates": [
         {
@@ -167,7 +167,7 @@
         "hit": 0.0
       },
       "timings_ms": {
-        "total_ms": 0.147
+        "total_ms": 0.183
       },
       "candidates": [
         {
@@ -205,7 +205,7 @@
         "hit": 1.0
       },
       "timings_ms": {
-        "total_ms": 0.122
+        "total_ms": 0.147
       },
       "candidates": [
         {
@@ -240,7 +240,7 @@
         "hit": 0.0
       },
       "timings_ms": {
-        "total_ms": 0.19
+        "total_ms": 0.204
       },
       "candidates": [
         {
@@ -277,7 +277,7 @@
         "hit": 0.0
       },
       "timings_ms": {
-        "total_ms": 0.082
+        "total_ms": 0.097
       },
       "candidates": [
         {
@@ -314,7 +314,7 @@
         "hit": 1.0
       },
       "timings_ms": {
-        "total_ms": 0.136
+        "total_ms": 0.165
       },
       "candidates": [
         {
@@ -349,7 +349,7 @@
         "hit": 0.0
       },
       "timings_ms": {
-        "total_ms": 0.149
+        "total_ms": 0.183
       },
       "candidates": [
         {
@@ -384,7 +384,7 @@
         "hit": 0.0
       },
       "timings_ms": {
-        "total_ms": 0.204
+        "total_ms": 0.095
       },
       "candidates": [
         {
@@ -419,7 +419,7 @@
         "hit": 0.0
       },
       "timings_ms": {
-        "total_ms": 0.147
+        "total_ms": 0.176
       },
       "candidates": [
         {
@@ -450,7 +450,7 @@
         "hit": 1.0
       },
       "timings_ms": {
-        "total_ms": 0.086
+        "total_ms": 0.109
       },
       "candidates": []
     },
@@ -474,7 +474,7 @@
         "hit": 0.0
       },
       "timings_ms": {
-        "total_ms": 0.119
+        "total_ms": 0.105
       },
       "candidates": [
         {
@@ -517,7 +517,7 @@
         "hit": 0.0
       },
       "timings_ms": {
-        "total_ms": 0.242
+        "total_ms": 0.174
       },
       "candidates": [
         {

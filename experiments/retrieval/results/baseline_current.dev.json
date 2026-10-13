@@ -24,14 +24,14 @@
   },
   "latency_ms": {
     "total_ms": {
-      "mean": 0.772,
-      "p50": 0.577,
-      "p95": 1.888
+      "mean": 0.404,
+      "p50": 0.29,
+      "p95": 1.108
     }
   },
   "environment": {
-    "python": "3.11.9",
-    "platform": "Windows-10-10.0.26200-SP0"
+    "python": "3.13.5",
+    "platform": "Windows-11-10.0.26200-SP0"
   },
   "per_query": [
     {
@@ -56,7 +56,7 @@
         "hit": 1.0
       },
       "timings_ms": {
-        "total_ms": 1.343
+        "total_ms": 0.576
       },
       "candidates": [
         {
@@ -95,7 +95,7 @@
         "hit": 1.0
       },
       "timings_ms": {
-        "total_ms": 0.532
+        "total_ms": 0.141
       },
       "candidates": [
         {
@@ -142,7 +142,7 @@
         "hit": 1.0
       },
       "timings_ms": {
-        "total_ms": 0.374
+        "total_ms": 0.107
       },
       "candidates": [
         {
@@ -179,7 +179,7 @@
         "hit": 1.0
       },
       "timings_ms": {
-        "total_ms": 1.888
+        "total_ms": 2.337
       },
       "candidates": [
         {
@@ -216,7 +216,7 @@
         "hit": 1.0
       },
       "timings_ms": {
-        "total_ms": 1.836
+        "total_ms": 1.023
       },
       "candidates": [
         {
@@ -253,7 +253,7 @@
         "hit": 1.0
       },
       "timings_ms": {
-        "total_ms": 0.256
+        "total_ms": 0.113
       },
       "candidates": [
         {
@@ -290,7 +290,7 @@
         "hit": 1.0
       },
       "timings_ms": {
-        "total_ms": 0.247
+        "total_ms": 0.11
       },
       "candidates": [
         {
@@ -327,7 +327,7 @@
         "hit": 1.0
       },
       "timings_ms": {
-        "total_ms": 1.344
+        "total_ms": 0.742
       },
       "candidates": [
         {
@@ -365,7 +365,7 @@
         "hit": 1.0
       },
       "timings_ms": {
-        "total_ms": 0.737
+        "total_ms": 0.274
       },
       "candidates": [
         {
@@ -402,7 +402,7 @@
         "hit": 1.0
       },
       "timings_ms": {
-        "total_ms": 0.455
+        "total_ms": 0.159
       },
       "candidates": [
         {
@@ -439,7 +439,7 @@
         "hit": 0.0
       },
       "timings_ms": {
-        "total_ms": 0.551
+        "total_ms": 0.181
       },
       "candidates": [
         {
@@ -476,7 +476,7 @@
         "hit": 0.0
       },
       "timings_ms": {
-        "total_ms": 0.371
+        "total_ms": 0.113
       },
       "candidates": [
         {
@@ -513,7 +513,7 @@
         "hit": 1.0
       },
       "timings_ms": {
-        "total_ms": 0.49
+        "total_ms": 0.144
       },
       "candidates": [
         {
@@ -550,7 +550,7 @@
         "hit": 0.0
       },
       "timings_ms": {
-        "total_ms": 0.757
+        "total_ms": 0.275
       },
       "candidates": [
         {
@@ -595,7 +595,7 @@
         "hit": 1.0
       },
       "timings_ms": {
-        "total_ms": 0.857
+        "total_ms": 0.293
       },
       "candidates": [
         {
@@ -672,7 +672,7 @@
         "hit": 0.0
       },
       "timings_ms": {
-        "total_ms": 0.871
+        "total_ms": 0.312
       },
       "candidates": [
         {
@@ -709,7 +709,7 @@
         "hit": 1.0
       },
       "timings_ms": {
-        "total_ms": 0.222
+        "total_ms": 0.127
       },
       "candidates": [
         {
@@ -746,7 +746,7 @@
         "hit": 1.0
       },
       "timings_ms": {
-        "total_ms": 0.014
+        "total_ms": 0.005
       },
       "candidates": [
         {
@@ -783,7 +783,7 @@
         "hit": 1.0
       },
       "timings_ms": {
-        "total_ms": 0.008
+        "total_ms": 0.003
       },
       "candidates": [
         {
@@ -817,7 +817,7 @@
         "hit": 0.0
       },
       "timings_ms": {
-        "total_ms": 0.381
+        "total_ms": 0.176
       },
       "candidates": []
     },
@@ -843,7 +843,7 @@
         "hit": 1.0
       },
       "timings_ms": {
-        "total_ms": 0.261
+        "total_ms": 0.114
       },
       "candidates": [
         {
@@ -880,7 +880,7 @@
         "hit": 1.0
       },
       "timings_ms": {
-        "total_ms": 0.384
+        "total_ms": 0.137
       },
       "candidates": [
         {
@@ -926,7 +926,7 @@
         "hit": 1.0
       },
       "timings_ms": {
-        "total_ms": 2.096
+        "total_ms": 0.275
       },
       "candidates": [
         {
@@ -1003,7 +1003,7 @@
         "hit": 0.0
       },
       "timings_ms": {
-        "total_ms": 1.219
+        "total_ms": 0.336
       },
       "candidates": [
         {
@@ -1040,7 +1040,7 @@
         "hit": 0.0
       },
       "timings_ms": {
-        "total_ms": 0.967
+        "total_ms": 0.291
       },
       "candidates": [
         {
@@ -1077,7 +1077,7 @@
         "hit": 0.0
       },
       "timings_ms": {
-        "total_ms": 1.205
+        "total_ms": 0.252
       },
       "candidates": [
         {
@@ -1132,7 +1132,7 @@
         "hit": 1.0
       },
       "timings_ms": {
-        "total_ms": 0.82
+        "total_ms": 0.29
       },
       "candidates": [
         {
@@ -1254,7 +1254,7 @@
         "hit": 1.0
       },
       "timings_ms": {
-        "total_ms": 1.164
+        "total_ms": 0.33
       },
       "candidates": [
         {
@@ -1363,7 +1363,7 @@
         "hit": 0.0
       },
       "timings_ms": {
-        "total_ms": 0.602
+        "total_ms": 0.203
       },
       "candidates": [
         {
@@ -1415,7 +1415,7 @@
         "hit": 1.0
       },
       "timings_ms": {
-        "total_ms": 0.953
+        "total_ms": 0.322
       },
       "candidates": [
         {
@@ -1531,7 +1531,7 @@
         "hit": 0.0
       },
       "timings_ms": {
-        "total_ms": 1.131
+        "total_ms": 0.358
       },
       "candidates": [
         {
@@ -1624,7 +1624,7 @@
         "hit": 1.0
       },
       "timings_ms": {
-        "total_ms": 1.006
+        "total_ms": 0.374
       },
       "candidates": [
         {
@@ -1748,7 +1748,7 @@
         "hit": 1.0
       },
       "timings_ms": {
-        "total_ms": 0.942
+        "total_ms": 0.353
       },
       "candidates": [
         {
@@ -1855,7 +1855,7 @@
         "hit": 0.0
       },
       "timings_ms": {
-        "total_ms": 1.053
+        "total_ms": 0.387
       },
       "candidates": [
         {
@@ -1906,7 +1906,7 @@
         "hit": 1.0
       },
       "timings_ms": {
-        "total_ms": 0.919
+        "total_ms": 0.37
       },
       "candidates": [
         {
@@ -2013,7 +2013,7 @@
         "hit": 0.0
       },
       "timings_ms": {
-        "total_ms": 1.055
+        "total_ms": 0.321
       },
       "candidates": [
         {
@@ -2048,7 +2048,7 @@
         "hit": 0.0
       },
       "timings_ms": {
-        "total_ms": 1.279
+        "total_ms": 0.34
       },
       "candidates": [
         {
@@ -2083,7 +2083,7 @@
         "hit": 0.0
       },
       "timings_ms": {
-        "total_ms": 0.514
+        "total_ms": 0.212
       },
       "candidates": [
         {
@@ -2120,7 +2120,7 @@
         "hit": 0.0
       },
       "timings_ms": {
-        "total_ms": 1.996
+        "total_ms": 1.058
       },
       "candidates": [
         {
@@ -2159,7 +2159,7 @@
         "hit": 1.0
       },
       "timings_ms": {
-        "total_ms": 2.023
+        "total_ms": 1.108
       },
       "candidates": [
         {
@@ -2206,7 +2206,7 @@
         "hit": 1.0
       },
       "timings_ms": {
-        "total_ms": 1.34
+        "total_ms": 1.662
       },
       "candidates": [
         {
@@ -2245,7 +2245,7 @@
         "hit": 1.0
       },
       "timings_ms": {
-        "total_ms": 1.172
+        "total_ms": 1.437
       },
       "candidates": [
         {
@@ -2294,7 +2294,7 @@
         "hit": 1.0
       },
       "timings_ms": {
-        "total_ms": 0.98
+        "total_ms": 1.102
       },
       "candidates": [
         {
@@ -2349,7 +2349,7 @@
         "hit": 1.0
       },
       "timings_ms": {
-        "total_ms": 0.534
+        "total_ms": 0.359
       },
       "candidates": [
         {
@@ -2424,7 +2424,7 @@
         "hit": 0.0
       },
       "timings_ms": {
-        "total_ms": 0.269
+        "total_ms": 0.206
       },
       "candidates": [
         {
@@ -2455,7 +2455,7 @@
         "hit": 1.0
       },
       "timings_ms": {
-        "total_ms": 0.364
+        "total_ms": 0.273
       },
       "candidates": []
     },
@@ -2475,7 +2475,7 @@
         "hit": 1.0
       },
       "timings_ms": {
-        "total_ms": 0.272
+        "total_ms": 0.226
       },
       "candidates": []
     },
@@ -2499,7 +2499,7 @@
         "hit": 0.0
       },
       "timings_ms": {
-        "total_ms": 0.443
+        "total_ms": 0.346
       },
       "candidates": [
         {
@@ -2534,7 +2534,7 @@
         "hit": 0.0
       },
       "timings_ms": {
-        "total_ms": 0.496
+        "total_ms": 0.36
       },
       "candidates": [
         {
@@ -2565,7 +2565,7 @@
         "hit": 1.0
       },
       "timings_ms": {
-        "total_ms": 0.241
+        "total_ms": 0.201
       },
       "candidates": []
     },
@@ -2589,7 +2589,7 @@
         "hit": 0.0
       },
       "timings_ms": {
-        "total_ms": 0.259
+        "total_ms": 0.22
       },
       "candidates": [
         {
@@ -2624,7 +2624,7 @@
         "hit": 0.0
       },
       "timings_ms": {
-        "total_ms": 0.177
+        "total_ms": 0.179
       },
       "candidates": [
         {
@@ -2659,7 +2659,7 @@
         "hit": 0.0
       },
       "timings_ms": {
-        "total_ms": 0.385
+        "total_ms": 0.357
       },
       "candidates": [
         {
@@ -2690,7 +2690,7 @@
         "hit": 1.0
       },
       "timings_ms": {
-        "total_ms": 0.276
+        "total_ms": 0.251
       },
       "candidates": []
     },
@@ -2731,7 +2731,7 @@
         "hit": 1.0
       },
       "timings_ms": {
-        "total_ms": 0.469
+        "total_ms": 0.403
       },
       "candidates": [
         {
@@ -2846,7 +2846,7 @@
         "hit": 1.0
       },
       "timings_ms": {
-        "total_ms": 0.427
+        "total_ms": 0.402
       },
       "candidates": [
         {

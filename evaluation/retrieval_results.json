@@ -22,8 +22,8 @@
           "Concise and technical"
         ],
         "expected": [
-          "Python",
-          "Go"
+          "Go",
+          "Python"
         ],
         "precision": 0.25,
         "recall": 1.0,
@@ -128,8 +128,8 @@
           "Go"
         ],
         "expected": [
-          "Senior AI Architect",
-          "Google DeepMind"
+          "Google DeepMind",
+          "Senior AI Architect"
         ],
         "precision": 0.4,
         "recall": 1.0,
@@ -160,8 +160,8 @@
           "Concise and technical"
         ],
         "expected": [
-          "Python",
-          "Go"
+          "Go",
+          "Python"
         ],
         "precision": 0.25,
         "recall": 1.0,
@@ -270,8 +270,8 @@
           "Go"
         ],
         "expected": [
-          "Senior AI Architect",
-          "Google DeepMind"
+          "Google DeepMind",
+          "Senior AI Architect"
         ],
         "precision": 0.4,
         "recall": 1.0,
