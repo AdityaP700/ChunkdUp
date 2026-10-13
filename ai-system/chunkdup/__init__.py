@@ -17,6 +17,13 @@ from .async_memory import AsyncMemory
 from .in_memory_repository import InMemoryRepository
 from .turn_repository import TurnRepository, InMemoryTurnRepository, PostgresTurnRepository, SourceTurnLog
 from .extraction import ExtractedFact, GroqFactExtractor, TurnBuffer
+from .decision_provider import (
+    DecisionProvider,
+    DefaultDecisionProvider,
+    ExternalDecisionProvider,
+    LayaDecisionProvider,
+    get_decision_provider,
+)
 from .entity_extractor import EntityExtractor
 try:
     from .postgres_repository import PostgresRepository
@@ -81,6 +88,11 @@ __all__ = [
     "ExtractedFact",
     "GroqFactExtractor",
     "TurnBuffer",
+    "DecisionProvider",
+    "DefaultDecisionProvider",
+    "ExternalDecisionProvider",
+    "LayaDecisionProvider",
+    "get_decision_provider",
     "Decision",
     "BasePolicy",
     "EmbeddingGenerator",

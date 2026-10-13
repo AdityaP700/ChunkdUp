@@ -11,7 +11,7 @@ import uuid
 import sys
 import importlib.util
 from datetime import datetime, timezone
-from typing import List, Dict, Any, Optional, Union
+from typing import List, Dict, Any, Optional, Union, Tuple
 import logging
 try:
     from .postgres_repository import PostgresRepository
@@ -34,6 +34,13 @@ logger = logging.getLogger(__name__)
 # Import local modules
 try:
     from .policies import Decision, PolicyFactory
+    from .decision_provider import (
+        DecisionProvider,
+        DefaultDecisionProvider,
+        ExternalDecisionProvider,
+        LayaDecisionProvider,
+        get_decision_provider,
+    )
     from .prompt_builder import PromptBuilder
     from .retrieval_class import MemoryRetriever
     from .retrieval_production import ProductionRetriever
@@ -343,13 +350,22 @@ class MemoryRanker:
 
 
 class DecisionEngine:
-    """Evaluates policy decisions for existing vs new memories."""
+    """Evaluates policy decisions for existing vs new memories using pluggable DecisionProvider."""
+
+    def __init__(self, provider: Optional[Any] = None):
+        if provider is not None:
+            self.provider = provider
+        else:
+            try:
+                self.provider = get_decision_provider()
+            except Exception:
+                self.provider = DefaultDecisionProvider()
 
     def decide(self, existing_memory: Optional[Dict[str, Any]], new_memory: Dict[str, Any]) -> Decision:
-        policy = PolicyFactory.get(new_memory["type"])
-        if not policy:
-            return Decision.STORE
-        return policy.decide(existing_memory, new_memory)
+        return self.provider.decide(existing_memory, new_memory)
+
+    def decide_batch(self, pairs: List[Tuple[Optional[Dict[str, Any]], Dict[str, Any]]]) -> List[Decision]:
+        return self.provider.decide_batch(pairs)
 
 
 class MemoryManager:
@@ -487,7 +503,7 @@ class Memory:
         self.memory_path = os.path.join(data_dir, "memory.json")
 
         # Initialize internal components
-        self.decision_engine = DecisionEngine()
+        self.decision_engine = DecisionEngine(provider=kwargs.get("decision_provider"))
         self.scorer = MemoryScorer()
         self.manager = MemoryManager(self.repository, self.decision_engine, self.scorer)
         self.extractor = MemoryExtractor()
