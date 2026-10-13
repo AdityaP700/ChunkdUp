@@ -255,6 +255,42 @@ def test_turn_buffer_layered_ingestion():
     assert fact["source_turn_id"] == "turn-b1"
 
 
+def test_groq_malformed_json_fallback():
+    """Verify malformed JSON from Groq triggers graceful fallback to pattern extractor."""
+    mock_client = MagicMock()
+    mock_response = MagicMock()
+    mock_choice = MagicMock()
+    mock_message = MagicMock()
+    mock_message.content = "Malformed JSON: {facts: incomplete"
+    mock_choice.message = mock_message
+    mock_response.choices = [mock_choice]
+    mock_client.chat.completions.create.return_value = mock_response
+
+    extractor = GroqFactExtractor(client=mock_client)
+    turn = {"turn_id": "turn-malformed", "speaker": "user", "raw_text": "I prefer Neovim"}
+    facts = extractor.extract_turn(turn)
+
+    # Should fall back and still extract fact via regex/rules
+    assert len(facts) >= 1
+    assert any(f.key == "editor" and f.value == "Neovim" for f in facts)
+    assert facts[0].source_turn_id == "turn-malformed"
+
+
+def test_groq_api_exception_fallback():
+    """Verify network or API exceptions in Groq call trigger graceful fallback."""
+    mock_client = MagicMock()
+    mock_client.chat.completions.create.side_effect = RuntimeError("Connection dropped")
+
+    extractor = GroqFactExtractor(client=mock_client, max_retries=1)
+    turn = {"turn_id": "turn-exc", "speaker": "user", "raw_text": "I use Linux"}
+    facts = extractor.extract_turn(turn)
+
+    # Should fall back to rule extraction
+    assert len(facts) >= 1
+    assert any(f.key == "os" and f.value == "Linux" for f in facts)
+    assert facts[0].source_turn_id == "turn-exc"
+
+
 @pytest.mark.skipif(not os.getenv("GROQ_API_KEY"), reason="GROQ_API_KEY not set")
 def test_live_groq_extraction():
     """Live integration test against Groq endpoint (runs only if GROQ_API_KEY is configured)."""

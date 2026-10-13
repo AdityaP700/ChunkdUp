@@ -87,6 +87,14 @@ class ExtractedFact(BaseModel):
     source_turn_id: str
     temporal_validity: Optional[Dict[str, Any]] = None
 
+    @field_validator("source_turn_id")
+    @classmethod
+    def validate_source_turn_id(cls, v: str) -> str:
+        cleaned = v.strip()
+        if not cleaned:
+            raise ValueError("source_turn_id cannot be empty")
+        return cleaned
+
     @field_validator("key")
     @classmethod
     def validate_and_normalize_key(cls, v: str) -> str:

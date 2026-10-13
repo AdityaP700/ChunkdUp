@@ -164,8 +164,13 @@ def evaluate_locomo_track_a(
             k_values=tuple(k_values),
         )
         summary = evaluator.evaluate(samples=samples)
-        overall = summary.get("overall", {})
-        cat_breakdown = summary.get("category_breakdown", {})
+        overall = summary.get("overall_answerable", summary.get("overall", {}))
+        cat_breakdown = summary.get("categories", summary.get("category_breakdown", {}))
+        adv_overall = summary.get("overall_adversarial", {})
+        adv_rejection = adv_overall.get(
+            "correct_rejection_rate",
+            cat_breakdown.get("Adversarial / Unanswerable", {}).get("correct_rejection_rate", 0.0)
+        )
 
         locomo_results[cfg] = {
             "config_name": cfg,
@@ -174,8 +179,7 @@ def evaluate_locomo_track_a(
             "Precision@5": overall.get("Precision@5", 0.0),
             "abstain_rate": overall.get("abstain_rate", 0.0),
             "duration_seconds": summary.get("total_duration_seconds", 0.0),
-            "adversarial_rejection_rate": cat_breakdown.get("Adversarial", {}).get("correct_rejection_rate", 0.0)
-            if "Adversarial" in cat_breakdown else 0.0,
+            "adversarial_rejection_rate": adv_rejection,
             "category_breakdown": cat_breakdown,
         }
 
