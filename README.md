@@ -19,6 +19,41 @@ ChunkdUp is my attempt to answer these questions by building the underlying piec
 
 ---
 
+## Installation & Quickstart
+
+ChunkdUp provides a lightweight, modular memory runtime. By default, the core in-memory runtime requires **zero external dependencies**.
+
+### 1. Minimal In-Memory Installation
+Install the lightweight core package:
+```bash
+pip install -e .
+```
+
+```python
+from chunkdup import Memory
+
+memory = Memory(store="memory")
+memory.remember("I use Python for backend development.")
+results = memory.retrieve("What programming language do I use?")
+print(results)
+```
+
+### 2. Optional Extras
+Install additional backends or capabilities as needed:
+
+```bash
+# PostgreSQL persistence with pgvector
+pip install -e ".[postgres]"
+
+# Neural & hybrid retrieval (sentence-transformers, BM25, cross-encoder)
+pip install -e ".[retrieval]"
+
+# Full stack (database + neural retrieval)
+pip install -e ".[all]"
+```
+
+---
+
 ## V1: What We Have Built
 
 V1 focuses primarily on **memory formation, state management, persistence, and establishing a measurable retrieval baseline**.

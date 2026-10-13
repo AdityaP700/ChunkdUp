@@ -210,10 +210,22 @@ def _get_sentence_transformer():
     if "st" not in _MODEL_CACHE:
         from sentence_transformers import SentenceTransformer
 
-        local_path = Path(__file__).resolve().parent.parent.parent / "models" / "all-MiniLM-L6-v2"
-        source = str(local_path) if local_path.exists() else os.getenv(
-            "CHUNKDUP_EMBEDDING_MODEL", "all-MiniLM-L6-v2"
-        )
+        env_source = os.getenv("CHUNKDUP_EMBEDDING_MODEL")
+        if env_source:
+            source = env_source
+        else:
+            models_dir = os.getenv("CHUNKDUP_MODELS_DIR")
+            local_path = Path(__file__).resolve().parent.parent.parent / "models" / "all-MiniLM-L6-v2"
+            cwd_path = Path.cwd() / "models" / "all-MiniLM-L6-v2"
+            if models_dir and (Path(models_dir) / "all-MiniLM-L6-v2").exists():
+                source = str(Path(models_dir) / "all-MiniLM-L6-v2")
+            elif local_path.exists():
+                source = str(local_path)
+            elif cwd_path.exists():
+                source = str(cwd_path)
+            else:
+                source = "all-MiniLM-L6-v2"
+        logger.info("Loading embedding model from source: %s", source)
         _MODEL_CACHE["st"] = SentenceTransformer(source)
         _MODEL_CACHE["st_source"] = source
     return _MODEL_CACHE["st"]
@@ -223,7 +235,12 @@ def _get_cross_encoder():
     if "ce" not in _MODEL_CACHE:
         from sentence_transformers import CrossEncoder
 
-        _MODEL_CACHE["ce"] = CrossEncoder("cross-encoder/ms-marco-MiniLM-L-12-v2")
+        model_name = os.getenv("CHUNKDUP_CE_MODEL", "cross-encoder/ms-marco-MiniLM-L-12-v2")
+        models_dir = os.getenv("CHUNKDUP_MODELS_DIR")
+        if models_dir and (Path(models_dir) / "ms-marco-MiniLM-L-12-v2").exists():
+            model_name = str(Path(models_dir) / "ms-marco-MiniLM-L-12-v2")
+        logger.info("Loading cross-encoder model: %s", model_name)
+        _MODEL_CACHE["ce"] = CrossEncoder(model_name)
     return _MODEL_CACHE["ce"]
 
 
@@ -309,6 +326,8 @@ class ProductionRetriever:
         return (len(memories), latest)
 
     def _ensure_index(self) -> None:
+        if self.effective_config == "baseline_current":
+            return
         signature = self._repository_signature()
         if signature == self._index_signature:
             return

@@ -1,14 +1,31 @@
 # test_semantic.py
 import os
-from dotenv import load_dotenv
-from chunkdup import Memory
-from chunkdup.postgres_repository import PostgresRepository
-load_dotenv()
+import pytest
+
+try:
+    from dotenv import load_dotenv
+    load_dotenv()
+except ImportError:
+    pass
+
+try:
+    from chunkdup.postgres_repository import PostgresRepository
+    from chunkdup import Memory
+except (ImportError, ModuleNotFoundError):
+    PostgresRepository = None
+
+
 def test_semantic_search():
+    if PostgresRepository is None:
+        pytest.skip("PostgreSQL dependencies (SQLAlchemy/pgvector) not installed")
+    database_url = os.environ.get("DATABASE_URL")
+    if not database_url:
+        pytest.skip("DATABASE_URL not configured; skipping live PostgreSQL test")
+
     print("🧪 Testing Semantic Search...")
 
     # Connect to PostgreSQL
-    DATABASE_URL = os.environ["DATABASE_URL"]
+    DATABASE_URL = database_url
     repo = PostgresRepository(DATABASE_URL)
     memory = Memory(store="postgres", repository=repo)
 
