@@ -69,11 +69,15 @@ class ExternalDecisionProvider(DecisionProvider):
         callback: Optional[Callable[[Optional[Dict[str, Any]], Dict[str, Any]], Optional[str]]] = None,
         timeout_seconds: float = 2.0,
         fallback_provider: Optional[DecisionProvider] = None,
+        api_key: Optional[str] = None,
+        headers: Optional[Dict[str, str]] = None,
     ):
         self.endpoint_url = endpoint_url
         self.callback = callback
         self.timeout_seconds = timeout_seconds
         self.fallback = fallback_provider or DefaultDecisionProvider()
+        self.api_key = api_key
+        self.custom_headers = headers or {}
 
     def decide(
         self,
@@ -97,10 +101,14 @@ class ExternalDecisionProvider(DecisionProvider):
                     "existing": existing_memory,
                     "proposed": proposed_memory,
                 }).encode("utf-8")
+                req_headers = {"Content-Type": "application/json"}
+                if self.api_key:
+                    req_headers["Authorization"] = f"Bearer {self.api_key}"
+                req_headers.update(self.custom_headers)
                 req = urllib_request.Request(
                     self.endpoint_url,
                     data=payload,
-                    headers={"Content-Type": "application/json"},
+                    headers=req_headers,
                 )
                 with urllib_request.urlopen(req, timeout=self.timeout_seconds) as resp:
                     if resp.status == 200:
@@ -132,7 +140,8 @@ class ExternalDecisionProvider(DecisionProvider):
 class LayaDecisionProvider(ExternalDecisionProvider):
     """
     Dedicated provider adapter for Laya decision engine.
-    Configured via LAYA_ENDPOINT and LAYA_API_KEY environment variables.
+    Configured via LAYA_ENDPOINT (or LAYA_BASE_URL) and LAYA_API_KEY environment variables.
+    Note: Scaffolded and disabled by default until an active live contract is verified.
     """
 
     def __init__(
@@ -141,13 +150,16 @@ class LayaDecisionProvider(ExternalDecisionProvider):
         api_key: Optional[str] = None,
         timeout_seconds: float = 2.0,
         fallback_provider: Optional[DecisionProvider] = None,
+        headers: Optional[Dict[str, str]] = None,
     ):
-        url = endpoint_url or os.getenv("LAYA_ENDPOINT")
-        self.api_key = api_key or os.getenv("LAYA_API_KEY")
+        url = endpoint_url or os.getenv("LAYA_ENDPOINT") or os.getenv("LAYA_BASE_URL")
+        key = api_key or os.getenv("LAYA_API_KEY")
         super().__init__(
             endpoint_url=url,
+            api_key=key,
             timeout_seconds=timeout_seconds,
             fallback_provider=fallback_provider,
+            headers=headers,
         )
 
 

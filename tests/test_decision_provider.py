@@ -1,4 +1,4 @@
-# tests/test_decision_provider.py
+import json
 import pytest
 from unittest.mock import MagicMock
 
@@ -101,3 +101,48 @@ def test_get_decision_provider_factory():
 
     p_ext = get_decision_provider("external")
     assert isinstance(p_ext, ExternalDecisionProvider)
+
+
+def test_external_decision_provider_transmits_authorization_header():
+    """Verify ExternalDecisionProvider attaches Bearer token and headers to HTTP requests."""
+    from unittest.mock import patch
+    import io
+
+    captured_requests = []
+
+    def mock_urlopen(req, timeout=None):
+        captured_requests.append(req)
+        # Return mock HTTP 200 response
+        mock_resp = MagicMock()
+        mock_resp.status = 200
+        mock_resp.read.return_value = json.dumps({"decision": "MERGE"}).encode("utf-8")
+        mock_resp.__enter__.return_value = mock_resp
+        return mock_resp
+
+    provider = ExternalDecisionProvider(
+        endpoint_url="https://api.example.com/v1/decision",
+        api_key="test-secret-token",
+        headers={"X-Custom-Client": "ChunkdUp-Test"},
+        timeout_seconds=1.5,
+    )
+
+    existing = {"type": "environment", "key": "os", "value": "Linux"}
+    proposed = {"type": "environment", "key": "os", "value": "Linux"}
+
+    with patch("urllib.request.urlopen", side_effect=mock_urlopen):
+        decision = provider.decide(existing, proposed)
+
+    assert decision == Decision.MERGE
+    assert len(captured_requests) == 1
+    req = captured_requests[0]
+
+    assert req.full_url == "https://api.example.com/v1/decision"
+    assert req.headers["Authorization"] == "Bearer test-secret-token"
+    assert req.headers["Content-type"] == "application/json"
+    assert req.headers["X-custom-client"] == "ChunkdUp-Test"
+
+    # Verify JSON payload
+    body = json.loads(req.data.decode("utf-8"))
+    assert body["existing"]["value"] == "Linux"
+    assert body["proposed"]["value"] == "Linux"
+

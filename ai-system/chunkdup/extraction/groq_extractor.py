@@ -53,17 +53,17 @@ class GroqFactExtractor:
     def __init__(
         self,
         api_key: Optional[str] = None,
-        model: str = "llama-3.3-70b-versatile",
+        model: Optional[str] = None,
         client: Optional[Any] = None,
         fallback_extractor: Optional[Any] = None,
         max_retries: int = 3,
         backoff_factor: float = 0.5,
     ):
-        self.model = model
+        self.model = model or os.getenv("GROQ_MODEL", "openai/gpt-oss-20b")
         self.max_retries = max_retries
         self.backoff_factor = backoff_factor
         self._client = client
-        self._api_key = api_key or os.getenv("GROQ_API_KEY")
+        self._api_key = api_key if api_key is not None else os.getenv("GROQ_API_KEY")
 
         # Lazy fallback extractor
         if fallback_extractor is not None:

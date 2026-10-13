@@ -8,3 +8,5 @@ __pycache__/
 # Local ML model and downloaded wheels
 models/all-MiniLM-L6-v2/
 wheels/
+data/retrieval_log.jsonl
+

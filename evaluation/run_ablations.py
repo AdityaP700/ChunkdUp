@@ -111,6 +111,12 @@ def evaluate_frozen_suite_config(config_key: str, rows: List[Dict[str, Any]]) ->
     else:
         raise ValueError(f"Unknown config_key: {config_key}")
 
+    # Warm-up phase: run warm-up queries to isolate steady-state query latency from cold-start weight loading
+    cold_t0 = time.perf_counter()
+    retriever.retrieve("warmup initialization query", k=5)
+    retriever.retrieve("second warmup query", k=5)
+    cold_start_latency_ms = (time.perf_counter() - cold_t0) * 1000
+
     per_query = []
     t_start = time.perf_counter()
     latencies = []
@@ -133,6 +139,11 @@ def evaluate_frozen_suite_config(config_key: str, rows: List[Dict[str, Any]]) ->
     total_duration = time.perf_counter() - t_start
     summary = aggregate(per_query, rows)
 
+    sorted_lats = sorted(latencies)
+    p50_latency_ms = round(sorted_lats[int(len(sorted_lats) * 0.50)], 2) if sorted_lats else 0.0
+    p95_latency_ms = round(sorted_lats[int(len(sorted_lats) * 0.95)], 2) if sorted_lats else 0.0
+    avg_latency_ms = round(sum(latencies) / len(latencies), 2) if latencies else 0.0
+
     return {
         "config_key": config_key,
         "n_queries": len(rows),
@@ -141,8 +152,11 @@ def evaluate_frozen_suite_config(config_key: str, rows: List[Dict[str, Any]]) ->
         "recall_at_5": summary.get("Recall@K", 0.0),
         "abstain_count": summary.get("abstain_count", 0),
         "total_duration_seconds": round(total_duration, 2),
-        "avg_latency_ms": round(sum(latencies) / len(latencies), 2) if latencies else 0.0,
-        "p95_latency_ms": round(sorted(latencies)[int(len(latencies) * 0.95)], 2) if latencies else 0.0,
+        "cold_start_latency_ms": round(cold_start_latency_ms, 2),
+        "warm_p50_latency_ms": p50_latency_ms,
+        "warm_p95_latency_ms": p95_latency_ms,
+        "warm_avg_latency_ms": avg_latency_ms,
+        "avg_latency_ms": avg_latency_ms,
     }
 
 
@@ -227,17 +241,23 @@ def run_ablations(
                 "legacy_baseline": {
                     "MRR": frozen_results["legacy_baseline"]["MRR"],
                     "P@5": frozen_results["legacy_baseline"]["P@5"],
-                    "avg_latency_ms": frozen_results["legacy_baseline"]["avg_latency_ms"],
+                    "warm_p50_ms": frozen_results["legacy_baseline"]["warm_p50_latency_ms"],
+                    "warm_p95_ms": frozen_results["legacy_baseline"]["warm_p95_latency_ms"],
+                    "avg_latency_ms": frozen_results["legacy_baseline"]["warm_avg_latency_ms"],
                 },
                 "dense_abstain_ed": {
                     "MRR": frozen_results["dense_abstain_ed"]["MRR"],
                     "P@5": frozen_results["dense_abstain_ed"]["P@5"],
-                    "avg_latency_ms": frozen_results["dense_abstain_ed"]["avg_latency_ms"],
+                    "warm_p50_ms": frozen_results["dense_abstain_ed"]["warm_p50_latency_ms"],
+                    "warm_p95_ms": frozen_results["dense_abstain_ed"]["warm_p95_latency_ms"],
+                    "avg_latency_ms": frozen_results["dense_abstain_ed"]["warm_avg_latency_ms"],
                 },
                 "hybrid_ce_abstain": {
                     "MRR": frozen_results["hybrid_ce_abstain"]["MRR"],
                     "P@5": frozen_results["hybrid_ce_abstain"]["P@5"],
-                    "avg_latency_ms": frozen_results["hybrid_ce_abstain"]["avg_latency_ms"],
+                    "warm_p50_ms": frozen_results["hybrid_ce_abstain"]["warm_p50_latency_ms"],
+                    "warm_p95_ms": frozen_results["hybrid_ce_abstain"]["warm_p95_latency_ms"],
+                    "avg_latency_ms": frozen_results["hybrid_ce_abstain"]["warm_avg_latency_ms"],
                 },
             },
         },
@@ -247,16 +267,16 @@ def run_ablations(
     logger.info(f"Saved ablation report to {out_file}")
 
     # 4. Print Scoreboard Table
-    print("\n" + "=" * 80)
+    print("\n" + "=" * 90)
     print("CHUNKDUP SYSTEM ABLATION SCOREBOARD")
-    print("=" * 80)
+    print("=" * 90)
     print(f"Commit: {commit_hash} | Timestamp: {timestamp}\n")
     print("1. FROZEN 92-QUERY SUITE (Fixed 12-Memory Regression Fixture)")
-    print("-" * 80)
-    print(f"{'Configuration':<22} | {'MRR':<8} | {'P@5':<8} | {'Abstentions':<12} | {'Avg Latency':<12}")
-    print("-" * 80)
+    print("-" * 90)
+    print(f"{'Configuration':<20} | {'MRR':<8} | {'P@5':<8} | {'Warm p50':<10} | {'Warm p95':<10} | {'Cold Start':<10}")
+    print("-" * 90)
     for cfg, r in frozen_results.items():
-        print(f"{cfg:<22} | {r['MRR']:<8.4f} | {r['P@5']:<8.4f} | {r['abstain_count']:<12} | {r['avg_latency_ms']:<7.1f} ms")
+        print(f"{cfg:<20} | {r['MRR']:<8.4f} | {r['P@5']:<8.4f} | {r['warm_p50_latency_ms']:<7.1f} ms | {r['warm_p95_latency_ms']:<7.1f} ms | {r['cold_start_latency_ms']:<7.1f} ms")
 
     if locomo_results:
         print("\n2. LOCOMO BENCHMARK TRACK A (Split: " + split + ")")

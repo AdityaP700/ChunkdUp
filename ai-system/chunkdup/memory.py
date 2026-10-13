@@ -518,9 +518,10 @@ class Memory:
         self.prompt_builder = PromptBuilder()
 
         # Fact extraction & turn buffer
+        self.extractor_type = kwargs.get("extractor", "rules")
         self.groq_extractor = GroqFactExtractor(
             api_key=kwargs.get("groq_api_key"),
-            model=kwargs.get("groq_model", "llama-3.3-70b-versatile"),
+            model=kwargs.get("groq_model", os.getenv("GROQ_MODEL", "openai/gpt-oss-20b")),
             fallback_extractor=self.extractor,
         )
         self.turn_buffer = TurnBuffer(
@@ -647,6 +648,7 @@ class Memory:
         speaker: str = "user",
         metadata: Optional[Dict[str, Any]] = None,
         timestamp: Optional[str] = None,
+        use_groq: bool = False,
     ) -> Dict[str, Any]:
         """
         Store a memory from conversation text.
@@ -658,6 +660,7 @@ class Memory:
             speaker: Speaker identifier ("user", "assistant", etc.)
             metadata: Optional dictionary of turn metadata
             timestamp: Optional ISO-8601 UTC timestamp
+            use_groq: Explicit toggle to run Groq LLM extraction
 
         Returns:
             Dict with turn_id, memory decisions, and count
@@ -686,12 +689,17 @@ class Memory:
         self._save_conversation(lines)
 
         # 3. Extract memories from current input text
-        extracted = self.extractor.extract(text)
+        if (use_groq or getattr(self, "extractor_type", "rules") == "groq") and self.groq_extractor.is_available():
+            turn_obj = {"turn_id": turn_id, "speaker": speaker, "raw_text": text}
+            facts = self.groq_extractor.extract_turn(turn_obj)
+            extracted = [f.to_memory_dict() for f in facts]
+        else:
+            extracted = self.extractor.extract(text)
 
         results = []
         for mem in extracted:
             mem["source_turn_id"] = turn_id
-            mem["valid_from"] = ts
+            mem["valid_from"] = mem.get("valid_from") or ts
             mem["valid_to"] = None
             decision = self.manager.process(mem)
             results.append({

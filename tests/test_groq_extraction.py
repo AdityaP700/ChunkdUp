@@ -5,6 +5,12 @@ import pytest
 from unittest.mock import MagicMock
 from pydantic import ValidationError
 
+try:
+    from dotenv import load_dotenv
+    load_dotenv()
+except ImportError:
+    pass
+
 from chunkdup.extraction.schema import ExtractedFact, is_turn_eligible
 from chunkdup.extraction.groq_extractor import GroqFactExtractor
 from chunkdup.extraction.turn_buffer import TurnBuffer
@@ -185,8 +191,9 @@ def test_mocked_groq_retry_on_429():
     assert mock_client.chat.completions.create.call_count == 2
 
 
-def test_graceful_fallback_when_groq_unavailable():
+def test_graceful_fallback_when_groq_unavailable(monkeypatch):
     """Verify extractor falls back to regex/spaCy when Groq API key is absent or call fails."""
+    monkeypatch.delenv("GROQ_API_KEY", raising=False)
     # No client, no API key
     extractor = GroqFactExtractor(api_key=None, client=None)
     assert not extractor.is_available()
