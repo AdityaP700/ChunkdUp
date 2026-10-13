@@ -29,6 +29,12 @@ class InMemoryRepository(MemoryRepository):
                 return memory
         return None
 
+    def get_by_id(self, memory_id: str) -> Optional[Dict[str, Any]]:
+        memory = self._memories.get(memory_id)
+        if memory and memory.get("status") == "active":
+            return memory
+        return None
+
     def update(self, memory: Dict[str, Any]) -> None:
         memory_id = memory.get("id")
         if not memory_id:

@@ -186,6 +186,14 @@ try:
 except ImportError:
     from retrieval.grounding_gate import GroundingGate, GroundedRetrievalResult
 
+try:
+    from .entity.entity_graph import EntityGraph
+except ImportError:
+    try:
+        from entity.entity_graph import EntityGraph
+    except ImportError:
+        EntityGraph = None
+
 # Alias for backwards compatibility with legacy tests/code
 _Gate = GroundingGate
 
@@ -326,6 +334,8 @@ class ProductionRetriever:
         self.last_calibration_size = None
         self.last_calibration = None
         self.demote_enabled = self.config_name in ENTITY_DEMOTION_CONFIGS
+        self.entity_graph = EntityGraph() if EntityGraph is not None else None
+        self.entity_expansion_enabled = os.getenv("CHUNKDUP_ENTITY_EXPANSION", "1") == "1"
 
         if self.config_name == "baseline_current":
             from .retrieval_class import MemoryRetriever
@@ -360,6 +370,8 @@ class ProductionRetriever:
         self._dense_matrix = None
         self._bm25 = None
         if active:
+            if self.entity_graph and self.entity_expansion_enabled:
+                self.entity_graph.index_repository(self.repository)
             try:
                 import numpy as np
                 from rank_bm25 import BM25Okapi
@@ -484,8 +496,24 @@ class ProductionRetriever:
                 logger.warning("BM25 leg failed (%s); continuing dense-only", exc)
                 bm25_results = []
             fused = _rrf_fuse([dense_results, bm25_results], k=60, limit=pool)
+
+            # Conservative bounded 1-hop entity expansion for multi-hop evidence
+            if self.entity_expansion_enabled and self.entity_graph:
+                expanded = self.entity_graph.expand_candidates(
+                    query=query,
+                    initial_candidates=fused,
+                    repository=self.repository,
+                    max_expansion=5,
+                )
+                seen_ids = {c.get("id") for c in fused}
+                for exp in expanded:
+                    if exp.get("id") not in seen_ids:
+                        fused.append(exp)
+                        seen_ids.add(exp.get("id"))
+
             try:
-                return self._cross_encoder_rerank(query, fused, limit=pool), "_rerank_score"
+                ce_pool_limit = min(25, len(fused))
+                return self._cross_encoder_rerank(query, fused, limit=ce_pool_limit), "_rerank_score"
             except Exception as exc:
                 self._ce_failed = True  # sticky: never retry a failed CE mid-process
                 self._degrade(
