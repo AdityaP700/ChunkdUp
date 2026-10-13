@@ -247,11 +247,19 @@ flowchart TD
     end
 ```
 
-## What's Next?
+## Production Architecture & Capabilities
 
-This chapter of ChunkdUp is complete! We have successfully built a modular, deterministic, memory-aware infrastructure pipeline from the ground up without relying on black-box frameworks.
+ChunkdUp has evolved from experimental labs into a production-grade memory runtime:
 
-We will be moving forward toward new horizons and different learnings. Keep building!
+- **Level 0 Raw-First Append-Only Turn Log**: Never drops conversation history, even on `IGNORE` memory decisions (`TurnRepository`, `InMemoryTurnRepository`, `PostgresTurnRepository`).
+- **Layered Ingestion & Schema Validation**: Turn eligibility heuristic filtering, batched `GroqFactExtractor` with exponential backoff on HTTP 429, and strict Pydantic `ExtractedFact` validation.
+- **Append-Only Temporal History**: Non-destructive memory evolution via `valid_from`, `valid_to`, `supersedes_id`, and `superseded_by`, with point-in-time querying via `as_of`.
+- **Evidence-Grounded Retrieval & Calibrated Abstention**: Hybrid dense+BM25 with cross-encoder reranking, entity demotion, and dynamic scale-aware abstention $\tau(N)$.
+- **Conservative Entity Graph**: Alias resolution, co-occurrence indexing, and bounded 1-hop expansion with distance decay penalties.
+- **Pluggable Decision Providers**: Protocol-based decision engine (`DefaultDecisionProvider`, `ExternalDecisionProvider`, `LayaDecisionProvider`). See [docs/decision_providers.md](docs/decision_providers.md).
+- **Verified Benchmark Zero-Regression**: Passes frozen 92-query regression suite (`MRR 0.8424`, `P@5 0.6475`) and LoCoMo deterministic benchmark protocols.
+
+For complete architectural specifications, see [docs/architecture.md](docs/architecture.md).
 
 ## Retrieval configuration & incident rollback
 
