@@ -654,6 +654,22 @@ class Memory:
         logger.info(f"Retrieving: {query}")
         return self.retriever.retrieve(query, k=limit)
 
+    def retrieve_grounded(self, query: str, limit: int = 5) -> List[Any]:
+        """
+        Retrieve memories with evidence provenance and sufficiency attribution.
+
+        Args:
+            query: Search query
+            limit: Maximum number of results
+
+        Returns:
+            List of GroundedRetrievalResult objects
+        """
+        logger.info(f"Retrieving grounded: {query}")
+        if hasattr(self.retriever, "retrieve_grounded"):
+            return self.retriever.retrieve_grounded(query, k=limit)
+        return self.retriever.retrieve(query, k=limit)
+
     def update(self, key: str, new_value: str) -> Dict[str, Any]:
         """
         Update a memory by key.

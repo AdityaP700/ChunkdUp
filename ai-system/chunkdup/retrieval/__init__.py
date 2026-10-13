@@ -5,6 +5,7 @@ from .reranker import PluggableReranker
 from .adaptive_k import AdaptiveKSelector
 from .cache import RetrievalCache
 from .query_rewriter import QueryRewriter
+from .grounding_gate import GroundingGate, GroundedRetrievalResult
 
 __all__ = [
     "ContextualRetriever",
@@ -12,5 +13,7 @@ __all__ = [
     "PluggableReranker",
     "AdaptiveKSelector",
     "RetrievalCache",
-    "QueryRewriter"
+    "QueryRewriter",
+    "GroundingGate",
+    "GroundedRetrievalResult",
 ]

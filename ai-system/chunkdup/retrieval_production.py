@@ -181,22 +181,13 @@ def _apply_entity_demotion(query: str, ranked: List[Dict], score_field: str) -> 
     return adjusted
 
 
-class _Gate:
-    """Relevance-decision stage (mirrors experiments/retrieval/abstention.py):
-    abstain when the top score is below threshold; otherwise keep every
-    candidate at or above the threshold."""
+try:
+    from .retrieval.grounding_gate import GroundingGate, GroundedRetrievalResult
+except ImportError:
+    from retrieval.grounding_gate import GroundingGate, GroundedRetrievalResult
 
-    def __init__(self, score_field: str, threshold: float):
-        self.score_field = score_field
-        self.threshold = threshold
-
-    def filter(self, results: List[Dict]) -> List[Dict]:
-        if not results:
-            return []
-        top = float(results[0].get(self.score_field, 0.0))
-        if top < self.threshold:
-            return []
-        return [r for r in results if float(r.get(self.score_field, 0.0)) >= self.threshold]
+# Alias for backwards compatibility with legacy tests/code
+_Gate = GroundingGate
 
 
 # ---------------------------------------------------------------------------
@@ -226,7 +217,21 @@ def _get_sentence_transformer():
             else:
                 source = "all-MiniLM-L6-v2"
         logger.info("Loading embedding model from source: %s", source)
-        _MODEL_CACHE["st"] = SentenceTransformer(source)
+        orig_threads = None
+        try:
+            import torch
+            orig_threads = torch.get_num_threads()
+            torch.set_num_threads(1)
+        except Exception:
+            pass
+        try:
+            _MODEL_CACHE["st"] = SentenceTransformer(source)
+        finally:
+            if orig_threads is not None:
+                try:
+                    torch.set_num_threads(orig_threads)
+                except Exception:
+                    pass
         _MODEL_CACHE["st_source"] = source
     return _MODEL_CACHE["st"]
 
@@ -240,7 +245,21 @@ def _get_cross_encoder():
         if models_dir and (Path(models_dir) / "ms-marco-MiniLM-L-12-v2").exists():
             model_name = str(Path(models_dir) / "ms-marco-MiniLM-L-12-v2")
         logger.info("Loading cross-encoder model: %s", model_name)
-        _MODEL_CACHE["ce"] = CrossEncoder(model_name)
+        orig_threads = None
+        try:
+            import torch
+            orig_threads = torch.get_num_threads()
+            torch.set_num_threads(1)
+        except Exception:
+            pass
+        try:
+            _MODEL_CACHE["ce"] = CrossEncoder(model_name)
+        finally:
+            if orig_threads is not None:
+                try:
+                    torch.set_num_threads(orig_threads)
+                except Exception:
+                    pass
     return _MODEL_CACHE["ce"]
 
 
@@ -493,10 +512,42 @@ class ProductionRetriever:
             ranked = _apply_entity_demotion(query, ranked, score_field)
 
         gate = self.gate if score_field == "_rerank_score" else self._dense_gate
-        final = gate.filter(ranked)[:k]
+        store_size = len(self._dense_memories) if self._dense_memories else len(self.repository.get_all())
+        grounded = gate.filter_and_ground(query, ranked, store_size=store_size, k=k)
+        final = [g.to_dict() for g in grounded]
         latency_ms = (time.perf_counter() - t0) * 1000
         self._log_query(query, final, ranked, latency_ms, not final)
         return final
+
+    def retrieve_grounded(self, query: str, k: int = 5) -> List[GroundedRetrievalResult]:
+        """Retrieve memories matching a query as typed GroundedRetrievalResult objects."""
+        t0 = time.perf_counter()
+        ranked, score_field = self._collect_ranked(query, k)
+
+        if ranked is None:
+            legacy = self._legacy.retrieve(query, k=k)
+            return [
+                GroundedRetrievalResult(
+                    id=str(r.get("id") or r.get("key") or ""),
+                    memory=r,
+                    score=1.0,
+                    score_field="legacy",
+                    source_turns=[],
+                    confidence=1.0,
+                    is_sufficient=True,
+                )
+                for r in legacy
+            ]
+
+        if self.demote_enabled and (
+            (score_field == "_rerank_score" and self.effective_config == "hybrid_ce_abstain")
+            or (score_field == "_similarity" and self.effective_config == "dense_abstain_ed")
+        ):
+            ranked = _apply_entity_demotion(query, ranked, score_field)
+
+        gate = self.gate if score_field == "_rerank_score" else self._dense_gate
+        store_size = len(self._dense_memories) if self._dense_memories else len(self.repository.get_all())
+        return gate.filter_and_ground(query, ranked, store_size=store_size, k=k)
 
     # -- scale-aware gate recalibration (part 2.4) --------------------------------
 
@@ -585,8 +636,10 @@ class ProductionRetriever:
         old_threshold = self.gate.threshold if score_field == "_rerank_score" else self._dense_gate.threshold
         if score_field == "_rerank_score":
             self.gate.threshold = best_threshold
+            self.gate.base_threshold = best_threshold
         else:
             self._dense_gate.threshold = best_threshold
+            self._dense_gate.base_threshold = best_threshold
         self.last_calibration_size = len(self.repository.get_all())
         self.last_calibration = {
             "timestamp": datetime.now(timezone.utc).isoformat(),
