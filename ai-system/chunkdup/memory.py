@@ -20,6 +20,7 @@ except ImportError:
 
 from .repository import MemoryRepository
 from .in_memory_repository import InMemoryRepository
+from .turn_repository import SourceTurnLog, TurnRepository, InMemoryTurnRepository, PostgresTurnRepository
 from .types import MemoryDict, SearchResult, RememberResult, UpdateResult, DeleteResult, StatsDict
 
 # Configure logging
@@ -366,7 +367,7 @@ class MemoryManager:
         existing = self.repository.get_by_key(memory["key"])
         if existing:
             memory["version"] = existing.get("version", 1)
-            memory["id"] = existing.get("id", memory["id"])
+            memory["supersedes_id"] = existing.get("id")
 
         decision = self.engine.decide(existing, memory)
 
@@ -438,6 +439,21 @@ class Memory:
             self.repository = PostgresRepository(connection_url)
         else:
             raise ValueError(f"Unknown store: {store}")
+
+        # Initialize dialogue turn log & repository
+        turn_repository = kwargs.get("turn_repository")
+        if turn_repository is not None:
+            self.turn_repository = turn_repository
+        elif hasattr(self.repository, "turn_repository") and self.repository.turn_repository is not None:
+            self.turn_repository = self.repository.turn_repository
+        elif store == "memory":
+            self.turn_repository = InMemoryTurnRepository()
+        elif store == "postgres":
+            self.turn_repository = PostgresTurnRepository(connection_url=connection_url)
+        else:
+            self.turn_repository = InMemoryTurnRepository()
+
+        self.turn_log = SourceTurnLog(self.turn_repository)
 
         # Set up paths
         if data_dir is None:
@@ -591,102 +607,118 @@ class Memory:
     # Core Operations
     # ──────────────────────────────────────────────────────
 
-    def remember(self, text: str) -> Dict[str, Any]:
+    def remember(
+        self,
+        text: str,
+        session_id: Optional[str] = None,
+        speaker: str = "user",
+        metadata: Optional[Dict[str, Any]] = None,
+        timestamp: Optional[str] = None,
+    ) -> Dict[str, Any]:
         """
         Store a memory from conversation text.
+        Persists raw dialogue turn and extracts structured facts with provenance.
 
         Args:
             text: The conversation text to remember
+            session_id: Optional session identifier
+            speaker: Speaker identifier ("user", "assistant", etc.)
+            metadata: Optional dictionary of turn metadata
+            timestamp: Optional ISO-8601 UTC timestamp
 
         Returns:
-            Dict with memory details and processed count
-
-        Example:
-            >>> memory.remember("I use Python")
-            {"memories": [{"decision": "processed", "key": "programming_language", "value": "Python"}], "count": 1}
+            Dict with turn_id, memory decisions, and count
         """
         logger.info(f"Remembering: {text[:50]}...")
 
-        # Add to conversation history
+        turn_id = str(uuid.uuid4())
+        now_utc = datetime.now(timezone.utc)
+        ts = timestamp or now_utc.isoformat().replace("+00:00", "Z")
+        sess_id = session_id or "default"
+        meta = metadata or {}
+
+        # 1. Permanently persist raw turn regardless of extraction decision
+        self.turn_log.append(
+            raw_text=text,
+            session_id=sess_id,
+            speaker=speaker,
+            metadata=meta,
+            turn_id=turn_id,
+            timestamp=ts,
+        )
+
+        # 2. Add to conversation history
         lines = self._load_conversation()
         lines.append(text)
         self._save_conversation(lines)
 
-        # Extract memories from current input text
+        # 3. Extract memories from current input text
         extracted = self.extractor.extract(text)
 
         results = []
         for mem in extracted:
-            existing = self.repository.get_by_key(mem["key"])
-            if existing:
-                mem["id"] = existing.get("id", mem["id"])
+            mem["source_turn_id"] = turn_id
+            mem["valid_from"] = ts
+            mem["valid_to"] = None
             decision = self.manager.process(mem)
             results.append({
                 "decision": decision.value.upper(),
                 "key": mem.get("key"),
-                "value": mem.get("value")
+                "value": mem.get("value"),
             })
 
         if not results:
             results.append({
                 "decision": "IGNORE",
                 "key": None,
-                "value": None
+                "value": None,
             })
 
-        return {"memories": results, "count": len(results)}
+        return {"turn_id": turn_id, "memories": results, "count": len(results)}
 
-    def retrieve(self, query: str, limit: int = 5) -> List[Dict[str, Any]]:
+    def retrieve(self, query: str, limit: int = 5, as_of: Optional[Any] = None) -> List[Dict[str, Any]]:
         """
-        Retrieve memories matching a query.
+        Retrieve memories matching a query, optionally point-in-time.
 
         Args:
             query: Search query
             limit: Maximum number of results
+            as_of: Optional point-in-time datetime or ISO string
 
         Returns:
             List of matching memories
-
-        Example:
-            >>> memory.retrieve("What language?")
-            [{"key": "programming_language", "value": "Python", ...}]
         """
         logger.info(f"Retrieving: {query}")
-        return self.retriever.retrieve(query, k=limit)
+        return self.retriever.retrieve(query, k=limit, as_of=as_of)
 
-    def retrieve_grounded(self, query: str, limit: int = 5) -> List[Any]:
+    def retrieve_grounded(self, query: str, limit: int = 5, as_of: Optional[Any] = None) -> List[Any]:
         """
         Retrieve memories with evidence provenance and sufficiency attribution.
 
         Args:
             query: Search query
             limit: Maximum number of results
+            as_of: Optional point-in-time datetime or ISO string
 
         Returns:
             List of GroundedRetrievalResult objects
         """
         logger.info(f"Retrieving grounded: {query}")
         if hasattr(self.retriever, "retrieve_grounded"):
-            return self.retriever.retrieve_grounded(query, k=limit)
-        return self.retriever.retrieve(query, k=limit)
+            return self.retriever.retrieve_grounded(query, k=limit, as_of=as_of)
+        return self.retriever.retrieve(query, k=limit, as_of=as_of)
 
-    def update(self, key: str, new_value: str) -> Dict[str, Any]:
+    def update(self, key: str, new_value: str, valid_from: Optional[str] = None) -> Dict[str, Any]:
         """
-        Update a memory by key.
+        Update a memory by key using append-only supersession.
 
         Args:
             key: The memory key to update
             new_value: The new value
+            valid_from: Optional ISO timestamp when the update becomes valid
 
         Returns:
             Dict with update result
-
-        Raises:
-            ValueError: If memory with key is not found
-
-        Example:
-            >>> memory.update("programming_language", "I now use Go")
-            {"decision": "UPDATE", "key": "programming_language", "value": "Go"}
         """
         logger.info(f"Updating {key} -> {new_value[:50]}...")
 
@@ -694,12 +726,17 @@ class Memory:
         if not existing:
             raise ValueError(f"Memory with key '{key}' not found")
 
+        ts = valid_from or datetime.now(timezone.utc).isoformat().replace("+00:00", "Z")
         updated = dict(existing)
+        updated["id"] = str(uuid.uuid4())
         updated["value"] = new_value
-        updated["updated_at"] = datetime.now(timezone.utc).isoformat().replace("+00:00", "Z")
+        updated["supersedes_id"] = existing["id"]
+        updated["valid_from"] = ts
+        updated["valid_to"] = None
+        updated["updated_at"] = ts
 
         self.repository.update(updated)
-        return {"decision": "UPDATE", "key": key, "value": new_value}
+        return {"decision": "UPDATE", "key": key, "value": new_value, "id": updated.get("id")}
 
     def delete(self, memory_id: str) -> Dict[str, Any]:
         """
@@ -710,41 +747,53 @@ class Memory:
 
         Returns:
             Dict with deletion result
-
-        Example:
-            >>> memory.delete("abc-123")
-            {"success": True, "id": "abc-123"}
         """
         logger.info(f"Deleting memory: {memory_id}")
         self.repository.delete(memory_id)
         return {"success": True, "id": memory_id}
 
-    def search(self, query: str, limit: int = 5, semantic: bool = True) -> List[Dict[str, Any]]:
+    def search(self, query: str, limit: int = 5, semantic: bool = True, as_of: Optional[Any] = None) -> List[Dict[str, Any]]:
         """
-        Search memories with optional semantic search.
+        Search memories with optional semantic search and point-in-time filtering.
 
         Args:
             query: Search query
             limit: Maximum results
             semantic: Use semantic search if available
+            as_of: Optional point-in-time datetime or ISO string
 
         Returns:
             List of matching memories
         """
         logger.info(f"Searching: {query}")
-        return self.retriever.retrieve(query, k=limit)
+        return self.retriever.retrieve(query, k=limit, as_of=as_of)
+
+    def get_turn(self, turn_id: str) -> Optional[Dict[str, Any]]:
+        """Retrieve a raw dialogue turn by turn ID."""
+        return self.turn_log.get(turn_id)
+
+    def get_turns(self, session_id: Optional[str] = None) -> List[Dict[str, Any]]:
+        """Retrieve all raw dialogue turns, optionally filtered by session."""
+        if session_id:
+            return self.turn_log.get_session(session_id)
+        return self.turn_log.get_all()
 
     # ──────────────────────────────────────────────────────
     # Utility Operations
     # ──────────────────────────────────────────────────────
 
-    def get_all(self) -> List[Dict[str, Any]]:
-        """Get all active memories."""
+    def get_all(self, as_of: Optional[Any] = None) -> List[Dict[str, Any]]:
+        """Get memories, optionally as of a point in time."""
+        if hasattr(self.repository, "get_all"):
+            import inspect
+            sig = inspect.signature(self.repository.get_all)
+            if "as_of" in sig.parameters:
+                return self.repository.get_all(as_of=as_of)
         return self.repository.get_all()
 
     def get_history(self, key: str) -> List[Dict[str, Any]]:
         """
-        Get history of a memory by key.
+        Get chronologically ordered history of a memory key.
         Requires repository supporting get_history.
         """
         if hasattr(self.repository, "get_history"):
@@ -759,12 +808,15 @@ class Memory:
             "store_type": self._store_type,
             "keys": [m.get("key") for m in all_memories],
             "active_memories": len(all_memories),
-            "conversation_lines": len(self._load_conversation())
+            "conversation_lines": len(self._load_conversation()),
+            "total_turns": len(self.get_turns()),
         }
 
     def clear(self) -> None:
-        """Clear all memories and conversation history."""
+        """Clear all memories, dialogue turns, and conversation history."""
         self.repository.clear()
+        if hasattr(self, "turn_log"):
+            self.turn_log.clear()
         self._save_conversation([])
         logger.info("Memory cleared")
 

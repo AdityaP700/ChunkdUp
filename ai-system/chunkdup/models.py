@@ -8,6 +8,23 @@ import uuid
 
 Base = declarative_base()
 
+
+class TurnModel(Base):
+    __tablename__ = "source_turns"
+
+    id = Column(UUID(as_uuid=True), primary_key=True, default=uuid.uuid4)
+    session_id = Column(String(255), nullable=True, default="default")
+    speaker = Column(String(50), nullable=False, default="user")
+    raw_text = Column(Text, nullable=False)
+    timestamp = Column(DateTime(timezone=True), default=lambda: datetime.now(timezone.utc))
+    metadata_ = Column("metadata", JSON, default=dict)
+
+    __table_args__ = (
+        Index('idx_source_turns_session', 'session_id'),
+        Index('idx_source_turns_timestamp', 'timestamp'),
+    )
+
+
 class MemoryModel(Base):
     __tablename__ = "memories"
 
@@ -27,13 +44,23 @@ class MemoryModel(Base):
 
     embedding = Column(Vector(384), nullable=True)  # 384-dimensional embeddings
 
+    # Temporal & provenance tracking
+    source_turn_id = Column(UUID(as_uuid=True), nullable=True)
+    valid_from = Column(DateTime(timezone=True), default=lambda: datetime.now(timezone.utc))
+    valid_to = Column(DateTime(timezone=True), nullable=True)
+    supersedes_id = Column(UUID(as_uuid=True), nullable=True)
+    superseded_by = Column(UUID(as_uuid=True), nullable=True)
+
     __table_args__ = (
         Index('idx_memories_key_status', 'key', 'status'),
         Index('idx_memories_created', 'created_at'),
         Index('idx_memories_version', 'version'),
-        # ← NEW: HNSW index for fast vector search
+        Index('idx_memories_valid_range', 'valid_from', 'valid_to'),
+        Index('idx_memories_supersedes', 'supersedes_id'),
+        # HNSW index for fast vector search
         Index('idx_memories_embedding', 'embedding', postgresql_using='hnsw', postgresql_ops={'embedding': 'vector_cosine_ops'}),
     )
+
 
 class MemoryHistoryModel(Base):
     __tablename__ = "memory_history"

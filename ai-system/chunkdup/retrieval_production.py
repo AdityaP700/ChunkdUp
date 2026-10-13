@@ -523,7 +523,20 @@ class ProductionRetriever:
                 return fused, "_similarity"
         return dense_results, "_similarity"
 
-    def retrieve(self, query: str, k: int = 5) -> List[Dict[str, Any]]:
+    def retrieve(self, query: str, k: int = 5, as_of: Optional[Any] = None) -> List[Dict[str, Any]]:
+        if as_of is not None:
+            pit_memories = self.repository.get_all(as_of=as_of)
+            if not pit_memories:
+                return []
+            query_words = set(query.lower().split())
+            scored = []
+            for m in pit_memories:
+                text = f"{m.get('key', '')} {m.get('value', '')} {m.get('contextual_text', '')}".lower()
+                overlap = sum(1 for w in query_words if w in text)
+                scored.append((overlap, m))
+            scored.sort(key=lambda x: x[0], reverse=True)
+            return [m for _, m in scored[:k]]
+
         t0 = time.perf_counter()
         ranked, score_field = self._collect_ranked(query, k)
 
@@ -547,8 +560,23 @@ class ProductionRetriever:
         self._log_query(query, final, ranked, latency_ms, not final)
         return final
 
-    def retrieve_grounded(self, query: str, k: int = 5) -> List[GroundedRetrievalResult]:
+    def retrieve_grounded(self, query: str, k: int = 5, as_of: Optional[Any] = None) -> List[GroundedRetrievalResult]:
         """Retrieve memories matching a query as typed GroundedRetrievalResult objects."""
+        if as_of is not None:
+            results = self.retrieve(query, k=k, as_of=as_of)
+            return [
+                GroundedRetrievalResult(
+                    id=str(r.get("id") or r.get("key") or ""),
+                    memory=r,
+                    score=1.0,
+                    score_field="point_in_time",
+                    source_turns=[r.get("source_turn_id")] if r.get("source_turn_id") else [],
+                    confidence=1.0,
+                    is_sufficient=True,
+                )
+                for r in results
+            ]
+
         t0 = time.perf_counter()
         ranked, score_field = self._collect_ranked(query, k)
 

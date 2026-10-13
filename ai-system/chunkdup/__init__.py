@@ -15,6 +15,7 @@ from .memory import (
 )
 from .async_memory import AsyncMemory
 from .in_memory_repository import InMemoryRepository
+from .turn_repository import TurnRepository, InMemoryTurnRepository, PostgresTurnRepository, SourceTurnLog
 from .entity_extractor import EntityExtractor
 try:
     from .postgres_repository import PostgresRepository
@@ -72,6 +73,10 @@ __all__ = [
     "EntityExtractor",
     "InMemoryRepository",
     "PostgresRepository",
+    "TurnRepository",
+    "InMemoryTurnRepository",
+    "PostgresTurnRepository",
+    "SourceTurnLog",
     "Decision",
     "BasePolicy",
     "EmbeddingGenerator",
