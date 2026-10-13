@@ -21,6 +21,10 @@ except ImportError:
 from .repository import MemoryRepository
 from .in_memory_repository import InMemoryRepository
 from .turn_repository import SourceTurnLog, TurnRepository, InMemoryTurnRepository, PostgresTurnRepository
+try:
+    from .extraction import ExtractedFact, GroqFactExtractor, TurnBuffer
+except ImportError:
+    from extraction import ExtractedFact, GroqFactExtractor, TurnBuffer
 from .types import MemoryDict, SearchResult, RememberResult, UpdateResult, DeleteResult, StatsDict
 
 # Configure logging
@@ -497,6 +501,19 @@ class Memory:
         )
         self.prompt_builder = PromptBuilder()
 
+        # Fact extraction & turn buffer
+        self.groq_extractor = GroqFactExtractor(
+            api_key=kwargs.get("groq_api_key"),
+            model=kwargs.get("groq_model", "llama-3.3-70b-versatile"),
+            fallback_extractor=self.extractor,
+        )
+        self.turn_buffer = TurnBuffer(
+            turn_log=self.turn_log,
+            extractor=self.groq_extractor,
+            memory_manager=self.manager,
+            batch_size=kwargs.get("turn_buffer_size", 5),
+        )
+
         # Lazy-load LLM components
         self._llm = None
         self._parser = None
@@ -675,6 +692,29 @@ class Memory:
             })
 
         return {"turn_id": turn_id, "memories": results, "count": len(results)}
+
+    def remember_buffered(
+        self,
+        text: str,
+        session_id: Optional[str] = None,
+        speaker: str = "user",
+        metadata: Optional[Dict[str, Any]] = None,
+    ) -> Dict[str, Any]:
+        """
+        Buffer dialogue turn for batched extraction.
+        Persists raw turn immediately to turn log (<5ms).
+        Flushes and extracts automatically when buffer capacity is reached.
+        """
+        return self.turn_buffer.add_turn(
+            raw_text=text,
+            session_id=session_id or "default",
+            speaker=speaker,
+            metadata=metadata,
+        )
+
+    def flush_buffer(self) -> List[Dict[str, Any]]:
+        """Flush currently buffered dialogue turns and extract facts."""
+        return self.turn_buffer.flush()
 
     def retrieve(self, query: str, limit: int = 5, as_of: Optional[Any] = None) -> List[Dict[str, Any]]:
         """
