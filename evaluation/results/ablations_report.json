@@ -1,0 +1,93 @@
+{
+  "timestamp": "2026-10-13T20:39:31.487667Z",
+  "commit_hash": "113e080ddddd63433fcded59a4363f06ab488665",
+  "frozen_92_query_suite": {
+    "legacy_baseline": {
+      "config_key": "legacy_baseline",
+      "n_queries": 92,
+      "MRR": 0.5185,
+      "P@5": 0.4442,
+      "recall_at_5": 0.5567,
+      "abstain_count": 0,
+      "total_duration_seconds": 0.06,
+      "avg_latency_ms": 0.59,
+      "p95_latency_ms": 1.77
+    },
+    "dense_abstain_ed": {
+      "config_key": "dense_abstain_ed",
+      "n_queries": 92,
+      "MRR": 0.8152,
+      "P@5": 0.7005,
+      "recall_at_5": 0.8007,
+      "abstain_count": 0,
+      "total_duration_seconds": 45.07,
+      "avg_latency_ms": 489.88,
+      "p95_latency_ms": 32.13
+    },
+    "hybrid_ce_abstain": {
+      "config_key": "hybrid_ce_abstain",
+      "n_queries": 92,
+      "MRR": 0.8424,
+      "P@5": 0.6475,
+      "recall_at_5": 0.8509,
+      "abstain_count": 0,
+      "total_duration_seconds": 61.45,
+      "avg_latency_ms": 667.89,
+      "p95_latency_ms": 753.28
+    }
+  },
+  "locomo_track_a": {
+    "split": "dev",
+    "results": {
+      "bm25": {
+        "config_name": "bm25",
+        "MRR@5": 0.0,
+        "Recall@5": 0.0,
+        "Precision@5": 0.0,
+        "abstain_rate": 0.0,
+        "duration_seconds": 24.9,
+        "adversarial_rejection_rate": 0.0,
+        "category_breakdown": {}
+      },
+      "dense_abstain_ed": {
+        "config_name": "dense_abstain_ed",
+        "MRR@5": 0.0,
+        "Recall@5": 0.0,
+        "Precision@5": 0.0,
+        "abstain_rate": 0.0,
+        "duration_seconds": 33.78,
+        "adversarial_rejection_rate": 0.0,
+        "category_breakdown": {}
+      },
+      "hybrid_ce_abstain": {
+        "config_name": "hybrid_ce_abstain",
+        "MRR@5": 0.0,
+        "Recall@5": 0.0,
+        "Precision@5": 0.0,
+        "abstain_rate": 0.0,
+        "duration_seconds": 1099.5,
+        "adversarial_rejection_rate": 0.0,
+        "category_breakdown": {}
+      }
+    }
+  },
+  "scoreboard": {
+    "frozen_92": {
+      "legacy_baseline": {
+        "MRR": 0.5185,
+        "P@5": 0.4442,
+        "avg_latency_ms": 0.59
+      },
+      "dense_abstain_ed": {
+        "MRR": 0.8152,
+        "P@5": 0.7005,
+        "avg_latency_ms": 489.88
+      },
+      "hybrid_ce_abstain": {
+        "MRR": 0.8424,
+        "P@5": 0.6475,
+        "avg_latency_ms": 667.89
+      }
+    }
+  }
+}
