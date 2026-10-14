@@ -1,0 +1,30 @@
+{
+  "Held_Out_Baseline_Control": {
+    "total_questions_evaluated": 1682,
+    "total_held_out_conversations": 8,
+    "hit_at_1": 0.5059,
+    "hit_at_3": 0.635,
+    "hit_at_5": 0.676,
+    "mrr": 0.5732,
+    "mean_recall_at_5": 0.6156,
+    "full_recall_at_5": 0.5642,
+    "multihop_full_recall_at_5": 0.19,
+    "temporal_accuracy_hit3": 0.6857,
+    "adversarial_abstention_accuracy": 0.0397,
+    "latency_p50_ms": 136.07
+  },
+  "Held_Out_Optimized_Pipeline": {
+    "total_questions_evaluated": 1682,
+    "total_held_out_conversations": 8,
+    "hit_at_1": 0.4293,
+    "hit_at_3": 0.4982,
+    "hit_at_5": 0.5089,
+    "mrr": 0.4632,
+    "mean_recall_at_5": 0.4671,
+    "full_recall_at_5": 0.4322,
+    "multihop_full_recall_at_5": 0.0692,
+    "temporal_accuracy_hit3": 0.5545,
+    "adversarial_abstention_accuracy": 0.3806,
+    "latency_p50_ms": 151.94
+  }
+}

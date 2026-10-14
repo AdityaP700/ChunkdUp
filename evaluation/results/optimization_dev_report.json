@@ -1,0 +1,58 @@
+{
+  "Baseline_Control": {
+    "total_questions": 304,
+    "hit_at_1": 0.4803,
+    "hit_at_3": 0.6184,
+    "hit_at_5": 0.6546,
+    "mrr": 0.5533,
+    "mean_recall_at_5": 0.611,
+    "full_recall_at_5": 0.5691,
+    "multihop_hit_at_3": 0.0769,
+    "multihop_full_recall_at_5": 0.0,
+    "temporal_accuracy_hit3": 0.9267,
+    "adversarial_abstention_accuracy": 0.0944,
+    "latency_p50_ms": 112.16
+  },
+  "Optimized_Abstention_Only": {
+    "total_questions": 304,
+    "hit_at_1": 0.421,
+    "hit_at_3": 0.4901,
+    "hit_at_5": 0.5033,
+    "mrr": 0.4572,
+    "mean_recall_at_5": 0.4753,
+    "full_recall_at_5": 0.4507,
+    "multihop_hit_at_3": 0.0,
+    "multihop_full_recall_at_5": 0.0,
+    "temporal_accuracy_hit3": 0.7823,
+    "adversarial_abstention_accuracy": 0.4309,
+    "latency_p50_ms": 113.11
+  },
+  "Optimized_Multihop_Only": {
+    "total_questions": 304,
+    "hit_at_1": 0.4803,
+    "hit_at_3": 0.6217,
+    "hit_at_5": 0.6612,
+    "mrr": 0.5551,
+    "mean_recall_at_5": 0.6176,
+    "full_recall_at_5": 0.5756,
+    "multihop_hit_at_3": 0.0769,
+    "multihop_full_recall_at_5": 0.0,
+    "temporal_accuracy_hit3": 0.9267,
+    "adversarial_abstention_accuracy": 0.0944,
+    "latency_p50_ms": 134.99
+  },
+  "Optimized_Full_Pipeline": {
+    "total_questions": 304,
+    "hit_at_1": 0.421,
+    "hit_at_3": 0.4901,
+    "hit_at_5": 0.5033,
+    "mrr": 0.4572,
+    "mean_recall_at_5": 0.4753,
+    "full_recall_at_5": 0.4507,
+    "multihop_hit_at_3": 0.0,
+    "multihop_full_recall_at_5": 0.0,
+    "temporal_accuracy_hit3": 0.7823,
+    "adversarial_abstention_accuracy": 0.4309,
+    "latency_p50_ms": 140.28
+  }
+}
