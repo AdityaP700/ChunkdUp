@@ -1,0 +1,737 @@
+{
+  "timestamp": "2026-10-14T08:31:09.721422Z",
+  "dev_samples": [
+    "conv-26",
+    "conv-30"
+  ],
+  "groq_api_available": true,
+  "synthetic_benchmark": {
+    "rules": {
+      "extractor_mode": "rules",
+      "total_turns": 6,
+      "active_memory_count": 4,
+      "ingest_duration_seconds": 0.24,
+      "queries_evaluated": 4,
+      "queries_successful": 4,
+      "success_rate": 1.0,
+      "point_in_time_reconstruction_correct": false,
+      "query_results": [
+        {
+          "query": "Where do I work and what is my role?",
+          "success": true,
+          "keys_found": true,
+          "values_found": true,
+          "provenance_valid": true,
+          "retrieved_count": 1
+        },
+        {
+          "query": "What cloud provider do I use currently?",
+          "success": true,
+          "keys_found": true,
+          "values_found": true,
+          "provenance_valid": true,
+          "retrieved_count": 2
+        },
+        {
+          "query": "What programming language do I use now?",
+          "success": true,
+          "keys_found": true,
+          "values_found": true,
+          "provenance_valid": true,
+          "retrieved_count": 3
+        },
+        {
+          "query": "What open source project am I building?",
+          "success": true,
+          "keys_found": true,
+          "values_found": true,
+          "provenance_valid": true,
+          "retrieved_count": 1
+        }
+      ],
+      "active_keys": [
+        "company",
+        "project_name",
+        "cloud_provider",
+        "programming_language"
+      ]
+    },
+    "groq": {
+      "extractor_mode": "groq",
+      "total_turns": 6,
+      "active_memory_count": 7,
+      "ingest_duration_seconds": 6.45,
+      "queries_evaluated": 4,
+      "queries_successful": 4,
+      "success_rate": 1.0,
+      "point_in_time_reconstruction_correct": false,
+      "query_results": [
+        {
+          "query": "Where do I work and what is my role?",
+          "success": true,
+          "keys_found": true,
+          "values_found": true,
+          "provenance_valid": true,
+          "retrieved_count": 2
+        },
+        {
+          "query": "What cloud provider do I use currently?",
+          "success": true,
+          "keys_found": true,
+          "values_found": true,
+          "provenance_valid": true,
+          "retrieved_count": 1
+        },
+        {
+          "query": "What programming language do I use now?",
+          "success": true,
+          "keys_found": true,
+          "values_found": true,
+          "provenance_valid": true,
+          "retrieved_count": 3
+        },
+        {
+          "query": "What open source project am I building?",
+          "success": true,
+          "keys_found": true,
+          "values_found": true,
+          "provenance_valid": true,
+          "retrieved_count": 1
+        }
+      ],
+      "active_keys": [
+        "company",
+        "role",
+        "container_platform",
+        "programming_language",
+        "project_name",
+        "cloud_provider",
+        "backend_language"
+      ]
+    }
+  },
+  "rules_extractor_eval": {
+    "conv-26": {
+      "sample_id": "conv-26",
+      "extractor_mode": "rules",
+      "turns_ingested": 419,
+      "active_memory_count": 0,
+      "ingest_time_seconds": 10.79,
+      "questions_evaluated": 199,
+      "pipelines": {
+        "baseline": {
+          "answerable_questions": 152,
+          "evidence_hits": 0,
+          "accuracy_recall_at_5": 0.0,
+          "mean_token_f1": 0.0,
+          "adversarial_questions": 47,
+          "adversarial_abstained": 47,
+          "adversarial_abstention_rate": 1.0,
+          "error_breakdown": {
+            "EXTRACTION_FAILURE": 152,
+            "RETRIEVAL_FAILURE": 0,
+            "STALE_MEMORY": 0,
+            "FALSE_ABSTENTION": 0
+          },
+          "categories": {
+            "1": {
+              "total": 32,
+              "accuracy": 0.0,
+              "mean_f1": 0.0,
+              "abstention_rate": 1.0
+            },
+            "2": {
+              "total": 37,
+              "accuracy": 0.0,
+              "mean_f1": 0.0,
+              "abstention_rate": 1.0
+            },
+            "3": {
+              "total": 13,
+              "accuracy": 0.0,
+              "mean_f1": 0.0,
+              "abstention_rate": 1.0
+            },
+            "4": {
+              "total": 70,
+              "accuracy": 0.0,
+              "mean_f1": 0.0,
+              "abstention_rate": 1.0
+            },
+            "5": {
+              "total": 47,
+              "accuracy": 0.0,
+              "mean_f1": 0.0,
+              "abstention_rate": 1.0
+            }
+          }
+        },
+        "production": {
+          "answerable_questions": 152,
+          "evidence_hits": 0,
+          "accuracy_recall_at_5": 0.0,
+          "mean_token_f1": 0.0,
+          "adversarial_questions": 47,
+          "adversarial_abstained": 47,
+          "adversarial_abstention_rate": 1.0,
+          "error_breakdown": {
+            "EXTRACTION_FAILURE": 152,
+            "RETRIEVAL_FAILURE": 0,
+            "STALE_MEMORY": 0,
+            "FALSE_ABSTENTION": 0
+          },
+          "categories": {
+            "1": {
+              "total": 32,
+              "accuracy": 0.0,
+              "mean_f1": 0.0,
+              "abstention_rate": 1.0
+            },
+            "2": {
+              "total": 37,
+              "accuracy": 0.0,
+              "mean_f1": 0.0,
+              "abstention_rate": 1.0
+            },
+            "3": {
+              "total": 13,
+              "accuracy": 0.0,
+              "mean_f1": 0.0,
+              "abstention_rate": 1.0
+            },
+            "4": {
+              "total": 70,
+              "accuracy": 0.0,
+              "mean_f1": 0.0,
+              "abstention_rate": 1.0
+            },
+            "5": {
+              "total": 47,
+              "accuracy": 0.0,
+              "mean_f1": 0.0,
+              "abstention_rate": 1.0
+            }
+          }
+        },
+        "entity_augmented": {
+          "answerable_questions": 152,
+          "evidence_hits": 0,
+          "accuracy_recall_at_5": 0.0,
+          "mean_token_f1": 0.0,
+          "adversarial_questions": 47,
+          "adversarial_abstained": 47,
+          "adversarial_abstention_rate": 1.0,
+          "error_breakdown": {
+            "EXTRACTION_FAILURE": 152,
+            "RETRIEVAL_FAILURE": 0,
+            "STALE_MEMORY": 0,
+            "FALSE_ABSTENTION": 0
+          },
+          "categories": {
+            "1": {
+              "total": 32,
+              "accuracy": 0.0,
+              "mean_f1": 0.0,
+              "abstention_rate": 1.0
+            },
+            "2": {
+              "total": 37,
+              "accuracy": 0.0,
+              "mean_f1": 0.0,
+              "abstention_rate": 1.0
+            },
+            "3": {
+              "total": 13,
+              "accuracy": 0.0,
+              "mean_f1": 0.0,
+              "abstention_rate": 1.0
+            },
+            "4": {
+              "total": 70,
+              "accuracy": 0.0,
+              "mean_f1": 0.0,
+              "abstention_rate": 1.0
+            },
+            "5": {
+              "total": 47,
+              "accuracy": 0.0,
+              "mean_f1": 0.0,
+              "abstention_rate": 1.0
+            }
+          }
+        }
+      }
+    },
+    "conv-30": {
+      "sample_id": "conv-30",
+      "extractor_mode": "rules",
+      "turns_ingested": 369,
+      "active_memory_count": 1,
+      "ingest_time_seconds": 11.24,
+      "questions_evaluated": 105,
+      "pipelines": {
+        "baseline": {
+          "answerable_questions": 81,
+          "evidence_hits": 0,
+          "accuracy_recall_at_5": 0.0,
+          "mean_token_f1": 0.0206,
+          "adversarial_questions": 24,
+          "adversarial_abstained": 8,
+          "adversarial_abstention_rate": 0.3333,
+          "error_breakdown": {
+            "EXTRACTION_FAILURE": 81,
+            "RETRIEVAL_FAILURE": 0,
+            "STALE_MEMORY": 0,
+            "FALSE_ABSTENTION": 0
+          },
+          "categories": {
+            "1": {
+              "total": 11,
+              "accuracy": 0.0,
+              "mean_f1": 0.0166,
+              "abstention_rate": 0.1818
+            },
+            "2": {
+              "total": 26,
+              "accuracy": 0.0,
+              "mean_f1": 0.0,
+              "abstention_rate": 0.2308
+            },
+            "4": {
+              "total": 44,
+              "accuracy": 0.0,
+              "mean_f1": 0.0337,
+              "abstention_rate": 0.25
+            },
+            "5": {
+              "total": 24,
+              "accuracy": 0.0,
+              "mean_f1": 0.0,
+              "abstention_rate": 0.3333
+            }
+          }
+        },
+        "production": {
+          "answerable_questions": 81,
+          "evidence_hits": 0,
+          "accuracy_recall_at_5": 0.0,
+          "mean_token_f1": 0.0143,
+          "adversarial_questions": 24,
+          "adversarial_abstained": 14,
+          "adversarial_abstention_rate": 0.5833,
+          "error_breakdown": {
+            "EXTRACTION_FAILURE": 81,
+            "RETRIEVAL_FAILURE": 0,
+            "STALE_MEMORY": 0,
+            "FALSE_ABSTENTION": 0
+          },
+          "categories": {
+            "1": {
+              "total": 11,
+              "accuracy": 0.0,
+              "mean_f1": 0.0088,
+              "abstention_rate": 0.5455
+            },
+            "2": {
+              "total": 26,
+              "accuracy": 0.0,
+              "mean_f1": 0.0,
+              "abstention_rate": 0.7692
+            },
+            "4": {
+              "total": 44,
+              "accuracy": 0.0,
+              "mean_f1": 0.0242,
+              "abstention_rate": 0.5227
+            },
+            "5": {
+              "total": 24,
+              "accuracy": 0.0,
+              "mean_f1": 0.0,
+              "abstention_rate": 0.5833
+            }
+          }
+        },
+        "entity_augmented": {
+          "answerable_questions": 81,
+          "evidence_hits": 0,
+          "accuracy_recall_at_5": 0.0,
+          "mean_token_f1": 0.0143,
+          "adversarial_questions": 24,
+          "adversarial_abstained": 14,
+          "adversarial_abstention_rate": 0.5833,
+          "error_breakdown": {
+            "EXTRACTION_FAILURE": 81,
+            "RETRIEVAL_FAILURE": 0,
+            "STALE_MEMORY": 0,
+            "FALSE_ABSTENTION": 0
+          },
+          "categories": {
+            "1": {
+              "total": 11,
+              "accuracy": 0.0,
+              "mean_f1": 0.0088,
+              "abstention_rate": 0.5455
+            },
+            "2": {
+              "total": 26,
+              "accuracy": 0.0,
+              "mean_f1": 0.0,
+              "abstention_rate": 0.7692
+            },
+            "4": {
+              "total": 44,
+              "accuracy": 0.0,
+              "mean_f1": 0.0242,
+              "abstention_rate": 0.5227
+            },
+            "5": {
+              "total": 24,
+              "accuracy": 0.0,
+              "mean_f1": 0.0,
+              "abstention_rate": 0.5833
+            }
+          }
+        }
+      }
+    },
+    "combined_dev_split": {
+      "total_samples": 2,
+      "total_turns": 788,
+      "total_active_memories": 1,
+      "total_questions": 304,
+      "pipelines": {
+        "baseline": {
+          "answerable_questions": 233,
+          "evidence_hits": 0,
+          "accuracy_recall_at_5": 0.0,
+          "mean_token_f1": 0.0072,
+          "adversarial_questions": 71,
+          "adversarial_abstained": 55,
+          "adversarial_abstention_rate": 0.7746,
+          "error_breakdown": {
+            "EXTRACTION_FAILURE": 233,
+            "RETRIEVAL_FAILURE": 0,
+            "STALE_MEMORY": 0,
+            "FALSE_ABSTENTION": 0
+          }
+        },
+        "production": {
+          "answerable_questions": 233,
+          "evidence_hits": 0,
+          "accuracy_recall_at_5": 0.0,
+          "mean_token_f1": 0.005,
+          "adversarial_questions": 71,
+          "adversarial_abstained": 61,
+          "adversarial_abstention_rate": 0.8592,
+          "error_breakdown": {
+            "EXTRACTION_FAILURE": 233,
+            "RETRIEVAL_FAILURE": 0,
+            "STALE_MEMORY": 0,
+            "FALSE_ABSTENTION": 0
+          }
+        },
+        "entity_augmented": {
+          "answerable_questions": 233,
+          "evidence_hits": 0,
+          "accuracy_recall_at_5": 0.0,
+          "mean_token_f1": 0.005,
+          "adversarial_questions": 71,
+          "adversarial_abstained": 61,
+          "adversarial_abstention_rate": 0.8592,
+          "error_breakdown": {
+            "EXTRACTION_FAILURE": 233,
+            "RETRIEVAL_FAILURE": 0,
+            "STALE_MEMORY": 0,
+            "FALSE_ABSTENTION": 0
+          }
+        }
+      }
+    }
+  },
+  "groq_extractor_eval": {
+    "conv-26": {
+      "sample_id": "conv-26",
+      "extractor_mode": "groq",
+      "turns_ingested": 25,
+      "active_memory_count": 13,
+      "ingest_time_seconds": 97.14,
+      "questions_evaluated": 25,
+      "pipelines": {
+        "baseline": {
+          "answerable_questions": 25,
+          "evidence_hits": 3,
+          "accuracy_recall_at_5": 0.12,
+          "mean_token_f1": 0.0186,
+          "adversarial_questions": 0,
+          "adversarial_abstained": 0,
+          "adversarial_abstention_rate": 0.0,
+          "error_breakdown": {
+            "EXTRACTION_FAILURE": 22,
+            "RETRIEVAL_FAILURE": 0,
+            "STALE_MEMORY": 0,
+            "FALSE_ABSTENTION": 0
+          },
+          "categories": {
+            "1": {
+              "total": 10,
+              "accuracy": 0.1,
+              "mean_f1": 0.019,
+              "abstention_rate": 0.3
+            },
+            "2": {
+              "total": 12,
+              "accuracy": 0.0833,
+              "mean_f1": 0.0186,
+              "abstention_rate": 0.0833
+            },
+            "3": {
+              "total": 3,
+              "accuracy": 0.3333,
+              "mean_f1": 0.0175,
+              "abstention_rate": 0.0
+            }
+          }
+        },
+        "production": {
+          "answerable_questions": 25,
+          "evidence_hits": 1,
+          "accuracy_recall_at_5": 0.04,
+          "mean_token_f1": 0.0139,
+          "adversarial_questions": 0,
+          "adversarial_abstained": 0,
+          "adversarial_abstention_rate": 0.0,
+          "error_breakdown": {
+            "EXTRACTION_FAILURE": 22,
+            "RETRIEVAL_FAILURE": 2,
+            "STALE_MEMORY": 0,
+            "FALSE_ABSTENTION": 0
+          },
+          "categories": {
+            "1": {
+              "total": 10,
+              "accuracy": 0.0,
+              "mean_f1": 0.013,
+              "abstention_rate": 0.5
+            },
+            "2": {
+              "total": 12,
+              "accuracy": 0.0833,
+              "mean_f1": 0.018,
+              "abstention_rate": 0.25
+            },
+            "3": {
+              "total": 3,
+              "accuracy": 0.0,
+              "mean_f1": 0.0,
+              "abstention_rate": 0.0
+            }
+          }
+        },
+        "entity_augmented": {
+          "answerable_questions": 25,
+          "evidence_hits": 1,
+          "accuracy_recall_at_5": 0.04,
+          "mean_token_f1": 0.0139,
+          "adversarial_questions": 0,
+          "adversarial_abstained": 0,
+          "adversarial_abstention_rate": 0.0,
+          "error_breakdown": {
+            "EXTRACTION_FAILURE": 22,
+            "RETRIEVAL_FAILURE": 2,
+            "STALE_MEMORY": 0,
+            "FALSE_ABSTENTION": 0
+          },
+          "categories": {
+            "1": {
+              "total": 10,
+              "accuracy": 0.0,
+              "mean_f1": 0.013,
+              "abstention_rate": 0.5
+            },
+            "2": {
+              "total": 12,
+              "accuracy": 0.0833,
+              "mean_f1": 0.018,
+              "abstention_rate": 0.25
+            },
+            "3": {
+              "total": 3,
+              "accuracy": 0.0,
+              "mean_f1": 0.0,
+              "abstention_rate": 0.0
+            }
+          }
+        }
+      }
+    },
+    "conv-30": {
+      "sample_id": "conv-30",
+      "extractor_mode": "groq",
+      "turns_ingested": 25,
+      "active_memory_count": 15,
+      "ingest_time_seconds": 154.82,
+      "questions_evaluated": 25,
+      "pipelines": {
+        "baseline": {
+          "answerable_questions": 25,
+          "evidence_hits": 7,
+          "accuracy_recall_at_5": 0.28,
+          "mean_token_f1": 0.0222,
+          "adversarial_questions": 0,
+          "adversarial_abstained": 0,
+          "adversarial_abstention_rate": 0.0,
+          "error_breakdown": {
+            "EXTRACTION_FAILURE": 16,
+            "RETRIEVAL_FAILURE": 2,
+            "STALE_MEMORY": 0,
+            "FALSE_ABSTENTION": 0
+          },
+          "categories": {
+            "1": {
+              "total": 7,
+              "accuracy": 0.4286,
+              "mean_f1": 0.0483,
+              "abstention_rate": 0.0
+            },
+            "2": {
+              "total": 16,
+              "accuracy": 0.125,
+              "mean_f1": 0.0028,
+              "abstention_rate": 0.0
+            },
+            "4": {
+              "total": 2,
+              "accuracy": 1.0,
+              "mean_f1": 0.0858,
+              "abstention_rate": 0.0
+            }
+          }
+        },
+        "production": {
+          "answerable_questions": 25,
+          "evidence_hits": 5,
+          "accuracy_recall_at_5": 0.2,
+          "mean_token_f1": 0.0106,
+          "adversarial_questions": 0,
+          "adversarial_abstained": 0,
+          "adversarial_abstention_rate": 0.0,
+          "error_breakdown": {
+            "EXTRACTION_FAILURE": 16,
+            "RETRIEVAL_FAILURE": 0,
+            "STALE_MEMORY": 0,
+            "FALSE_ABSTENTION": 4
+          },
+          "categories": {
+            "1": {
+              "total": 7,
+              "accuracy": 0.1429,
+              "mean_f1": 0.0226,
+              "abstention_rate": 0.8571
+            },
+            "2": {
+              "total": 16,
+              "accuracy": 0.1875,
+              "mean_f1": 0.0,
+              "abstention_rate": 0.6875
+            },
+            "4": {
+              "total": 2,
+              "accuracy": 0.5,
+              "mean_f1": 0.0536,
+              "abstention_rate": 0.5
+            }
+          }
+        },
+        "entity_augmented": {
+          "answerable_questions": 25,
+          "evidence_hits": 5,
+          "accuracy_recall_at_5": 0.2,
+          "mean_token_f1": 0.0106,
+          "adversarial_questions": 0,
+          "adversarial_abstained": 0,
+          "adversarial_abstention_rate": 0.0,
+          "error_breakdown": {
+            "EXTRACTION_FAILURE": 16,
+            "RETRIEVAL_FAILURE": 0,
+            "STALE_MEMORY": 0,
+            "FALSE_ABSTENTION": 4
+          },
+          "categories": {
+            "1": {
+              "total": 7,
+              "accuracy": 0.1429,
+              "mean_f1": 0.0226,
+              "abstention_rate": 0.8571
+            },
+            "2": {
+              "total": 16,
+              "accuracy": 0.1875,
+              "mean_f1": 0.0,
+              "abstention_rate": 0.6875
+            },
+            "4": {
+              "total": 2,
+              "accuracy": 0.5,
+              "mean_f1": 0.0536,
+              "abstention_rate": 0.5
+            }
+          }
+        }
+      }
+    },
+    "combined_dev_split": {
+      "total_samples": 2,
+      "total_turns": 50,
+      "total_active_memories": 28,
+      "total_questions": 50,
+      "pipelines": {
+        "baseline": {
+          "answerable_questions": 50,
+          "evidence_hits": 10,
+          "accuracy_recall_at_5": 0.2,
+          "mean_token_f1": 0.0204,
+          "adversarial_questions": 0,
+          "adversarial_abstained": 0,
+          "adversarial_abstention_rate": 0.0,
+          "error_breakdown": {
+            "EXTRACTION_FAILURE": 38,
+            "RETRIEVAL_FAILURE": 2,
+            "STALE_MEMORY": 0,
+            "FALSE_ABSTENTION": 0
+          }
+        },
+        "production": {
+          "answerable_questions": 50,
+          "evidence_hits": 6,
+          "accuracy_recall_at_5": 0.12,
+          "mean_token_f1": 0.0123,
+          "adversarial_questions": 0,
+          "adversarial_abstained": 0,
+          "adversarial_abstention_rate": 0.0,
+          "error_breakdown": {
+            "EXTRACTION_FAILURE": 38,
+            "RETRIEVAL_FAILURE": 2,
+            "STALE_MEMORY": 0,
+            "FALSE_ABSTENTION": 4
+          }
+        },
+        "entity_augmented": {
+          "answerable_questions": 50,
+          "evidence_hits": 6,
+          "accuracy_recall_at_5": 0.12,
+          "mean_token_f1": 0.0123,
+          "adversarial_questions": 0,
+          "adversarial_abstained": 0,
+          "adversarial_abstention_rate": 0.0,
+          "error_breakdown": {
+            "EXTRACTION_FAILURE": 38,
+            "RETRIEVAL_FAILURE": 2,
+            "STALE_MEMORY": 0,
+            "FALSE_ABSTENTION": 4
+          }
+        }
+      }
+    }
+  }
+}
