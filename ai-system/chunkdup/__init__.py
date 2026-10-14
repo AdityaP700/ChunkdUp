@@ -108,4 +108,16 @@ def __getattr__(name):
     if name == "EmbeddingGenerator":
         from .embeddings import EmbeddingGenerator
         return EmbeddingGenerator
+    if name == "GraphAugmentedRetriever":
+        from .retrieval_graph_augmented import GraphAugmentedRetriever
+        return GraphAugmentedRetriever
+    if name == "ProfileGuidedArchiveRetriever":
+        from .profile.profile_guided_retriever import ProfileGuidedArchiveRetriever
+        return ProfileGuidedArchiveRetriever
+    if name == "OptimizedHybridMemory":
+        from .hybrid_memory_optimized import OptimizedHybridMemory
+        return OptimizedHybridMemory
+    if name == "QueryRouter":
+        from .query_router import QueryRouter
+        return QueryRouter
     raise AttributeError(name)

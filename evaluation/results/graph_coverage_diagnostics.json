@@ -1,0 +1,40 @@
+{
+  "conv-26": {
+    "sample_id": "conv-26",
+    "num_passages": 419,
+    "num_claims": 64,
+    "num_entities": 133,
+    "num_edges": 1697,
+    "total_gold_turns": 134,
+    "gold_in_passages": 134,
+    "pct_gold_in_passages": 1.0,
+    "total_claims": 71,
+    "pct_claims_with_turn_provenance": 1.0,
+    "gold_turns_with_claims": 22,
+    "pct_gold_with_claims": 0.1642,
+    "total_answerable_questions": 150,
+    "questions_with_extracted_seeds": 150,
+    "seeds_matching_gold_turns": 120,
+    "ppr_top5_hits": 12,
+    "ppr_hit_rate": 0.08
+  },
+  "conv-30": {
+    "sample_id": "conv-30",
+    "num_passages": 369,
+    "num_claims": 31,
+    "num_entities": 68,
+    "num_edges": 995,
+    "total_gold_turns": 75,
+    "gold_in_passages": 75,
+    "pct_gold_in_passages": 1.0,
+    "total_claims": 36,
+    "pct_claims_with_turn_provenance": 1.0,
+    "gold_turns_with_claims": 9,
+    "pct_gold_with_claims": 0.12,
+    "total_answerable_questions": 81,
+    "questions_with_extracted_seeds": 81,
+    "seeds_matching_gold_turns": 69,
+    "ppr_top5_hits": 1,
+    "ppr_hit_rate": 0.0123
+  }
+}

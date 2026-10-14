@@ -1,0 +1,375 @@
+{
+  "metadata": {
+    "timestamp": "2026-10-14T15:28:10Z",
+    "samples": [
+      "conv-41",
+      "conv-42",
+      "conv-43",
+      "conv-44",
+      "conv-47",
+      "conv-48",
+      "conv-49",
+      "conv-50"
+    ],
+    "total_samples": 8,
+    "split": "held_out",
+    "device": "cuda"
+  },
+  "results": {
+    "Strategy_A": {
+      "strategy_id": "Strategy_A",
+      "total_questions": 1682,
+      "hit_at_1": 0.4821640903686088,
+      "hit_at_3": 0.617717003567182,
+      "hit_at_5": 0.6587395957193817,
+      "mrr": 0.551674593737614,
+      "p_at_5": 0.14803804994054698,
+      "mean_recall_at_5": 0.5973204212930159,
+      "avg_context_tokens": 142.41260404280618,
+      "latency_p50_ms": 116.65594999976747,
+      "latency_p95_ms": 176.15799499690178,
+      "adversarial_abstention_accuracy": 0.010666666666666666,
+      "category_breakdown": {
+        "1": {
+          "name": "Single-hop / Factual",
+          "count": 239,
+          "hit_at_1": 0.4476987447698745,
+          "hit_at_3": 0.6443514644351465,
+          "hit_at_5": 0.694560669456067,
+          "mrr": 0.5503486750348675,
+          "p_at_5": 0.2267782426778243,
+          "mean_recall_at_5": 0.400491457819139,
+          "abstention_rate": 0.0041841004184100415
+        },
+        "2": {
+          "name": "Temporal reasoning",
+          "count": 258,
+          "hit_at_1": 0.5775193798449613,
+          "hit_at_3": 0.6821705426356589,
+          "hit_at_5": 0.7170542635658915,
+          "mrr": 0.6295865633074935,
+          "p_at_5": 0.15271317829457368,
+          "mean_recall_at_5": 0.6728036175710594,
+          "abstention_rate": 0.007751937984496124
+        },
+        "3": {
+          "name": "Multi-hop reasoning",
+          "count": 83,
+          "hit_at_1": 0.2289156626506024,
+          "hit_at_3": 0.3373493975903614,
+          "hit_at_5": 0.40963855421686746,
+          "mrr": 0.29538152610441765,
+          "p_at_5": 0.0963855421686747,
+          "mean_recall_at_5": 0.30592960075596504,
+          "abstention_rate": 0.04819277108433735
+        },
+        "4": {
+          "name": "Open-domain / Inference",
+          "count": 727,
+          "hit_at_1": 0.5832187070151307,
+          "hit_at_3": 0.7276478679504814,
+          "hit_at_5": 0.7592847317744154,
+          "mrr": 0.6550664832645575,
+          "p_at_5": 0.15570839064649244,
+          "mean_recall_at_5": 0.7434662998624484,
+          "abstention_rate": 0.0041265474552957355
+        },
+        "5": {
+          "name": "Adversarial / Unanswerable",
+          "count": 375,
+          "hit_at_1": 0.2986666666666667,
+          "hit_at_3": 0.4053333333333333,
+          "hit_at_5": 0.456,
+          "mrr": 0.35519999999999996,
+          "p_at_5": 0.0912,
+          "mean_recall_at_5": 0.452,
+          "abstention_rate": 0.010666666666666666
+        }
+      }
+    },
+    "Strategy_B": {
+      "strategy_id": "Strategy_B",
+      "total_questions": 1682,
+      "hit_at_1": 0.4827586206896552,
+      "hit_at_3": 0.6153388822829964,
+      "hit_at_5": 0.6587395957193817,
+      "mrr": 0.5516349583828776,
+      "p_at_5": 0.1475624256837099,
+      "mean_recall_at_5": 0.5966905022623833,
+      "avg_context_tokens": 139.8382877526754,
+      "latency_p50_ms": 119.66935000054946,
+      "latency_p95_ms": 174.54335500042362,
+      "adversarial_abstention_accuracy": 0.013333333333333334,
+      "category_breakdown": {
+        "1": {
+          "name": "Single-hop / Factual",
+          "count": 239,
+          "hit_at_1": 0.4435146443514644,
+          "hit_at_3": 0.6359832635983264,
+          "hit_at_5": 0.694560669456067,
+          "mrr": 0.546652719665272,
+          "p_at_5": 0.22259414225941423,
+          "mean_recall_at_5": 0.39187420338598494,
+          "abstention_rate": 0.0041841004184100415
+        },
+        "2": {
+          "name": "Temporal reasoning",
+          "count": 258,
+          "hit_at_1": 0.5813953488372093,
+          "hit_at_3": 0.689922480620155,
+          "hit_at_5": 0.7286821705426356,
+          "mrr": 0.6357235142118863,
+          "p_at_5": 0.15658914728682172,
+          "mean_recall_at_5": 0.685077519379845,
+          "abstention_rate": 0.007751937984496124
+        },
+        "3": {
+          "name": "Multi-hop reasoning",
+          "count": 83,
+          "hit_at_1": 0.2289156626506024,
+          "hit_at_3": 0.3373493975903614,
+          "hit_at_5": 0.3855421686746988,
+          "mrr": 0.2899598393574297,
+          "p_at_5": 0.09156626506024097,
+          "mean_recall_at_5": 0.29588944011339474,
+          "abstention_rate": 0.04819277108433735
+        },
+        "4": {
+          "name": "Open-domain / Inference",
+          "count": 727,
+          "hit_at_1": 0.5845942228335625,
+          "hit_at_3": 0.7235213204951857,
+          "hit_at_5": 0.7565337001375516,
+          "mrr": 0.6545621274644658,
+          "p_at_5": 0.1548830811554333,
+          "mean_recall_at_5": 0.7402567629527739,
+          "abstention_rate": 0.0041265474552957355
+        },
+        "5": {
+          "name": "Adversarial / Unanswerable",
+          "count": 375,
+          "hit_at_1": 0.2986666666666667,
+          "hit_at_3": 0.4026666666666667,
+          "hit_at_5": 0.45866666666666667,
+          "mrr": 0.35533333333333333,
+          "p_at_5": 0.09173333333333333,
+          "mean_recall_at_5": 0.45466666666666666,
+          "abstention_rate": 0.013333333333333334
+        }
+      }
+    },
+    "Strategy_Opt_C": {
+      "strategy_id": "Strategy_Opt_C",
+      "total_questions": 1682,
+      "hit_at_1": 0.4958382877526754,
+      "hit_at_3": 0.6266349583828775,
+      "hit_at_5": 0.6712247324613555,
+      "mrr": 0.565120887831946,
+      "p_at_5": 0.14625445897740785,
+      "mean_recall_at_5": 0.6109875409351652,
+      "avg_context_tokens": 136.1319857312723,
+      "latency_p50_ms": 57.699749999301275,
+      "latency_p95_ms": 111.73338500029777,
+      "adversarial_abstention_accuracy": 0.0,
+      "category_breakdown": {
+        "1": {
+          "name": "Single-hop / Factual",
+          "count": 239,
+          "hit_at_1": 0.41841004184100417,
+          "hit_at_3": 0.602510460251046,
+          "hit_at_5": 0.6192468619246861,
+          "mrr": 0.5077405857740586,
+          "p_at_5": 0.18661087866108786,
+          "mean_recall_at_5": 0.3282659148822989,
+          "abstention_rate": 0.0
+        },
+        "2": {
+          "name": "Temporal reasoning",
+          "count": 258,
+          "hit_at_1": 0.5775193798449613,
+          "hit_at_3": 0.6511627906976745,
+          "hit_at_5": 0.6782945736434108,
+          "mrr": 0.6151162790697674,
+          "p_at_5": 0.1434108527131783,
+          "mean_recall_at_5": 0.6430878552971576,
+          "abstention_rate": 0.0
+        },
+        "3": {
+          "name": "Multi-hop reasoning",
+          "count": 83,
+          "hit_at_1": 0.20481927710843373,
+          "hit_at_3": 0.3614457831325301,
+          "hit_at_5": 0.40963855421686746,
+          "mrr": 0.292570281124498,
+          "p_at_5": 0.08433734939759036,
+          "mean_recall_at_5": 0.2828372312780534,
+          "abstention_rate": 0.0
+        },
+        "4": {
+          "name": "Open-domain / Inference",
+          "count": 727,
+          "hit_at_1": 0.5694635488308115,
+          "hit_at_3": 0.7028885832187071,
+          "hit_at_5": 0.749656121045392,
+          "mrr": 0.6403484640073361,
+          "p_at_5": 0.15378266850068778,
+          "mean_recall_at_5": 0.7363594681338836,
+          "abstention_rate": 0.0
+        },
+        "5": {
+          "name": "Adversarial / Unanswerable",
+          "count": 375,
+          "hit_at_1": 0.4106666666666667,
+          "hit_at_3": 0.536,
+          "hit_at_5": 0.6053333333333333,
+          "mrr": 0.48177777777777775,
+          "p_at_5": 0.1216,
+          "mean_recall_at_5": 0.5986666666666667,
+          "abstention_rate": 0.0
+        }
+      }
+    },
+    "Strategy_Opt_D": {
+      "strategy_id": "Strategy_Opt_D",
+      "total_questions": 1682,
+      "hit_at_1": 0.49167657550535077,
+      "hit_at_3": 0.6153388822829964,
+      "hit_at_5": 0.6587395957193817,
+      "mrr": 0.5576198969480777,
+      "p_at_5": 0.14351961950059453,
+      "mean_recall_at_5": 0.5999151214798683,
+      "avg_context_tokens": 135.410225921522,
+      "latency_p50_ms": 59.66595000063535,
+      "latency_p95_ms": 110.03048999955352,
+      "adversarial_abstention_accuracy": 0.0,
+      "category_breakdown": {
+        "1": {
+          "name": "Single-hop / Factual",
+          "count": 239,
+          "hit_at_1": 0.41422594142259417,
+          "hit_at_3": 0.5857740585774058,
+          "hit_at_5": 0.602510460251046,
+          "mrr": 0.49937238493723846,
+          "p_at_5": 0.18242677824267783,
+          "mean_recall_at_5": 0.32147173277430935,
+          "abstention_rate": 0.0
+        },
+        "2": {
+          "name": "Temporal reasoning",
+          "count": 258,
+          "hit_at_1": 0.5775193798449613,
+          "hit_at_3": 0.6550387596899225,
+          "hit_at_5": 0.6821705426356589,
+          "mrr": 0.6177002583979329,
+          "p_at_5": 0.14418604651162792,
+          "mean_recall_at_5": 0.6469638242894057,
+          "abstention_rate": 0.0
+        },
+        "3": {
+          "name": "Multi-hop reasoning",
+          "count": 83,
+          "hit_at_1": 0.20481927710843373,
+          "hit_at_3": 0.3614457831325301,
+          "hit_at_5": 0.40963855421686746,
+          "mrr": 0.29116465863453816,
+          "p_at_5": 0.08433734939759036,
+          "mean_recall_at_5": 0.2828372312780534,
+          "abstention_rate": 0.0
+        },
+        "4": {
+          "name": "Open-domain / Inference",
+          "count": 727,
+          "hit_at_1": 0.562585969738652,
+          "hit_at_3": 0.6891334250343879,
+          "hit_at_5": 0.7372764786795049,
+          "mrr": 0.63060522696011,
+          "p_at_5": 0.15103163686382395,
+          "mean_recall_at_5": 0.7232920678587804,
+          "abstention_rate": 0.0
+        },
+        "5": {
+          "name": "Adversarial / Unanswerable",
+          "count": 375,
+          "hit_at_1": 0.408,
+          "hit_at_3": 0.52,
+          "hit_at_5": 0.5813333333333334,
+          "mrr": 0.4708888888888889,
+          "p_at_5": 0.11680000000000001,
+          "mean_recall_at_5": 0.576,
+          "abstention_rate": 0.0
+        }
+      }
+    },
+    "Strategy_Opt_E": {
+      "strategy_id": "Strategy_Opt_E",
+      "total_questions": 1682,
+      "hit_at_1": 0.4768133174791914,
+      "hit_at_3": 0.584423305588585,
+      "hit_at_5": 0.6171224732461356,
+      "mrr": 0.5335711454617519,
+      "p_at_5": 0.13436385255648037,
+      "mean_recall_at_5": 0.5580910375062074,
+      "avg_context_tokens": 109.0743162901308,
+      "latency_p50_ms": 50.509149999925285,
+      "latency_p95_ms": 106.7524349999075,
+      "adversarial_abstention_accuracy": 0.0,
+      "category_breakdown": {
+        "1": {
+          "name": "Single-hop / Factual",
+          "count": 239,
+          "hit_at_1": 0.3891213389121339,
+          "hit_at_3": 0.5648535564853556,
+          "hit_at_5": 0.5815899581589958,
+          "mrr": 0.47587168758716875,
+          "p_at_5": 0.17573221757322174,
+          "mean_recall_at_5": 0.30701168097116127,
+          "abstention_rate": 0.0
+        },
+        "2": {
+          "name": "Temporal reasoning",
+          "count": 258,
+          "hit_at_1": 0.5775193798449613,
+          "hit_at_3": 0.6356589147286822,
+          "hit_at_5": 0.6627906976744186,
+          "mrr": 0.6099483204134367,
+          "p_at_5": 0.13953488372093023,
+          "mean_recall_at_5": 0.6217700258397932,
+          "abstention_rate": 0.0
+        },
+        "3": {
+          "name": "Multi-hop reasoning",
+          "count": 83,
+          "hit_at_1": 0.21686746987951808,
+          "hit_at_3": 0.3614457831325301,
+          "hit_at_5": 0.40963855421686746,
+          "mrr": 0.29799196787148596,
+          "p_at_5": 0.08433734939759036,
+          "mean_recall_at_5": 0.2901606425702811,
+          "abstention_rate": 0.0
+        },
+        "4": {
+          "name": "Open-domain / Inference",
+          "count": 727,
+          "hit_at_1": 0.547455295735901,
+          "hit_at_3": 0.6547455295735901,
+          "hit_at_5": 0.686382393397524,
+          "mrr": 0.6036451169188446,
+          "p_at_5": 0.14030261348005502,
+          "mean_recall_at_5": 0.6710224667583677,
+          "abstention_rate": 0.0
+        },
+        "5": {
+          "name": "Adversarial / Unanswerable",
+          "count": 375,
+          "hit_at_1": 0.384,
+          "hit_at_3": 0.4746666666666667,
+          "hit_at_5": 0.52,
+          "mrr": 0.43408888888888886,
+          "p_at_5": 0.104,
+          "mean_recall_at_5": 0.5146666666666667,
+          "abstention_rate": 0.0
+        }
+      }
+    }
+  }
+}

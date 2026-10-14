@@ -1,0 +1,583 @@
+{
+  "a_fails_others_succeed": {
+    "Strategy_C": [
+      {
+        "sample_id": "conv-26",
+        "question_idx": 4,
+        "category": 1,
+        "category_name": "Single-hop / Factual",
+        "question": "What is Caroline's identity?",
+        "answer": "Transgender woman",
+        "expected": [
+          "D1:5"
+        ],
+        "a_retrieved": [
+          "D11:12",
+          "D13:13",
+          "D3:3",
+          "D8:25",
+          "D19:13"
+        ],
+        "s_retrieved": [
+          "D1:1",
+          "D1:2",
+          "D1:3",
+          "D1:4",
+          "D1:5"
+        ]
+      },
+      {
+        "sample_id": "conv-30",
+        "question_idx": 3,
+        "category": 1,
+        "category_name": "Single-hop / Factual",
+        "question": "What do Jon and Gina both have in common?",
+        "answer": "They lost their jobs and decided to start their own businesses.",
+        "expected": [
+          "D1:2",
+          "D1:3",
+          "D1:4",
+          "D2:1"
+        ],
+        "a_retrieved": [
+          "D9:9",
+          "D5:21",
+          "D18:21",
+          "D6:16",
+          "D18:18"
+        ],
+        "s_retrieved": [
+          "D1:1",
+          "D1:2",
+          "D1:3",
+          "D1:4",
+          "D1:5"
+        ]
+      },
+      {
+        "sample_id": "conv-30",
+        "question_idx": 17,
+        "category": 1,
+        "category_name": "Single-hop / Factual",
+        "question": "Why did Gina decide to start her own clothing store?",
+        "answer": "She always loved fashion trends and finding unique pieces and she lost her job so decided it was time to start her own business.",
+        "expected": [
+          "D1:3",
+          "D6:8"
+        ],
+        "a_retrieved": [
+          "D2:1",
+          "D14:8",
+          "D10:2",
+          "D7:2",
+          "D3:2"
+        ],
+        "s_retrieved": [
+          "D1:1",
+          "D1:2",
+          "D1:3",
+          "D1:4",
+          "D1:5"
+        ]
+      },
+      {
+        "sample_id": "conv-30",
+        "question_idx": 18,
+        "category": 1,
+        "category_name": "Single-hop / Factual",
+        "question": "Do Jon and Gina start businesses out of what they love?",
+        "answer": "Yes",
+        "expected": [
+          "D1:4",
+          "D6:8"
+        ],
+        "a_retrieved": [
+          "D9:1",
+          "D7:2",
+          "D14:8",
+          "D18:19",
+          "D18:21"
+        ],
+        "s_retrieved": [
+          "D1:1",
+          "D1:2",
+          "D1:3",
+          "D1:4",
+          "D1:5"
+        ]
+      },
+      {
+        "sample_id": "conv-30",
+        "question_idx": 31,
+        "category": 1,
+        "category_name": "Single-hop / Factual",
+        "question": "How long did it take for Jon to open his studio?",
+        "answer": "six months",
+        "expected": [
+          "D15:13",
+          "D1:2"
+        ],
+        "a_retrieved": [
+          "D15:3",
+          "D3:1",
+          "D15:5",
+          "D11:3",
+          "D13:3"
+        ],
+        "s_retrieved": [
+          "D1:1",
+          "D1:2",
+          "D1:3",
+          "D1:4",
+          "D1:5"
+        ]
+      }
+    ],
+    "Strategy_D": [
+      {
+        "sample_id": "conv-26",
+        "question_idx": 34,
+        "category": 1,
+        "category_name": "Single-hop / Factual",
+        "question": "What events has Caroline participated in to help children?",
+        "answer": "Mentoring program, school speech",
+        "expected": [
+          "D3:3",
+          "D9:2"
+        ],
+        "a_retrieved": [
+          "D11:2",
+          "D15:3",
+          "D19:6",
+          "D9:8",
+          "D15:11"
+        ],
+        "s_retrieved": [
+          "D8:15",
+          "D8:16",
+          "D10:16",
+          "D3:3",
+          "D15:9"
+        ]
+      },
+      {
+        "sample_id": "conv-26",
+        "question_idx": 153,
+        "category": 5,
+        "category_name": "Adversarial / Unanswerable",
+        "question": "What are Melanie's plans for the summer with respect to adoption?",
+        "answer": "",
+        "expected": [
+          "D2:8"
+        ],
+        "a_retrieved": [
+          "D2:7",
+          "D19:2",
+          "D2:13",
+          "D19:3",
+          "D13:16"
+        ],
+        "s_retrieved": [
+          "D19:3",
+          "D2:12",
+          "D17:7",
+          "D19:1",
+          "D2:8"
+        ]
+      },
+      {
+        "sample_id": "conv-26",
+        "question_idx": 154,
+        "category": 5,
+        "category_name": "Adversarial / Unanswerable",
+        "question": "What type of individuals does the adoption agency Melanie is considering support?",
+        "answer": "",
+        "expected": [
+          "D2:12"
+        ],
+        "a_retrieved": [
+          "D2:13",
+          "D19:1",
+          "D13:1",
+          "D2:10",
+          "D6:14"
+        ],
+        "s_retrieved": [
+          "D19:3",
+          "D2:12",
+          "D19:1",
+          "D17:7",
+          "D2:8"
+        ]
+      },
+      {
+        "sample_id": "conv-26",
+        "question_idx": 155,
+        "category": 5,
+        "category_name": "Adversarial / Unanswerable",
+        "question": "Why did Melanie choose the adoption agency?",
+        "answer": "",
+        "expected": [
+          "D2:12"
+        ],
+        "a_retrieved": [
+          "D19:1",
+          "D13:1",
+          "D19:3",
+          "D2:11",
+          "D13:16"
+        ],
+        "s_retrieved": [
+          "D19:3",
+          "D2:12",
+          "D19:1",
+          "D17:7",
+          "D2:8"
+        ]
+      },
+      {
+        "sample_id": "conv-26",
+        "question_idx": 174,
+        "category": 5,
+        "category_name": "Adversarial / Unanswerable",
+        "question": "How often does Caroline go to the beach with her kids?",
+        "answer": "",
+        "expected": [
+          "D10:10"
+        ],
+        "a_retrieved": [
+          "D10:8",
+          "D10:9",
+          "D1:18",
+          "D10:11",
+          "D15:2"
+        ],
+        "s_retrieved": [
+          "D10:10",
+          "D1:17",
+          "D5:3",
+          "D4:15",
+          "D1:18"
+        ]
+      }
+    ],
+    "Strategy_E": [
+      {
+        "sample_id": "conv-26",
+        "question_idx": 132,
+        "category": 4,
+        "category_name": "Open-domain / Inference",
+        "question": "How long has Melanie been creating art?",
+        "answer": "7 years",
+        "expected": [
+          "D16:7"
+        ],
+        "a_retrieved": [
+          "D16:8",
+          "D16:6",
+          "D14:16",
+          "D16:9",
+          "D1:16"
+        ],
+        "s_retrieved": [
+          "D16:6",
+          "D8:27",
+          "D16:7",
+          "D3:15",
+          "D4:1"
+        ]
+      },
+      {
+        "sample_id": "conv-26",
+        "question_idx": 164,
+        "category": 5,
+        "category_name": "Adversarial / Unanswerable",
+        "question": "What kind of counseling workshop did Melanie attend recently?",
+        "answer": "",
+        "expected": [
+          "D4:13"
+        ],
+        "a_retrieved": [
+          "D4:12",
+          "D1:12",
+          "D4:15",
+          "D4:14",
+          "D5:4"
+        ],
+        "s_retrieved": [
+          "D4:12",
+          "D13:1",
+          "D4:13",
+          "D6:8",
+          "D13:8"
+        ]
+      },
+      {
+        "sample_id": "conv-26",
+        "question_idx": 171,
+        "category": 5,
+        "category_name": "Adversarial / Unanswerable",
+        "question": "What did Melanie see at the council meeting for adoption?",
+        "answer": "",
+        "expected": [
+          "D8:9"
+        ],
+        "a_retrieved": [
+          "D2:13",
+          "D19:2",
+          "D13:16",
+          "D13:1",
+          "D17:3"
+        ],
+        "s_retrieved": [
+          "D13:1",
+          "D3:3",
+          "D5:2",
+          "D8:9",
+          "D8:11"
+        ]
+      },
+      {
+        "sample_id": "conv-26",
+        "question_idx": 174,
+        "category": 5,
+        "category_name": "Adversarial / Unanswerable",
+        "question": "How often does Caroline go to the beach with her kids?",
+        "answer": "",
+        "expected": [
+          "D10:10"
+        ],
+        "a_retrieved": [
+          "D10:8",
+          "D10:9",
+          "D1:18",
+          "D10:11",
+          "D15:2"
+        ],
+        "s_retrieved": [
+          "D1:18",
+          "D10:10",
+          "D1:2",
+          "D3:4",
+          "D6:4"
+        ]
+      },
+      {
+        "sample_id": "conv-26",
+        "question_idx": 180,
+        "category": 5,
+        "category_name": "Adversarial / Unanswerable",
+        "question": "What activity did Melanie used to do with her dad?",
+        "answer": "",
+        "expected": [
+          "D13:7"
+        ],
+        "a_retrieved": [
+          "D3:20",
+          "D12:16",
+          "D4:8",
+          "D11:1",
+          "D15:4"
+        ],
+        "s_retrieved": [
+          "D8:5",
+          "D8:11",
+          "D13:1",
+          "D13:7",
+          "D17:3"
+        ]
+      },
+      {
+        "sample_id": "conv-30",
+        "question_idx": 3,
+        "category": 1,
+        "category_name": "Single-hop / Factual",
+        "question": "What do Jon and Gina both have in common?",
+        "answer": "They lost their jobs and decided to start their own businesses.",
+        "expected": [
+          "D1:2",
+          "D1:3",
+          "D1:4",
+          "D2:1"
+        ],
+        "a_retrieved": [
+          "D9:9",
+          "D5:21",
+          "D18:21",
+          "D6:16",
+          "D18:18"
+        ],
+        "s_retrieved": [
+          "D8:12",
+          "D2:1",
+          "D10:8",
+          "D16:12",
+          "D18:5"
+        ]
+      },
+      {
+        "sample_id": "conv-30",
+        "question_idx": 89,
+        "category": 5,
+        "category_name": "Adversarial / Unanswerable",
+        "question": "What did Jon want his customers to feel in her store?",
+        "answer": "",
+        "expected": [
+          "D3:6",
+          "D3:8"
+        ],
+        "a_retrieved": [
+          "D3:7",
+          "D3:9",
+          "D16:2",
+          "D5:1",
+          "D8:21"
+        ],
+        "s_retrieved": [
+          "D3:8",
+          "D8:4",
+          "D8:12",
+          "D2:1",
+          "D3:2"
+        ]
+      }
+    ],
+    "Strategy_F": [
+      {
+        "sample_id": "conv-26",
+        "question_idx": 132,
+        "category": 4,
+        "category_name": "Open-domain / Inference",
+        "question": "How long has Melanie been creating art?",
+        "answer": "7 years",
+        "expected": [
+          "D16:7"
+        ],
+        "a_retrieved": [
+          "D16:8",
+          "D16:6",
+          "D14:16",
+          "D16:9",
+          "D1:16"
+        ],
+        "s_retrieved": [
+          "D16:6",
+          "D8:27",
+          "D16:7",
+          "D18:16",
+          "D3:19"
+        ]
+      },
+      {
+        "sample_id": "conv-26",
+        "question_idx": 164,
+        "category": 5,
+        "category_name": "Adversarial / Unanswerable",
+        "question": "What kind of counseling workshop did Melanie attend recently?",
+        "answer": "",
+        "expected": [
+          "D4:13"
+        ],
+        "a_retrieved": [
+          "D4:12",
+          "D1:12",
+          "D4:15",
+          "D4:14",
+          "D5:4"
+        ],
+        "s_retrieved": [
+          "D4:13",
+          "D13:1",
+          "D4:12",
+          "D9:14",
+          "D17:9"
+        ]
+      },
+      {
+        "sample_id": "conv-26",
+        "question_idx": 174,
+        "category": 5,
+        "category_name": "Adversarial / Unanswerable",
+        "question": "How often does Caroline go to the beach with her kids?",
+        "answer": "",
+        "expected": [
+          "D10:10"
+        ],
+        "a_retrieved": [
+          "D10:8",
+          "D10:9",
+          "D1:18",
+          "D10:11",
+          "D15:2"
+        ],
+        "s_retrieved": [
+          "D10:10",
+          "D1:18",
+          "D1:2",
+          "D1:17",
+          "D5:3"
+        ]
+      },
+      {
+        "sample_id": "conv-30",
+        "question_idx": 3,
+        "category": 1,
+        "category_name": "Single-hop / Factual",
+        "question": "What do Jon and Gina both have in common?",
+        "answer": "They lost their jobs and decided to start their own businesses.",
+        "expected": [
+          "D1:2",
+          "D1:3",
+          "D1:4",
+          "D2:1"
+        ],
+        "a_retrieved": [
+          "D9:9",
+          "D5:21",
+          "D18:21",
+          "D6:16",
+          "D18:18"
+        ],
+        "s_retrieved": [
+          "D8:12",
+          "D10:8",
+          "D2:1",
+          "D16:12",
+          "D13:4"
+        ]
+      },
+      {
+        "sample_id": "conv-30",
+        "question_idx": 89,
+        "category": 5,
+        "category_name": "Adversarial / Unanswerable",
+        "question": "What did Jon want his customers to feel in her store?",
+        "answer": "",
+        "expected": [
+          "D3:6",
+          "D3:8"
+        ],
+        "a_retrieved": [
+          "D3:7",
+          "D3:9",
+          "D16:2",
+          "D5:1",
+          "D8:21"
+        ],
+        "s_retrieved": [
+          "D3:8",
+          "D8:12",
+          "D8:4",
+          "D1:26",
+          "D1:27"
+        ]
+      }
+    ]
+  },
+  "a_succeeds_others_fail_counts": {
+    "Strategy_C": 195,
+    "Strategy_D": 183,
+    "Strategy_E": 136,
+    "Strategy_F": 139
+  }
+}
