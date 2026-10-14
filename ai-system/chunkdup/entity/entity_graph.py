@@ -179,10 +179,12 @@ class EntityGraph:
                 canonical = self.aliases[alias]
                 matched.add(canonical)
 
-        # Extract capitalized multi-word or single-word proper nouns
-        capitalized_tokens = re.findall(r"\b[A-Z][a-z]+(?:\s+[A-Z][a-z]+)*\b", text)
+        # Extract capitalized multi-word or single-word proper nouns (including CamelCase/PascalCase)
+        capitalized_tokens = re.findall(r"\b[A-Z][A-Za-z0-9_-]*(?:\s+[A-Z][A-Za-z0-9_-]*)*\b", text)
         for cap in capitalized_tokens:
-            cap_clean = cap.strip()
+            cap_clean = cap.strip().rstrip(".,;:!?")
+            if not cap_clean:
+                continue
             if cap_clean.lower() in self.aliases:
                 matched.add(self.aliases[cap_clean.lower()])
             elif len(cap_clean) > 2 and cap_clean not in self.COMMON_SENTENCE_STARTERS:
@@ -282,20 +284,25 @@ class EntityGraph:
         4. Candidates already in initial_candidates are not duplicated.
         """
         query_entities = self.resolve_entities(query)
-        if not query_entities:
-            return []
-
         initial_ids = {str(c.get("id") or c.get("key") or "") for c in initial_candidates}
-        initial_entities: Set[str] = set()
-        for c in initial_candidates:
+
+        # Collect entities from top initial candidates to enable bridge expansion
+        top_cand_entities: List[str] = []
+        for c in initial_candidates[:3]:
             cid = str(c.get("id") or c.get("key") or "")
             if cid in self.memory_to_entities:
-                initial_entities.update(self.memory_to_entities[cid])
+                for ent in self.memory_to_entities[cid]:
+                    if ent not in top_cand_entities and ent not in query_entities:
+                        top_cand_entities.append(ent)
+
+        expansion_sources = list(query_entities) + top_cand_entities
+        if not expansion_sources:
+            return []
 
         expanded_candidates: List[Dict[str, Any]] = []
         seen_expanded_ids: Set[str] = set()
 
-        for q_ent in query_entities:
+        for q_ent in expansion_sources:
             neighbors = self.get_1hop_neighbors(q_ent)
             for neighbor_ent, rel_type, confidence in neighbors:
                 if len(expanded_candidates) >= max_expansion:
