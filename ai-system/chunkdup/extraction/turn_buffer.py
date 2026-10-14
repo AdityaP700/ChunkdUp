@@ -71,6 +71,7 @@ class TurnBuffer:
     def flush(self) -> List[Dict[str, Any]]:
         """
         Process all currently buffered dialogue turns in a single batched extraction call.
+        Partial batch failures are isolated and recoverable without duplicating successfully persisted facts.
         """
         if not self._buffer:
             return []
@@ -79,20 +80,40 @@ class TurnBuffer:
         self._buffer.clear()
 
         # Level 2 & 3: Batched extraction and schema validation
-        extracted_facts = self.extractor.extract_batch(turns_to_process)
+        try:
+            extracted_facts = self.extractor.extract_batch(turns_to_process)
+        except Exception as exc:
+            logger.warning(f"Batch extraction failed ({exc.__class__.__name__}). Falling back to per-turn extraction.")
+            extracted_facts = []
+            for t in turns_to_process:
+                try:
+                    extracted_facts.extend(self.extractor._fallback_extract(t))
+                except Exception:
+                    continue
 
-        # Level 4: Propose to policy engine
+        # Level 4: Propose to policy engine with per-fact isolation
         results = []
         for fact in extracted_facts:
-            mem_dict = fact.to_memory_dict()
-            decision = self.memory_manager.process(mem_dict)
-            results.append({
-                "decision": decision.value.upper(),
-                "key": fact.key,
-                "value": fact.value,
-                "type": fact.type,
-                "source_turn_id": fact.source_turn_id,
-            })
+            try:
+                mem_dict = fact.to_memory_dict() if hasattr(fact, "to_memory_dict") else dict(fact)
+                decision = self.memory_manager.process(mem_dict)
+                results.append({
+                    "decision": decision.value.upper(),
+                    "key": mem_dict.get("key"),
+                    "value": mem_dict.get("value"),
+                    "type": mem_dict.get("type"),
+                    "source_turn_id": mem_dict.get("source_turn_id"),
+                    "status": "success",
+                })
+            except Exception as proc_exc:
+                logger.warning(f"Failed to process fact {getattr(fact, 'key', 'unknown')}: {proc_exc.__class__.__name__}")
+                results.append({
+                    "decision": "ERROR",
+                    "key": getattr(fact, "key", None),
+                    "source_turn_id": getattr(fact, "source_turn_id", None),
+                    "status": "failed",
+                    "error": proc_exc.__class__.__name__,
+                })
 
         return results
 

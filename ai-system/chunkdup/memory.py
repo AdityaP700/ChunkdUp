@@ -47,6 +47,10 @@ try:
     from .spacy_extractor import SpacyExtractor
     from .llm_extractor import LLMExtractor
     from .entity_extractor import EntityExtractor
+    try:
+        from .entity.entity_graph import EntityGraph
+    except ImportError:
+        from entity.entity_graph import EntityGraph
 except ImportError:
     from policies import Decision, PolicyFactory
     from prompt_builder import PromptBuilder
@@ -55,6 +59,10 @@ except ImportError:
     from spacy_extractor import SpacyExtractor
     from llm_extractor import LLMExtractor
     from entity_extractor import EntityExtractor
+    try:
+        from entity.entity_graph import EntityGraph
+    except ImportError:
+        EntityGraph = None
 
 
 class MemoryExtractor:
@@ -371,11 +379,19 @@ class DecisionEngine:
 class MemoryManager:
     """Manages memory persistence pipeline based on scores and policy decisions."""
 
-    def __init__(self, repository: MemoryRepository, decision_engine: DecisionEngine, scorer: MemoryScorer, threshold: float = 0.5):
+    def __init__(
+        self,
+        repository: MemoryRepository,
+        decision_engine: DecisionEngine,
+        scorer: MemoryScorer,
+        threshold: float = 0.5,
+        entity_graph: Optional[Any] = None,
+    ):
         self.repository = repository
         self.engine = decision_engine
         self.scorer = scorer
         self.threshold = threshold
+        self.entity_graph = entity_graph
 
     def process(self, memory: Dict[str, Any]) -> Decision:
         importance = self.scorer.score(memory)
@@ -393,14 +409,29 @@ class MemoryManager:
 
         if decision == Decision.STORE:
             self.repository.save(memory)
+            if self.entity_graph is not None:
+                try:
+                    self.entity_graph.index_memory(memory)
+                except Exception as e:
+                    logger.warning(f"Entity indexing failed: {e}")
             logger.info(f"Stored new memory: {memory['key']} = {memory['value']}")
         elif decision == Decision.IGNORE:
             logger.info(f"Ignored duplicate memory: {memory['key']}")
         elif decision == Decision.MERGE:
             self.repository.merge(memory["key"], memory)
+            if self.entity_graph is not None:
+                try:
+                    self.entity_graph.index_memory(memory)
+                except Exception as e:
+                    logger.warning(f"Entity indexing failed: {e}")
             logger.info(f"Merged duplicate memory (increased frequency): {memory['key']}")
         elif decision == Decision.UPDATE:
             self.repository.update(memory)
+            if self.entity_graph is not None:
+                try:
+                    self.entity_graph.index_memory(memory)
+                except Exception as e:
+                    logger.warning(f"Entity indexing failed: {e}")
             logger.info(f"Updated memory: {memory['key']} = {memory['value']}")
 
         return decision
@@ -503,9 +534,18 @@ class Memory:
         self.memory_path = os.path.join(data_dir, "memory.json")
 
         # Initialize internal components
+        self.entity_graph = kwargs.get("entity_graph")
+        if self.entity_graph is None and EntityGraph is not None:
+            self.entity_graph = EntityGraph()
+
         self.decision_engine = DecisionEngine(provider=kwargs.get("decision_provider"))
         self.scorer = MemoryScorer()
-        self.manager = MemoryManager(self.repository, self.decision_engine, self.scorer)
+        self.manager = MemoryManager(
+            self.repository,
+            self.decision_engine,
+            self.scorer,
+            entity_graph=self.entity_graph,
+        )
         self.extractor = MemoryExtractor()
         # Production retrieval path (docs/round3-decision.md): config selected
         # via CHUNKDUP_RETRIEVAL_CONFIG, CE failures degrade to the dense gate,
@@ -514,6 +554,7 @@ class Memory:
             self.repository,
             query_log_path=os.path.join(data_dir, "retrieval_log.jsonl"),
             fast_mode=fast_mode,
+            entity_graph=self.entity_graph,
         )
         self.prompt_builder = PromptBuilder()
 
@@ -649,10 +690,12 @@ class Memory:
         metadata: Optional[Dict[str, Any]] = None,
         timestamp: Optional[str] = None,
         use_groq: bool = False,
+        turn_id: Optional[str] = None,
     ) -> Dict[str, Any]:
         """
         Store a memory from conversation text.
         Persists raw dialogue turn and extracts structured facts with provenance.
+        Reprocessing an existing turn is idempotent.
 
         Args:
             text: The conversation text to remember
@@ -661,13 +704,14 @@ class Memory:
             metadata: Optional dictionary of turn metadata
             timestamp: Optional ISO-8601 UTC timestamp
             use_groq: Explicit toggle to run Groq LLM extraction
+            turn_id: Optional existing or specified turn identifier for idempotency
 
         Returns:
             Dict with turn_id, memory decisions, and count
         """
         logger.info(f"Remembering: {text[:50]}...")
 
-        turn_id = str(uuid.uuid4())
+        t_id = str(turn_id).strip() if turn_id else str(uuid.uuid4())
         now_utc = datetime.now(timezone.utc)
         ts = timestamp or now_utc.isoformat().replace("+00:00", "Z")
         sess_id = session_id or "default"
@@ -679,7 +723,7 @@ class Memory:
             session_id=sess_id,
             speaker=speaker,
             metadata=meta,
-            turn_id=turn_id,
+            turn_id=t_id,
             timestamp=ts,
         )
 
@@ -689,16 +733,21 @@ class Memory:
         self._save_conversation(lines)
 
         # 3. Extract memories from current input text
-        if (use_groq or getattr(self, "extractor_type", "rules") == "groq") and self.groq_extractor.is_available():
-            turn_obj = {"turn_id": turn_id, "speaker": speaker, "raw_text": text}
-            facts = self.groq_extractor.extract_turn(turn_obj)
-            extracted = [f.to_memory_dict() for f in facts]
-        else:
-            extracted = self.extractor.extract(text)
+        extracted = []
+        try:
+            if (use_groq or getattr(self, "extractor_type", "rules") == "groq") and self.groq_extractor.is_available():
+                turn_obj = {"turn_id": t_id, "speaker": speaker, "raw_text": text}
+                facts = self.groq_extractor.extract_turn(turn_obj)
+                extracted = [f.to_memory_dict() for f in facts]
+            else:
+                extracted = self.extractor.extract(text)
+        except Exception as e:
+            logger.warning(f"Extraction failed for turn {t_id}: {e}")
+            extracted = []
 
         results = []
         for mem in extracted:
-            mem["source_turn_id"] = turn_id
+            mem["source_turn_id"] = t_id
             mem["valid_from"] = mem.get("valid_from") or ts
             mem["valid_to"] = None
             decision = self.manager.process(mem)
@@ -706,6 +755,7 @@ class Memory:
                 "decision": decision.value.upper(),
                 "key": mem.get("key"),
                 "value": mem.get("value"),
+                "source_turn_id": t_id,
             })
 
         if not results:
@@ -713,9 +763,10 @@ class Memory:
                 "decision": "IGNORE",
                 "key": None,
                 "value": None,
+                "source_turn_id": t_id,
             })
 
-        return {"turn_id": turn_id, "memories": results, "count": len(results)}
+        return {"turn_id": t_id, "memories": results, "count": len(results)}
 
     def remember_buffered(
         self,

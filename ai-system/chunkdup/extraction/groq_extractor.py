@@ -7,7 +7,7 @@ import os
 import json
 import time
 import logging
-from typing import List, Dict, Any, Optional
+from typing import List, Dict, Any, Optional, Set
 
 from .schema import ExtractedFact, is_turn_eligible
 
@@ -18,9 +18,10 @@ EXTRACTION_SYSTEM_PROMPT = """You are a precision fact extraction engine for an 
 Your job is to extract durable personal facts and preferences about the user from dialogue turns.
 
 CRITICAL INSTRUCTIONS:
-1. ONLY extract enduring facts about the user (e.g. tools, programming languages, operating systems, roles, projects, employers, preferences).
+1. ONLY extract enduring, explicit, and grounded facts about the user (e.g. tools, programming languages, operating systems, roles, projects, employers, verified preferences).
 2. DO NOT extract transient status, greetings, conversation meta, opinions on external topics, or questions.
-3. Every extracted fact MUST include:
+3. DO NOT extract speculation, hypothetical statements (e.g. 'I might', 'if I could', 'maybe', 'I wonder'), future wishes without commitment, or unsupported inferences.
+4. Every extracted fact MUST include:
    - "key": normalized snake_case attribute name (e.g. "programming_language", "editor", "os", "company", "project_name")
    - "value": concise factual value statement (e.g. "Python", "Neovim", "Linux", "ChunkdUp")
    - "type": EXACTLY one of: ["environment", "project", "tool", "preference", "employment", "role", "learning", "general"]
@@ -115,13 +116,13 @@ class GroqFactExtractor:
             except Exception as exc:
                 is_rate_limit = "429" in str(exc) or "RateLimit" in exc.__class__.__name__
                 if is_rate_limit and attempt < self.max_retries - 1:
-                    sleep_time = self.backoff_factor * (2 ** attempt)
+                    sleep_time = min(2.0, self.backoff_factor * (2 ** attempt))
                     logger.warning(
                         f"Groq 429 rate limit reached. Backing off for {sleep_time:.2f}s (attempt {attempt + 1}/{self.max_retries})"
                     )
                     time.sleep(sleep_time)
                 else:
-                    logger.warning(f"Groq API call failed: {exc}")
+                    logger.warning(f"Groq API call failed: {exc.__class__.__name__}")
                     if attempt == self.max_retries - 1:
                         return None
         return None
@@ -130,8 +131,12 @@ class GroqFactExtractor:
         self,
         raw_response: str,
         default_turn_id: Optional[str] = None,
+        valid_turn_ids: Optional[Set[str]] = None,
     ) -> List[ExtractedFact]:
-        """Parse JSON response and validate all facts against ExtractedFact schema."""
+        """
+        Parse JSON response and validate all facts against ExtractedFact schema.
+        Rejects fabricated, unknown, or empty source_turn_id references.
+        """
         if not raw_response:
             return []
 
@@ -152,6 +157,17 @@ class GroqFactExtractor:
             try:
                 turn_id = item.get("turn_id") or default_turn_id
                 if not turn_id:
+                    continue
+                turn_id = str(turn_id).strip()
+                if not turn_id:
+                    continue
+
+                # Provenance constraint: turn_id must be in input batch
+                if valid_turn_ids is not None and turn_id not in valid_turn_ids:
+                    logger.warning(
+                        f"Rejecting fact with fabricated or unknown source turn_id: '{turn_id}' "
+                        f"(valid batch turn IDs: {sorted(valid_turn_ids)})"
+                    )
                     continue
 
                 fact = ExtractedFact(
@@ -174,7 +190,7 @@ class GroqFactExtractor:
             return []
 
         raw_text = turn.get("raw_text", "")
-        turn_id = turn.get("turn_id", "")
+        turn_id = str(turn.get("turn_id", "")).strip()
         try:
             extracted_list = self.fallback_extractor.extract(raw_text)
             validated = []
@@ -204,9 +220,10 @@ class GroqFactExtractor:
         if not is_turn_eligible(turn):
             return []
 
-        turn_id = turn.get("turn_id", "")
+        turn_id = str(turn.get("turn_id", "")).strip()
         raw_text = turn.get("raw_text", "")
         speaker = turn.get("speaker", "user")
+        valid_turn_ids = {turn_id} if turn_id else None
 
         if self.is_available():
             user_content = json.dumps({
@@ -214,7 +231,11 @@ class GroqFactExtractor:
             })
             resp = self._call_groq_with_retry(user_content)
             if resp:
-                facts = self._parse_and_validate_response(resp, default_turn_id=turn_id)
+                facts = self._parse_and_validate_response(
+                    resp,
+                    default_turn_id=turn_id,
+                    valid_turn_ids=valid_turn_ids,
+                )
                 if facts:
                     return facts
 
@@ -224,11 +245,13 @@ class GroqFactExtractor:
     def extract_batch(self, turns: List[Dict[str, Any]]) -> List[ExtractedFact]:
         """
         Extract facts from a batch of dialogue turns.
-        Preserves provenance by attaching the correct source_turn_id to each fact.
+        Preserves provenance by enforcing that every fact references a valid source_turn_id from the batch.
         """
         eligible = [t for t in turns if is_turn_eligible(t)]
         if not eligible:
             return []
+
+        valid_turn_ids = {str(t.get("turn_id")).strip() for t in eligible if t.get("turn_id")}
 
         if self.is_available():
             batch_payload = [
@@ -242,7 +265,10 @@ class GroqFactExtractor:
             user_content = json.dumps({"turns": batch_payload})
             resp = self._call_groq_with_retry(user_content)
             if resp:
-                facts = self._parse_and_validate_response(resp)
+                facts = self._parse_and_validate_response(
+                    resp,
+                    valid_turn_ids=valid_turn_ids,
+                )
                 if facts:
                     return facts
 

@@ -23,6 +23,14 @@ ALLOWED_MEMORY_TYPES: Set[str] = {
 
 KEY_REGEX = re.compile(r"^[a-z0-9_.-]+$")
 
+SPECULATIVE_PATTERNS = [
+    re.compile(r"\b(?:might|maybe|perhaps|possibly|probably|hypothetically)\b", re.IGNORECASE),
+    re.compile(r"\bif\s+(?:i|we)\s+(?:ever|could|had|were|decided)\b", re.IGNORECASE),
+    re.compile(r"\b(?:i\s+wonder\s+if|not\s+sure\s+if|thinking\s+about\s+(?:maybe)?)\b", re.IGNORECASE),
+    re.compile(r"\b(?:someday|one\s+day|in\s+the\s+future\s+i\s+might)\b", re.IGNORECASE),
+    re.compile(r"\b(?:speculati(?:ve|on)|unconfirmed|hypothetical)\b", re.IGNORECASE),
+]
+
 CHIT_CHAT_PATTERNS = [
     r"^(?:hi|hello|hey|greetings|howdy|good\s+(?:morning|afternoon|evening|day))[\s!.]*$",
     r"^(?:thanks|thank\s+you|thx|ty|cheers)[\s!.]*$",
@@ -48,11 +56,19 @@ QUESTION_PREFIXES = (
 )
 
 
+def is_speculative(text: str) -> bool:
+    """Check if text contains speculation, hypothetical conditions, or unconfirmed inferences."""
+    if not text:
+        return False
+    return any(p.search(text) for p in SPECULATIVE_PATTERNS)
+
+
 def is_turn_eligible(turn: Dict[str, Any]) -> bool:
     """
     Level 1 Eligibility Check:
     Fast rule-based filter to determine if a dialogue turn contains extractable facts.
-    Filters out noise, greetings, and pure questions before invoking LLM extraction.
+    Filters out noise, greetings, pure questions, and purely speculative statements
+    before invoking LLM extraction.
     """
     raw_text = (turn.get("raw_text") or "").strip()
     if not raw_text or len(raw_text) < 4:
@@ -70,6 +86,12 @@ def is_turn_eligible(turn: Dict[str, Any]) -> bool:
             # Exception: e.g. "I use Linux, but what do you use?"
             if not ("i use" in lower or "i prefer" in lower or "i'm " in lower or "my " in lower):
                 return False
+
+    # Reject purely speculative or hypothetical statements without ground-truth assertions
+    if is_speculative(raw_text):
+        grounding_markers = ("i work at", "i use", "i am a", "my favorite", "we use", "we migrated", "i painted")
+        if not any(gm in lower for gm in grounding_markers):
+            return False
 
     return True
 
@@ -111,6 +133,8 @@ class ExtractedFact(BaseModel):
         cleaned = v.strip().rstrip(".,;:")
         if not cleaned:
             raise ValueError("Fact value cannot be empty")
+        if is_speculative(cleaned):
+            raise ValueError(f"Fact value contains speculation or hypothetical statement: '{cleaned}'")
         return cleaned
 
     @field_validator("type")
