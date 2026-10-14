@@ -199,14 +199,49 @@ _Gate = GroundingGate
 
 
 # ---------------------------------------------------------------------------
-# Model singletons (loaded once per process, lazily)
+# Model singletons (loaded once per process/device, lazily)
 # ---------------------------------------------------------------------------
 
 _MODEL_CACHE: Dict[str, Any] = {}
 
 
-def _get_sentence_transformer():
-    if "st" not in _MODEL_CACHE:
+def _resolve_device(requested_device: Optional[str] = None) -> str:
+    """
+    Resolve compute device:
+    1. Explicit requested_device if provided
+    2. CHUNKDUP_DEVICE env var ('cuda', 'cpu')
+    3. Auto-detect CUDA if torch.cuda.is_available()
+    4. Fall back safely to CPU
+    """
+    if requested_device:
+        device = requested_device.strip().lower()
+    else:
+        env_dev = os.getenv("CHUNKDUP_DEVICE")
+        if env_dev:
+            device = env_dev.strip().lower()
+        else:
+            try:
+                import torch
+                device = "cuda" if torch.cuda.is_available() else "cpu"
+            except Exception:
+                device = "cpu"
+
+    if device.startswith("cuda"):
+        try:
+            import torch
+            if not torch.cuda.is_available():
+                logger.info("CUDA requested or detected but not available; falling back to CPU")
+                return "cpu"
+        except Exception:
+            return "cpu"
+
+    return device
+
+
+def _get_sentence_transformer(device: Optional[str] = None):
+    dev = _resolve_device(device)
+    cache_key = f"st_{dev}"
+    if cache_key not in _MODEL_CACHE:
         from sentence_transformers import SentenceTransformer
 
         env_source = os.getenv("CHUNKDUP_EMBEDDING_MODEL")
@@ -224,7 +259,7 @@ def _get_sentence_transformer():
                 source = str(cwd_path)
             else:
                 source = "all-MiniLM-L6-v2"
-        logger.info("Loading embedding model from source: %s", source)
+        logger.info("Loading embedding model from source: %s on device: %s", source, dev)
         orig_threads = None
         try:
             import torch
@@ -233,26 +268,38 @@ def _get_sentence_transformer():
         except Exception:
             pass
         try:
-            _MODEL_CACHE["st"] = SentenceTransformer(source)
+            model = SentenceTransformer(source, device=dev)
+        except Exception as exc:
+            if dev != "cpu":
+                logger.warning("Failed to initialize embedding model on %s (%s); falling back to CPU", dev, exc)
+                model = SentenceTransformer(source, device="cpu")
+                dev = "cpu"
+                cache_key = f"st_{dev}"
+            else:
+                raise
         finally:
             if orig_threads is not None:
                 try:
                     torch.set_num_threads(orig_threads)
                 except Exception:
                     pass
+        _MODEL_CACHE[cache_key] = model
+        _MODEL_CACHE["st"] = model  # default fallback
         _MODEL_CACHE["st_source"] = source
-    return _MODEL_CACHE["st"]
+    return _MODEL_CACHE[cache_key]
 
 
-def _get_cross_encoder():
-    if "ce" not in _MODEL_CACHE:
+def _get_cross_encoder(device: Optional[str] = None):
+    dev = _resolve_device(device)
+    cache_key = f"ce_{dev}"
+    if cache_key not in _MODEL_CACHE:
         from sentence_transformers import CrossEncoder
 
         model_name = os.getenv("CHUNKDUP_CE_MODEL", "cross-encoder/ms-marco-MiniLM-L-12-v2")
         models_dir = os.getenv("CHUNKDUP_MODELS_DIR")
         if models_dir and (Path(models_dir) / "ms-marco-MiniLM-L-12-v2").exists():
             model_name = str(Path(models_dir) / "ms-marco-MiniLM-L-12-v2")
-        logger.info("Loading cross-encoder model: %s", model_name)
+        logger.info("Loading cross-encoder model: %s on device: %s", model_name, dev)
         orig_threads = None
         try:
             import torch
@@ -261,14 +308,53 @@ def _get_cross_encoder():
         except Exception:
             pass
         try:
-            _MODEL_CACHE["ce"] = CrossEncoder(model_name)
+            model = CrossEncoder(model_name, device=dev)
+        except Exception as exc:
+            if dev != "cpu":
+                logger.warning("Failed to initialize cross-encoder on %s (%s); falling back to CPU", dev, exc)
+                model = CrossEncoder(model_name, device="cpu")
+                dev = "cpu"
+                cache_key = f"ce_{dev}"
+            else:
+                raise
         finally:
             if orig_threads is not None:
                 try:
                     torch.set_num_threads(orig_threads)
                 except Exception:
                     pass
-    return _MODEL_CACHE["ce"]
+        _MODEL_CACHE[cache_key] = model
+        _MODEL_CACHE["ce"] = model  # default fallback
+    return _MODEL_CACHE[cache_key]
+
+
+def _safe_encode(st_model, texts, normalize_embeddings: bool = True, batch_size: int = 32):
+    import inspect
+    kwargs = {}
+    try:
+        sig = inspect.signature(st_model.encode)
+        has_varkw = any(p.kind == inspect.Parameter.VAR_KEYWORD for p in sig.parameters.values())
+        if "normalize_embeddings" in sig.parameters or has_varkw:
+            kwargs["normalize_embeddings"] = normalize_embeddings
+        if "batch_size" in sig.parameters or has_varkw:
+            kwargs["batch_size"] = batch_size
+        if "show_progress_bar" in sig.parameters or has_varkw:
+            kwargs["show_progress_bar"] = False
+        return st_model.encode(texts, **kwargs)
+    except Exception:
+        return st_model.encode(texts)
+
+
+def _safe_predict(ce_model, pairs, batch_size: int = 32):
+    import inspect
+    try:
+        sig = inspect.signature(ce_model.predict)
+        has_varkw = any(p.kind == inspect.Parameter.VAR_KEYWORD for p in sig.parameters.values())
+        if "batch_size" in sig.parameters or has_varkw:
+            return ce_model.predict(pairs, batch_size=batch_size)
+        return ce_model.predict(pairs)
+    except Exception:
+        return ce_model.predict(pairs)
 
 
 # ---------------------------------------------------------------------------
@@ -296,8 +382,11 @@ class ProductionRetriever:
         ce_timeout_s: Optional[float] = None,
         query_log_path: Optional[str] = None,
         fast_mode: bool = False,
+        entity_graph: Optional[Any] = None,
+        device: Optional[str] = None,
     ):
         self.repository = repository
+        self.device = _resolve_device(device)
         # Selection precedence: explicit config_name > fast_mode request >
         # CHUNKDUP_RETRIEVAL_CONFIG env var > default. fast_mode is a PLANNED
         # choice of the exp-6-enhanced fast path (dense_abstain_ed, ~10 ms,
@@ -334,7 +423,7 @@ class ProductionRetriever:
         self.last_calibration_size = None
         self.last_calibration = None
         self.demote_enabled = self.config_name in ENTITY_DEMOTION_CONFIGS
-        self.entity_graph = EntityGraph() if EntityGraph is not None else None
+        self.entity_graph = entity_graph if entity_graph is not None else (EntityGraph() if EntityGraph is not None else None)
         self.entity_expansion_enabled = os.getenv("CHUNKDUP_ENTITY_EXPANSION", "1") == "1"
 
         if self.config_name == "baseline_current":
@@ -379,8 +468,10 @@ class ProductionRetriever:
                 corpus = [_tokenize(_index_text(m)) for m in active]
                 self._bm25 = BM25Okapi(corpus) if any(corpus) else None
                 texts = [_index_text(m) for m in active]
-                st = _get_sentence_transformer()
-                vectors = st.encode(texts, normalize_embeddings=True)
+                st = _get_sentence_transformer(device=self.device)
+                vectors = _safe_encode(st, texts, normalize_embeddings=True, batch_size=32)
+                if hasattr(vectors, "cpu"):
+                    vectors = vectors.cpu().numpy()
                 self._dense_matrix = vectors
             except Exception as exc:  # embedding/BM25 unavailable -> degrade
                 self._degrade("embedding_model_failure", str(exc))
@@ -420,8 +511,10 @@ class ProductionRetriever:
             return []
         import numpy as np
 
-        st = _get_sentence_transformer()
-        q_vec = st.encode(query, normalize_embeddings=True)
+        st = _get_sentence_transformer(device=self.device)
+        q_vec = _safe_encode(st, query, normalize_embeddings=True)
+        if hasattr(q_vec, "cpu"):
+            q_vec = q_vec.cpu().numpy()
         sims = self._dense_matrix @ q_vec
         order = np.argsort(-sims)[:limit]
         out = []
@@ -453,9 +546,9 @@ class ProductionRetriever:
         if self._ce_failed:
             raise RuntimeError("cross-encoder previously failed; sticky failure")
         if self._ce is None:
-            self._ce = _get_cross_encoder()  # may raise -> handled by caller
+            self._ce = _get_cross_encoder(device=self.device)  # may raise -> handled by caller
         pairs = [[query, _index_text(c)] for c in candidates[:limit]]
-        future = self._executor.submit(self._ce.predict, pairs)
+        future = self._executor.submit(_safe_predict, self._ce, pairs, batch_size=32)
         scores = future.result(timeout=self.ce_timeout_s)  # raises TimeoutError
         scored = []
         for candidate, score in zip(candidates[:limit], scores):

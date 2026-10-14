@@ -1,0 +1,144 @@
+{
+  "timestamp": "2026-10-14T08:12:18Z",
+  "scale": 300,
+  "reps": 20,
+  "hardware": {
+    "cuda_available": true,
+    "device_name": "NVIDIA GeForce RTX 4050 Laptop GPU",
+    "torch_version": "2.6.0+cu124"
+  },
+  "cpu_benchmarks": {
+    "device": "cpu",
+    "is_cuda": false,
+    "init_ms": {
+      "sentence_transformer": 33588.67,
+      "cross_encoder": 11733.96,
+      "index_build": 4132.84
+    },
+    "dense_search_ms": {
+      "p50": 21.35,
+      "p90": 43.75,
+      "p95": 45.63,
+      "mean": 25.7,
+      "min": 15.36
+    },
+    "ce_rerank_ms": {
+      "p50": 366.87,
+      "p90": 442.65,
+      "p95": 452.84,
+      "mean": 373.15,
+      "min": 296.71
+    },
+    "ce_batch_scaling": {
+      "batch_1": {
+        "p50_ms": 827.73,
+        "p95_ms": 889.4,
+        "mean_ms": 812.57
+      },
+      "batch_8": {
+        "p50_ms": 363.24,
+        "p95_ms": 557.5,
+        "mean_ms": 395.34
+      },
+      "batch_16": {
+        "p50_ms": 346.66,
+        "p95_ms": 457.33,
+        "mean_ms": 361.88
+      },
+      "batch_32": {
+        "p50_ms": 267.28,
+        "p95_ms": 368.48,
+        "mean_ms": 278.52
+      },
+      "batch_64": {
+        "p50_ms": 273.85,
+        "p95_ms": 330.09,
+        "mean_ms": 269.91
+      }
+    },
+    "e2e_retrieve_ms": {
+      "p50": 521.02,
+      "p90": 585.92,
+      "p95": 599.21,
+      "mean": 506.4,
+      "min": 293.04
+    },
+    "vram_mb": {
+      "peak": 0.0,
+      "allocated": 0.0
+    }
+  },
+  "gpu_benchmarks": {
+    "device": "cuda",
+    "is_cuda": true,
+    "init_ms": {
+      "sentence_transformer": 673.76,
+      "cross_encoder": 11702.78,
+      "index_build": 2926.87
+    },
+    "dense_search_ms": {
+      "p50": 14.5,
+      "p90": 19.92,
+      "p95": 20.61,
+      "mean": 15.12,
+      "min": 10.58
+    },
+    "ce_rerank_ms": {
+      "p50": 30.98,
+      "p90": 37.85,
+      "p95": 40.7,
+      "mean": 32.08,
+      "min": 26.41
+    },
+    "ce_batch_scaling": {
+      "batch_1": {
+        "p50_ms": 381.54,
+        "p95_ms": 620.69,
+        "mean_ms": 419.62
+      },
+      "batch_8": {
+        "p50_ms": 79.48,
+        "p95_ms": 123.39,
+        "mean_ms": 85.36
+      },
+      "batch_16": {
+        "p50_ms": 45.44,
+        "p95_ms": 85.95,
+        "mean_ms": 53.16
+      },
+      "batch_32": {
+        "p50_ms": 32.82,
+        "p95_ms": 65.2,
+        "mean_ms": 37.99
+      },
+      "batch_64": {
+        "p50_ms": 23.67,
+        "p95_ms": 33.85,
+        "mean_ms": 25.31
+      }
+    },
+    "e2e_retrieve_ms": {
+      "p50": 44.77,
+      "p90": 59.57,
+      "p95": 63.45,
+      "mean": 46.5,
+      "min": 35.72
+    },
+    "vram_mb": {
+      "peak": 266.01,
+      "allocated": 230.17
+    }
+  },
+  "ranking_consistency": {
+    "total_queries_compared": 20,
+    "exact_order_match_rate": 1.0,
+    "top1_match_rate": 0.85,
+    "status": "WARN"
+  },
+  "cpu_fallback_verification": {
+    "fallback_triggered": true,
+    "effective_config": "hybrid_ce_abstain",
+    "fallback_events": [],
+    "status": "PASS"
+  }
+}
