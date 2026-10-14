@@ -1,0 +1,475 @@
+{
+  "metadata": {
+    "timestamp": "2026-10-14T09:51:39Z",
+    "dev_samples": [
+      "conv-26",
+      "conv-30"
+    ],
+    "held_out_samples_excluded": [
+      "conv-42",
+      "conv-43",
+      "conv-44",
+      "conv-45",
+      "conv-47",
+      "conv-48",
+      "conv-49",
+      "conv-50"
+    ],
+    "cuda_available": true,
+    "device": "NVIDIA GeForce RTX 4050 Laptop GPU"
+  },
+  "aggregated_results": {
+    "Strategy_A": {
+      "strategy_id": "Strategy_A",
+      "total_questions_evaluated": 60,
+      "hit_at_1": 0.0,
+      "hit_at_3": 0.0,
+      "hit_at_5": 0.0,
+      "mrr": 0.0,
+      "multihop_accuracy": 0.0,
+      "temporal_invalidation_accuracy": 0.0,
+      "adversarial_abstention_accuracy": 0.0,
+      "latency_p50_ms": 10.46,
+      "latency_p95_ms": 16.63,
+      "avg_context_tokens": 0.0,
+      "failure_breakdown": {
+        "EXTRACTION_FAILURE": 0,
+        "RETRIEVAL_FAILURE": 0,
+        "RANKING_FAILURE": 0,
+        "FALSE_ABSTENTION": 60,
+        "FALSE_RETRIEVAL": 0
+      }
+    },
+    "Strategy_B": {
+      "strategy_id": "Strategy_B",
+      "total_questions_evaluated": 60,
+      "hit_at_1": 0.0,
+      "hit_at_3": 0.0,
+      "hit_at_5": 0.0,
+      "mrr": 0.0,
+      "multihop_accuracy": 0.0,
+      "temporal_invalidation_accuracy": 0.0,
+      "adversarial_abstention_accuracy": 0.0,
+      "latency_p50_ms": 97.3,
+      "latency_p95_ms": 153.19,
+      "avg_context_tokens": 2.6,
+      "failure_breakdown": {
+        "EXTRACTION_FAILURE": 0,
+        "RETRIEVAL_FAILURE": 4,
+        "RANKING_FAILURE": 0,
+        "FALSE_ABSTENTION": 56,
+        "FALSE_RETRIEVAL": 0
+      }
+    },
+    "Strategy_C": {
+      "strategy_id": "Strategy_C",
+      "total_questions_evaluated": 60,
+      "hit_at_1": 0.0,
+      "hit_at_3": 0.0833,
+      "hit_at_5": 0.1333,
+      "mrr": 0.0469,
+      "multihop_accuracy": 0.0,
+      "temporal_invalidation_accuracy": 0.0588,
+      "adversarial_abstention_accuracy": 0.0,
+      "latency_p50_ms": 18.49,
+      "latency_p95_ms": 26.45,
+      "avg_context_tokens": 95.0,
+      "failure_breakdown": {
+        "EXTRACTION_FAILURE": 0,
+        "RETRIEVAL_FAILURE": 52,
+        "RANKING_FAILURE": 0,
+        "FALSE_ABSTENTION": 0,
+        "FALSE_RETRIEVAL": 0
+      }
+    },
+    "Strategy_D": {
+      "strategy_id": "Strategy_D",
+      "total_questions_evaluated": 60,
+      "hit_at_1": 0.0,
+      "hit_at_3": 0.0,
+      "hit_at_5": 0.0333,
+      "mrr": 0.0067,
+      "multihop_accuracy": 0.0,
+      "temporal_invalidation_accuracy": 0.0,
+      "adversarial_abstention_accuracy": 0.0,
+      "latency_p50_ms": 18.95,
+      "latency_p95_ms": 24.93,
+      "avg_context_tokens": 176.0,
+      "failure_breakdown": {
+        "EXTRACTION_FAILURE": 0,
+        "RETRIEVAL_FAILURE": 58,
+        "RANKING_FAILURE": 0,
+        "FALSE_ABSTENTION": 0,
+        "FALSE_RETRIEVAL": 0
+      }
+    },
+    "Strategy_E": {
+      "strategy_id": "Strategy_E",
+      "total_questions_evaluated": 60,
+      "hit_at_1": 0.2167,
+      "hit_at_3": 0.2167,
+      "hit_at_5": 0.2333,
+      "mrr": 0.22,
+      "multihop_accuracy": 0.25,
+      "temporal_invalidation_accuracy": 0.2059,
+      "adversarial_abstention_accuracy": 0.0,
+      "latency_p50_ms": 1.86,
+      "latency_p95_ms": 2.85,
+      "avg_context_tokens": 978.5,
+      "failure_breakdown": {
+        "EXTRACTION_FAILURE": 0,
+        "RETRIEVAL_FAILURE": 46,
+        "RANKING_FAILURE": 0,
+        "FALSE_ABSTENTION": 0,
+        "FALSE_RETRIEVAL": 0
+      }
+    },
+    "Strategy_F": {
+      "strategy_id": "Strategy_F",
+      "total_questions_evaluated": 60,
+      "hit_at_1": 0.1,
+      "hit_at_3": 0.2167,
+      "hit_at_5": 0.2333,
+      "mrr": 0.1617,
+      "multihop_accuracy": 0.25,
+      "temporal_invalidation_accuracy": 0.2059,
+      "adversarial_abstention_accuracy": 0.0,
+      "latency_p50_ms": 10.9,
+      "latency_p95_ms": 22.73,
+      "avg_context_tokens": 145.5,
+      "failure_breakdown": {
+        "EXTRACTION_FAILURE": 0,
+        "RETRIEVAL_FAILURE": 46,
+        "RANKING_FAILURE": 0,
+        "FALSE_ABSTENTION": 0,
+        "FALSE_RETRIEVAL": 0
+      }
+    }
+  },
+  "per_sample_results": {
+    "Strategy_A": [
+      {
+        "strategy_id": "Strategy_A",
+        "total_questions": 30,
+        "hit_at_1": 0.0,
+        "hit_at_3": 0.0,
+        "hit_at_5": 0.0,
+        "mrr": 0.0,
+        "multihop_accuracy": 0.0,
+        "multihop_queries_count": 4,
+        "temporal_invalidation_accuracy": 0.0,
+        "temporal_queries_count": 16,
+        "adversarial_abstention_accuracy": 0.0,
+        "adversarial_queries_count": 0,
+        "latency_p50_ms": 11.353150000104506,
+        "latency_p95_ms": 22.209744999963718,
+        "cold_start_latency_ms": 14142.660800000158,
+        "avg_context_tokens": 0.0,
+        "failure_breakdown": {
+          "EXTRACTION_FAILURE": 0,
+          "RETRIEVAL_FAILURE": 0,
+          "RANKING_FAILURE": 0,
+          "FALSE_ABSTENTION": 30,
+          "FALSE_RETRIEVAL": 0
+        },
+        "sample_id": "conv-26"
+      },
+      {
+        "strategy_id": "Strategy_A",
+        "total_questions": 30,
+        "hit_at_1": 0.0,
+        "hit_at_3": 0.0,
+        "hit_at_5": 0.0,
+        "mrr": 0.0,
+        "multihop_accuracy": 0.0,
+        "multihop_queries_count": 0,
+        "temporal_invalidation_accuracy": 0.0,
+        "temporal_queries_count": 18,
+        "adversarial_abstention_accuracy": 0.0,
+        "adversarial_queries_count": 0,
+        "latency_p50_ms": 9.567799999786075,
+        "latency_p95_ms": 11.05412500019156,
+        "cold_start_latency_ms": 9.67060000039055,
+        "avg_context_tokens": 0.0,
+        "failure_breakdown": {
+          "EXTRACTION_FAILURE": 0,
+          "RETRIEVAL_FAILURE": 0,
+          "RANKING_FAILURE": 0,
+          "FALSE_ABSTENTION": 30,
+          "FALSE_RETRIEVAL": 0
+        },
+        "sample_id": "conv-30"
+      }
+    ],
+    "Strategy_B": [
+      {
+        "strategy_id": "Strategy_B",
+        "total_questions": 30,
+        "hit_at_1": 0.0,
+        "hit_at_3": 0.0,
+        "hit_at_5": 0.0,
+        "mrr": 0.0,
+        "multihop_accuracy": 0.0,
+        "multihop_queries_count": 4,
+        "temporal_invalidation_accuracy": 0.0,
+        "temporal_queries_count": 16,
+        "adversarial_abstention_accuracy": 0.0,
+        "adversarial_queries_count": 0,
+        "latency_p50_ms": 97.88710000066203,
+        "latency_p95_ms": 170.93526000135168,
+        "cold_start_latency_ms": 253.5360000001674,
+        "avg_context_tokens": 0.3333333333333333,
+        "failure_breakdown": {
+          "EXTRACTION_FAILURE": 0,
+          "RETRIEVAL_FAILURE": 1,
+          "RANKING_FAILURE": 0,
+          "FALSE_ABSTENTION": 29,
+          "FALSE_RETRIEVAL": 0
+        },
+        "sample_id": "conv-26"
+      },
+      {
+        "strategy_id": "Strategy_B",
+        "total_questions": 30,
+        "hit_at_1": 0.0,
+        "hit_at_3": 0.0,
+        "hit_at_5": 0.0,
+        "mrr": 0.0,
+        "multihop_accuracy": 0.0,
+        "multihop_queries_count": 0,
+        "temporal_invalidation_accuracy": 0.0,
+        "temporal_queries_count": 18,
+        "adversarial_abstention_accuracy": 0.0,
+        "adversarial_queries_count": 0,
+        "latency_p50_ms": 96.71720000005735,
+        "latency_p95_ms": 135.4377399997247,
+        "cold_start_latency_ms": 89.15470000101777,
+        "avg_context_tokens": 4.9,
+        "failure_breakdown": {
+          "EXTRACTION_FAILURE": 0,
+          "RETRIEVAL_FAILURE": 3,
+          "RANKING_FAILURE": 0,
+          "FALSE_ABSTENTION": 27,
+          "FALSE_RETRIEVAL": 0
+        },
+        "sample_id": "conv-30"
+      }
+    ],
+    "Strategy_C": [
+      {
+        "strategy_id": "Strategy_C",
+        "total_questions": 30,
+        "hit_at_1": 0.0,
+        "hit_at_3": 0.0,
+        "hit_at_5": 0.06666666666666667,
+        "mrr": 0.013333333333333334,
+        "multihop_accuracy": 0.0,
+        "multihop_queries_count": 4,
+        "temporal_invalidation_accuracy": 0.0,
+        "temporal_queries_count": 16,
+        "adversarial_abstention_accuracy": 0.0,
+        "adversarial_queries_count": 0,
+        "latency_p50_ms": 17.994050001107098,
+        "latency_p95_ms": 26.273495000168623,
+        "cold_start_latency_ms": 48.01460000089719,
+        "avg_context_tokens": 85.5,
+        "failure_breakdown": {
+          "EXTRACTION_FAILURE": 0,
+          "RETRIEVAL_FAILURE": 28,
+          "RANKING_FAILURE": 0,
+          "FALSE_ABSTENTION": 0,
+          "FALSE_RETRIEVAL": 0
+        },
+        "sample_id": "conv-26"
+      },
+      {
+        "strategy_id": "Strategy_C",
+        "total_questions": 30,
+        "hit_at_1": 0.0,
+        "hit_at_3": 0.16666666666666666,
+        "hit_at_5": 0.2,
+        "mrr": 0.08055555555555555,
+        "multihop_accuracy": 0.0,
+        "multihop_queries_count": 0,
+        "temporal_invalidation_accuracy": 0.1111111111111111,
+        "temporal_queries_count": 18,
+        "adversarial_abstention_accuracy": 0.0,
+        "adversarial_queries_count": 0,
+        "latency_p50_ms": 18.98405000065395,
+        "latency_p95_ms": 26.62882500044361,
+        "cold_start_latency_ms": 22.138700000141398,
+        "avg_context_tokens": 104.53333333333333,
+        "failure_breakdown": {
+          "EXTRACTION_FAILURE": 0,
+          "RETRIEVAL_FAILURE": 24,
+          "RANKING_FAILURE": 0,
+          "FALSE_ABSTENTION": 0,
+          "FALSE_RETRIEVAL": 0
+        },
+        "sample_id": "conv-30"
+      }
+    ],
+    "Strategy_D": [
+      {
+        "strategy_id": "Strategy_D",
+        "total_questions": 30,
+        "hit_at_1": 0.0,
+        "hit_at_3": 0.0,
+        "hit_at_5": 0.06666666666666667,
+        "mrr": 0.013333333333333334,
+        "multihop_accuracy": 0.0,
+        "multihop_queries_count": 4,
+        "temporal_invalidation_accuracy": 0.0,
+        "temporal_queries_count": 16,
+        "adversarial_abstention_accuracy": 0.0,
+        "adversarial_queries_count": 0,
+        "latency_p50_ms": 19.799450000391516,
+        "latency_p95_ms": 27.534209999248556,
+        "cold_start_latency_ms": 19.535899999027606,
+        "avg_context_tokens": 211.53333333333333,
+        "failure_breakdown": {
+          "EXTRACTION_FAILURE": 0,
+          "RETRIEVAL_FAILURE": 28,
+          "RANKING_FAILURE": 0,
+          "FALSE_ABSTENTION": 0,
+          "FALSE_RETRIEVAL": 0
+        },
+        "sample_id": "conv-26"
+      },
+      {
+        "strategy_id": "Strategy_D",
+        "total_questions": 30,
+        "hit_at_1": 0.0,
+        "hit_at_3": 0.0,
+        "hit_at_5": 0.0,
+        "mrr": 0.0,
+        "multihop_accuracy": 0.0,
+        "multihop_queries_count": 0,
+        "temporal_invalidation_accuracy": 0.0,
+        "temporal_queries_count": 18,
+        "adversarial_abstention_accuracy": 0.0,
+        "adversarial_queries_count": 0,
+        "latency_p50_ms": 18.09274999959598,
+        "latency_p95_ms": 22.321069999088646,
+        "cold_start_latency_ms": 18.424200001391,
+        "avg_context_tokens": 140.4,
+        "failure_breakdown": {
+          "EXTRACTION_FAILURE": 0,
+          "RETRIEVAL_FAILURE": 30,
+          "RANKING_FAILURE": 0,
+          "FALSE_ABSTENTION": 0,
+          "FALSE_RETRIEVAL": 0
+        },
+        "sample_id": "conv-30"
+      }
+    ],
+    "Strategy_E": [
+      {
+        "strategy_id": "Strategy_E",
+        "total_questions": 30,
+        "hit_at_1": 0.16666666666666666,
+        "hit_at_3": 0.16666666666666666,
+        "hit_at_5": 0.16666666666666666,
+        "mrr": 0.16666666666666666,
+        "multihop_accuracy": 0.25,
+        "multihop_queries_count": 4,
+        "temporal_invalidation_accuracy": 0.1875,
+        "temporal_queries_count": 16,
+        "adversarial_abstention_accuracy": 0.0,
+        "adversarial_queries_count": 0,
+        "latency_p50_ms": 1.9814499992207857,
+        "latency_p95_ms": 3.5580049995587615,
+        "cold_start_latency_ms": 2.4645000012242235,
+        "avg_context_tokens": 990.0,
+        "failure_breakdown": {
+          "EXTRACTION_FAILURE": 0,
+          "RETRIEVAL_FAILURE": 25,
+          "RANKING_FAILURE": 0,
+          "FALSE_ABSTENTION": 0,
+          "FALSE_RETRIEVAL": 0
+        },
+        "sample_id": "conv-26"
+      },
+      {
+        "strategy_id": "Strategy_E",
+        "total_questions": 30,
+        "hit_at_1": 0.26666666666666666,
+        "hit_at_3": 0.26666666666666666,
+        "hit_at_5": 0.3,
+        "mrr": 0.2733333333333333,
+        "multihop_accuracy": 0.0,
+        "multihop_queries_count": 0,
+        "temporal_invalidation_accuracy": 0.2222222222222222,
+        "temporal_queries_count": 18,
+        "adversarial_abstention_accuracy": 0.0,
+        "adversarial_queries_count": 0,
+        "latency_p50_ms": 1.7457000003560097,
+        "latency_p95_ms": 2.1489449990440335,
+        "cold_start_latency_ms": 1.3165000000299187,
+        "avg_context_tokens": 967.0,
+        "failure_breakdown": {
+          "EXTRACTION_FAILURE": 0,
+          "RETRIEVAL_FAILURE": 21,
+          "RANKING_FAILURE": 0,
+          "FALSE_ABSTENTION": 0,
+          "FALSE_RETRIEVAL": 0
+        },
+        "sample_id": "conv-30"
+      }
+    ],
+    "Strategy_F": [
+      {
+        "strategy_id": "Strategy_F",
+        "total_questions": 30,
+        "hit_at_1": 0.06666666666666667,
+        "hit_at_3": 0.16666666666666666,
+        "hit_at_5": 0.16666666666666666,
+        "mrr": 0.11666666666666667,
+        "multihop_accuracy": 0.25,
+        "multihop_queries_count": 4,
+        "temporal_invalidation_accuracy": 0.1875,
+        "temporal_queries_count": 16,
+        "adversarial_abstention_accuracy": 0.0,
+        "adversarial_queries_count": 0,
+        "latency_p50_ms": 18.005400000220106,
+        "latency_p95_ms": 23.919850000402214,
+        "cold_start_latency_ms": 40.929399998276494,
+        "avg_context_tokens": 144.0,
+        "failure_breakdown": {
+          "EXTRACTION_FAILURE": 0,
+          "RETRIEVAL_FAILURE": 25,
+          "RANKING_FAILURE": 0,
+          "FALSE_ABSTENTION": 0,
+          "FALSE_RETRIEVAL": 0
+        },
+        "sample_id": "conv-26"
+      },
+      {
+        "strategy_id": "Strategy_F",
+        "total_questions": 30,
+        "hit_at_1": 0.13333333333333333,
+        "hit_at_3": 0.26666666666666666,
+        "hit_at_5": 0.3,
+        "mrr": 0.20666666666666667,
+        "multihop_accuracy": 0.0,
+        "multihop_queries_count": 0,
+        "temporal_invalidation_accuracy": 0.2222222222222222,
+        "temporal_queries_count": 18,
+        "adversarial_abstention_accuracy": 0.0,
+        "adversarial_queries_count": 0,
+        "latency_p50_ms": 3.7963499999023043,
+        "latency_p95_ms": 21.542039999985718,
+        "cold_start_latency_ms": 15.400600001157727,
+        "avg_context_tokens": 146.93333333333334,
+        "failure_breakdown": {
+          "EXTRACTION_FAILURE": 0,
+          "RETRIEVAL_FAILURE": 21,
+          "RANKING_FAILURE": 0,
+          "FALSE_ABSTENTION": 0,
+          "FALSE_RETRIEVAL": 0
+        },
+        "sample_id": "conv-30"
+      }
+    ]
+  }
+}
