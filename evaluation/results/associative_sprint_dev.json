@@ -1,0 +1,547 @@
+{
+  "benchmark": "LoCoMo",
+  "split": "dev",
+  "n_samples": 2,
+  "total_questions": 304,
+  "device": "cuda",
+  "strategies": {
+    "Variant_A_Grep": {
+      "n_total": 304,
+      "n_answerable": 233,
+      "n_adversarial": 71,
+      "hit_at_1": 0.2747,
+      "hit_at_3": 0.3863,
+      "hit_at_5": 0.4249,
+      "mrr_at_5": 0.3298,
+      "recall_at_5": 0.3914,
+      "full_recall_at_5": 0.3648,
+      "precision_at_5": 0.0867,
+      "mean_tokens": 181.7,
+      "latency_p50_ms": 11.39,
+      "latency_p95_ms": 25.96,
+      "adversarial_rejection_rate": 0.0,
+      "category_breakdown": {
+        "Single-hop / Factual": {
+          "n": 43,
+          "hit_at_5": 0.2326,
+          "recall_at_5": 0.1093,
+          "full_recall_at_5": 0.0233,
+          "mrr_at_5": 0.1612
+        },
+        "Temporal reasoning": {
+          "n": 63,
+          "hit_at_5": 0.6508,
+          "recall_at_5": 0.6508,
+          "full_recall_at_5": 0.6508,
+          "mrr_at_5": 0.5151
+        },
+        "Multi-hop reasoning": {
+          "n": 13,
+          "hit_at_5": 0.2308,
+          "recall_at_5": 0.1154,
+          "full_recall_at_5": 0.0,
+          "mrr_at_5": 0.1218
+        },
+        "Open-domain / Inference": {
+          "n": 114,
+          "hit_at_5": 0.3947,
+          "recall_at_5": 0.386,
+          "full_recall_at_5": 0.3772,
+          "mrr_at_5": 0.3146
+        },
+        "Adversarial / Unanswerable": {
+          "n": 71,
+          "rejection_rate": 0.0,
+          "fp_rate": 1.0
+        }
+      },
+      "failure_taxonomy": {
+        "C: Semantic retrieval miss": 102,
+        "F: Missing multi-hop evidence": 10,
+        "F: Missing multi-hop evidence (partial recall only)": 3,
+        "G: Temporal conflict / stale state": 22,
+        "I: Ranking failure (remaining evidence displaced)": 11,
+        "J: Incorrect abstention (hallucinated on unanswerable)": 71
+      }
+    },
+    "Variant_B_BM25": {
+      "n_total": 304,
+      "n_answerable": 233,
+      "n_adversarial": 71,
+      "hit_at_1": 0.2747,
+      "hit_at_3": 0.4249,
+      "hit_at_5": 0.4979,
+      "mrr_at_5": 0.3603,
+      "recall_at_5": 0.4587,
+      "full_recall_at_5": 0.4335,
+      "precision_at_5": 0.101,
+      "mean_tokens": 124.3,
+      "latency_p50_ms": 0.95,
+      "latency_p95_ms": 2.2,
+      "adversarial_rejection_rate": 0.0,
+      "category_breakdown": {
+        "Single-hop / Factual": {
+          "n": 43,
+          "hit_at_5": 0.2791,
+          "recall_at_5": 0.1016,
+          "full_recall_at_5": 0.0,
+          "mrr_at_5": 0.1481
+        },
+        "Temporal reasoning": {
+          "n": 63,
+          "hit_at_5": 0.746,
+          "recall_at_5": 0.746,
+          "full_recall_at_5": 0.746,
+          "mrr_at_5": 0.5791
+        },
+        "Multi-hop reasoning": {
+          "n": 13,
+          "hit_at_5": 0.1538,
+          "recall_at_5": 0.1154,
+          "full_recall_at_5": 0.0769,
+          "mrr_at_5": 0.0538
+        },
+        "Open-domain / Inference": {
+          "n": 114,
+          "hit_at_5": 0.4825,
+          "recall_at_5": 0.4737,
+          "full_recall_at_5": 0.4649,
+          "mrr_at_5": 0.3544
+        },
+        "Adversarial / Unanswerable": {
+          "n": 71,
+          "rejection_rate": 0.0,
+          "fp_rate": 1.0
+        }
+      },
+      "failure_taxonomy": {
+        "C: Semantic retrieval miss": 90,
+        "F: Missing multi-hop evidence": 11,
+        "F: Missing multi-hop evidence (partial recall only)": 1,
+        "G: Temporal conflict / stale state": 16,
+        "I: Ranking failure (remaining evidence displaced)": 14,
+        "J: Incorrect abstention (hallucinated on unanswerable)": 71
+      }
+    },
+    "Variant_C_HybridCE": {
+      "n_total": 304,
+      "n_answerable": 233,
+      "n_adversarial": 71,
+      "hit_at_1": 0.5236,
+      "hit_at_3": 0.6695,
+      "hit_at_5": 0.6953,
+      "mrr_at_5": 0.5973,
+      "recall_at_5": 0.6459,
+      "full_recall_at_5": 0.6009,
+      "precision_at_5": 0.1745,
+      "mean_tokens": 147.3,
+      "latency_p50_ms": 134.5,
+      "latency_p95_ms": 188.75,
+      "adversarial_rejection_rate": 0.0,
+      "category_breakdown": {
+        "Single-hop / Factual": {
+          "n": 43,
+          "hit_at_5": 0.5814,
+          "recall_at_5": 0.3484,
+          "full_recall_at_5": 0.1395,
+          "mrr_at_5": 0.4651
+        },
+        "Temporal reasoning": {
+          "n": 63,
+          "hit_at_5": 0.9524,
+          "recall_at_5": 0.9524,
+          "full_recall_at_5": 0.9524,
+          "mrr_at_5": 0.8505
+        },
+        "Multi-hop reasoning": {
+          "n": 13,
+          "hit_at_5": 0.3077,
+          "recall_at_5": 0.2692,
+          "full_recall_at_5": 0.2308,
+          "mrr_at_5": 0.25
+        },
+        "Open-domain / Inference": {
+          "n": 114,
+          "hit_at_5": 0.6404,
+          "recall_at_5": 0.6316,
+          "full_recall_at_5": 0.6228,
+          "mrr_at_5": 0.5468
+        },
+        "Adversarial / Unanswerable": {
+          "n": 71,
+          "rejection_rate": 0.0,
+          "fp_rate": 1.0
+        }
+      },
+      "failure_taxonomy": {
+        "C: Semantic retrieval miss": 58,
+        "F: Missing multi-hop evidence": 7,
+        "F: Missing multi-hop evidence (partial recall only)": 1,
+        "G: Temporal conflict / stale state": 3,
+        "I: Ranking failure (remaining evidence displaced)": 21,
+        "J: Incorrect abstention (false refusal)": 3,
+        "J: Incorrect abstention (hallucinated on unanswerable)": 71
+      }
+    },
+    "Variant_D_BoundedAssociative": {
+      "n_total": 304,
+      "n_answerable": 233,
+      "n_adversarial": 71,
+      "hit_at_1": 0.5193,
+      "hit_at_3": 0.6695,
+      "hit_at_5": 0.7124,
+      "mrr_at_5": 0.5983,
+      "recall_at_5": 0.6643,
+      "full_recall_at_5": 0.6223,
+      "precision_at_5": 0.1528,
+      "mean_tokens": 161.0,
+      "latency_p50_ms": 389.89,
+      "latency_p95_ms": 556.37,
+      "adversarial_rejection_rate": 0.0,
+      "category_breakdown": {
+        "Single-hop / Factual": {
+          "n": 43,
+          "hit_at_5": 0.5814,
+          "recall_at_5": 0.3554,
+          "full_recall_at_5": 0.1628,
+          "mrr_at_5": 0.4806
+        },
+        "Temporal reasoning": {
+          "n": 63,
+          "hit_at_5": 0.9524,
+          "recall_at_5": 0.9524,
+          "full_recall_at_5": 0.9524,
+          "mrr_at_5": 0.8386
+        },
+        "Multi-hop reasoning": {
+          "n": 13,
+          "hit_at_5": 0.3077,
+          "recall_at_5": 0.2692,
+          "full_recall_at_5": 0.2308,
+          "mrr_at_5": 0.25
+        },
+        "Open-domain / Inference": {
+          "n": 114,
+          "hit_at_5": 0.6754,
+          "recall_at_5": 0.6667,
+          "full_recall_at_5": 0.6579,
+          "mrr_at_5": 0.5496
+        },
+        "Adversarial / Unanswerable": {
+          "n": 71,
+          "rejection_rate": 0.0,
+          "fp_rate": 1.0
+        }
+      },
+      "failure_taxonomy": {
+        "C: Semantic retrieval miss": 54,
+        "F: Missing multi-hop evidence": 7,
+        "F: Missing multi-hop evidence (partial recall only)": 1,
+        "G: Temporal conflict / stale state": 3,
+        "I: Ranking failure (remaining evidence displaced)": 20,
+        "J: Incorrect abstention (false refusal)": 3,
+        "J: Incorrect abstention (hallucinated on unanswerable)": 71
+      }
+    },
+    "Variant_E_ConsolidatedSemantic": {
+      "n_total": 304,
+      "n_answerable": 233,
+      "n_adversarial": 71,
+      "hit_at_1": 0.5236,
+      "hit_at_3": 0.6695,
+      "hit_at_5": 0.6996,
+      "mrr_at_5": 0.5996,
+      "recall_at_5": 0.6459,
+      "full_recall_at_5": 0.5966,
+      "precision_at_5": 0.1768,
+      "mean_tokens": 144.9,
+      "latency_p50_ms": 125.89,
+      "latency_p95_ms": 164.04,
+      "adversarial_rejection_rate": 0.0,
+      "category_breakdown": {
+        "Single-hop / Factual": {
+          "n": 43,
+          "hit_at_5": 0.5814,
+          "recall_at_5": 0.3484,
+          "full_recall_at_5": 0.1395,
+          "mrr_at_5": 0.4729
+        },
+        "Temporal reasoning": {
+          "n": 63,
+          "hit_at_5": 0.9524,
+          "recall_at_5": 0.9524,
+          "full_recall_at_5": 0.9524,
+          "mrr_at_5": 0.8505
+        },
+        "Multi-hop reasoning": {
+          "n": 13,
+          "hit_at_5": 0.3077,
+          "recall_at_5": 0.2308,
+          "full_recall_at_5": 0.1538,
+          "mrr_at_5": 0.25
+        },
+        "Open-domain / Inference": {
+          "n": 114,
+          "hit_at_5": 0.6491,
+          "recall_at_5": 0.636,
+          "full_recall_at_5": 0.6228,
+          "mrr_at_5": 0.5485
+        },
+        "Adversarial / Unanswerable": {
+          "n": 71,
+          "rejection_rate": 0.0,
+          "fp_rate": 1.0
+        }
+      },
+      "failure_taxonomy": {
+        "C: Semantic retrieval miss": 57,
+        "F: Missing multi-hop evidence": 7,
+        "F: Missing multi-hop evidence (partial recall only)": 2,
+        "G: Temporal conflict / stale state": 3,
+        "I: Ranking failure (remaining evidence displaced)": 22,
+        "J: Incorrect abstention (false refusal)": 3,
+        "J: Incorrect abstention (hallucinated on unanswerable)": 71
+      }
+    },
+    "Variant_F_ConsolidatedAssociative": {
+      "n_total": 304,
+      "n_answerable": 233,
+      "n_adversarial": 71,
+      "hit_at_1": 0.5193,
+      "hit_at_3": 0.6695,
+      "hit_at_5": 0.7124,
+      "mrr_at_5": 0.5983,
+      "recall_at_5": 0.6643,
+      "full_recall_at_5": 0.6223,
+      "precision_at_5": 0.1528,
+      "mean_tokens": 160.3,
+      "latency_p50_ms": 382.74,
+      "latency_p95_ms": 492.35,
+      "adversarial_rejection_rate": 0.0,
+      "category_breakdown": {
+        "Single-hop / Factual": {
+          "n": 43,
+          "hit_at_5": 0.5814,
+          "recall_at_5": 0.3554,
+          "full_recall_at_5": 0.1628,
+          "mrr_at_5": 0.4806
+        },
+        "Temporal reasoning": {
+          "n": 63,
+          "hit_at_5": 0.9524,
+          "recall_at_5": 0.9524,
+          "full_recall_at_5": 0.9524,
+          "mrr_at_5": 0.8386
+        },
+        "Multi-hop reasoning": {
+          "n": 13,
+          "hit_at_5": 0.3077,
+          "recall_at_5": 0.2692,
+          "full_recall_at_5": 0.2308,
+          "mrr_at_5": 0.25
+        },
+        "Open-domain / Inference": {
+          "n": 114,
+          "hit_at_5": 0.6754,
+          "recall_at_5": 0.6667,
+          "full_recall_at_5": 0.6579,
+          "mrr_at_5": 0.5496
+        },
+        "Adversarial / Unanswerable": {
+          "n": 71,
+          "rejection_rate": 0.0,
+          "fp_rate": 1.0
+        }
+      },
+      "failure_taxonomy": {
+        "C: Semantic retrieval miss": 54,
+        "F: Missing multi-hop evidence": 7,
+        "F: Missing multi-hop evidence (partial recall only)": 1,
+        "G: Temporal conflict / stale state": 3,
+        "I: Ranking failure (remaining evidence displaced)": 20,
+        "J: Incorrect abstention (false refusal)": 3,
+        "J: Incorrect abstention (hallucinated on unanswerable)": 71
+      }
+    },
+    "Variant_G_QueryRouted": {
+      "n_total": 304,
+      "n_answerable": 233,
+      "n_adversarial": 71,
+      "hit_at_1": 0.4893,
+      "hit_at_3": 0.6094,
+      "hit_at_5": 0.6395,
+      "mrr_at_5": 0.554,
+      "recall_at_5": 0.5978,
+      "full_recall_at_5": 0.5622,
+      "precision_at_5": 0.1557,
+      "mean_tokens": 155.1,
+      "latency_p50_ms": 122.81,
+      "latency_p95_ms": 382.34,
+      "adversarial_rejection_rate": 0.0,
+      "category_breakdown": {
+        "Single-hop / Factual": {
+          "n": 43,
+          "hit_at_5": 0.4419,
+          "recall_at_5": 0.2624,
+          "full_recall_at_5": 0.1163,
+          "mrr_at_5": 0.3566
+        },
+        "Temporal reasoning": {
+          "n": 63,
+          "hit_at_5": 0.9365,
+          "recall_at_5": 0.9365,
+          "full_recall_at_5": 0.9365,
+          "mrr_at_5": 0.8307
+        },
+        "Multi-hop reasoning": {
+          "n": 13,
+          "hit_at_5": 0.3077,
+          "recall_at_5": 0.2692,
+          "full_recall_at_5": 0.2308,
+          "mrr_at_5": 0.2564
+        },
+        "Open-domain / Inference": {
+          "n": 114,
+          "hit_at_5": 0.5877,
+          "recall_at_5": 0.5746,
+          "full_recall_at_5": 0.5614,
+          "mrr_at_5": 0.5095
+        },
+        "Adversarial / Unanswerable": {
+          "n": 71,
+          "rejection_rate": 0.0,
+          "fp_rate": 1.0
+        }
+      },
+      "failure_taxonomy": {
+        "C: Semantic retrieval miss": 70,
+        "F: Missing multi-hop evidence": 8,
+        "F: Missing multi-hop evidence (partial recall only)": 1,
+        "G: Temporal conflict / stale state": 4,
+        "I: Ranking failure (remaining evidence displaced)": 17,
+        "J: Incorrect abstention (false refusal)": 2,
+        "J: Incorrect abstention (hallucinated on unanswerable)": 71
+      }
+    },
+    "Ablation_D_Depth1": {
+      "n_total": 304,
+      "n_answerable": 233,
+      "n_adversarial": 71,
+      "hit_at_1": 0.5193,
+      "hit_at_3": 0.6695,
+      "hit_at_5": 0.7124,
+      "mrr_at_5": 0.5983,
+      "recall_at_5": 0.6643,
+      "full_recall_at_5": 0.6223,
+      "precision_at_5": 0.1528,
+      "mean_tokens": 161.0,
+      "latency_p50_ms": 382.96,
+      "latency_p95_ms": 520.39,
+      "adversarial_rejection_rate": 0.0,
+      "category_breakdown": {
+        "Single-hop / Factual": {
+          "n": 43,
+          "hit_at_5": 0.5814,
+          "recall_at_5": 0.3554,
+          "full_recall_at_5": 0.1628,
+          "mrr_at_5": 0.4806
+        },
+        "Temporal reasoning": {
+          "n": 63,
+          "hit_at_5": 0.9524,
+          "recall_at_5": 0.9524,
+          "full_recall_at_5": 0.9524,
+          "mrr_at_5": 0.8386
+        },
+        "Multi-hop reasoning": {
+          "n": 13,
+          "hit_at_5": 0.3077,
+          "recall_at_5": 0.2692,
+          "full_recall_at_5": 0.2308,
+          "mrr_at_5": 0.25
+        },
+        "Open-domain / Inference": {
+          "n": 114,
+          "hit_at_5": 0.6754,
+          "recall_at_5": 0.6667,
+          "full_recall_at_5": 0.6579,
+          "mrr_at_5": 0.5496
+        },
+        "Adversarial / Unanswerable": {
+          "n": 71,
+          "rejection_rate": 0.0,
+          "fp_rate": 1.0
+        }
+      },
+      "failure_taxonomy": {
+        "C: Semantic retrieval miss": 54,
+        "F: Missing multi-hop evidence": 7,
+        "F: Missing multi-hop evidence (partial recall only)": 1,
+        "G: Temporal conflict / stale state": 3,
+        "I: Ranking failure (remaining evidence displaced)": 20,
+        "J: Incorrect abstention (false refusal)": 3,
+        "J: Incorrect abstention (hallucinated on unanswerable)": 71
+      }
+    },
+    "Ablation_D_Branch1": {
+      "n_total": 304,
+      "n_answerable": 233,
+      "n_adversarial": 71,
+      "hit_at_1": 0.5279,
+      "hit_at_3": 0.6695,
+      "hit_at_5": 0.7253,
+      "mrr_at_5": 0.6065,
+      "recall_at_5": 0.6716,
+      "full_recall_at_5": 0.6223,
+      "precision_at_5": 0.1554,
+      "mean_tokens": 158.0,
+      "latency_p50_ms": 180.02,
+      "latency_p95_ms": 395.41,
+      "adversarial_rejection_rate": 0.0,
+      "category_breakdown": {
+        "Single-hop / Factual": {
+          "n": 43,
+          "hit_at_5": 0.6279,
+          "recall_at_5": 0.3717,
+          "full_recall_at_5": 0.1395,
+          "mrr_at_5": 0.493
+        },
+        "Temporal reasoning": {
+          "n": 63,
+          "hit_at_5": 0.9683,
+          "recall_at_5": 0.9683,
+          "full_recall_at_5": 0.9683,
+          "mrr_at_5": 0.8532
+        },
+        "Multi-hop reasoning": {
+          "n": 13,
+          "hit_at_5": 0.3077,
+          "recall_at_5": 0.2692,
+          "full_recall_at_5": 0.2308,
+          "mrr_at_5": 0.25
+        },
+        "Open-domain / Inference": {
+          "n": 114,
+          "hit_at_5": 0.6754,
+          "recall_at_5": 0.6667,
+          "full_recall_at_5": 0.6579,
+          "mrr_at_5": 0.5537
+        },
+        "Adversarial / Unanswerable": {
+          "n": 71,
+          "rejection_rate": 0.0,
+          "fp_rate": 1.0
+        }
+      },
+      "failure_taxonomy": {
+        "C: Semantic retrieval miss": 52,
+        "F: Missing multi-hop evidence": 7,
+        "F: Missing multi-hop evidence (partial recall only)": 1,
+        "G: Temporal conflict / stale state": 2,
+        "I: Ranking failure (remaining evidence displaced)": 23,
+        "J: Incorrect abstention (false refusal)": 3,
+        "J: Incorrect abstention (hallucinated on unanswerable)": 71
+      }
+    }
+  }
+}
