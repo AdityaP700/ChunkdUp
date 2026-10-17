@@ -18,6 +18,7 @@ and this project adheres to Semantic Versioning.
 - `tests/test_associative_memory.py`: Unit and integration test suite validating schema provenance, bounded expansion limits, and all 7 retrieval variants (100% pass).
 - `evaluation/run_associative_sprint.py`: Turnkey unified evaluation runner for all 7 variants and controlled ablations with GPU acceleration.
 - `evaluation/results/associative_sprint_dev.json` & `evaluation/results/associative_per_question_dev.csv`: Complete dev split results across 304 questions. Bounded associative expansion with branch limit $B=1$ achieves highest Hit@5 (72.53%, +3.00% over hybrid CE control) and highest MRR@5 (0.6065) while cutting latency by >50% (180ms vs 390ms). Semantic consolidation achieves lowest context tokens (144.9) while matching control accuracy.
+- `docs/research/associative-memory-report.md`: Phase 8 comprehensive research report with complete empirical comparative scoreboard, ablation findings, failure taxonomy, answers to all 7 research questions, and production recommendations.
 
 ### Fixed
 - `evaluation/adapters/locomo_adapter.py`: Protected `data/conversation.json` from write pollution during Track B evaluation by using isolated temporary directories (`tempfile.mkdtemp()`).
