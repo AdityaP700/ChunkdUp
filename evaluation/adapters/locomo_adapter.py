@@ -38,6 +38,7 @@ import os
 import re
 import subprocess
 import sys
+import tempfile
 import time
 from dataclasses import asdict, dataclass, field
 from datetime import datetime, timezone
@@ -631,7 +632,7 @@ class TrackBEvaluator:
 
         for s_idx, sample in enumerate(samples):
             # Create fresh in-memory instance
-            mem = Memory(store="memory")
+            mem = Memory(store="memory", data_dir=tempfile.mkdtemp())
 
             # Track which turns produced which memories
             # dia_id -> list of decisions made
