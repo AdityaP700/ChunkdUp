@@ -1,4 +1,6 @@
 # chunkdup/in_memory_repository.py
+import os
+import json
 from typing import Dict, List, Optional, Any, Union
 from datetime import datetime, timezone
 import uuid
@@ -53,12 +55,45 @@ def _is_valid_at(memory: Dict[str, Any], target_dt: datetime) -> bool:
 
 
 class InMemoryRepository(MemoryRepository):
-    """Stores memories in RAM with append-only temporal history and supersession."""
+    """Stores memories in RAM with append-only temporal history, supersession, and durable decision audit."""
 
-    def __init__(self):
+    def __init__(self, data_dir: Optional[str] = None):
         self._memories: Dict[str, Dict[str, Any]] = {}  # id -> memory
         self._key_index: Dict[str, str] = {}            # key -> active id
         self.turn_repository = InMemoryTurnRepository()
+        self._decisions: Dict[str, Dict[str, Any]] = {}
+        self._decisions_by_turn: Dict[str, List[str]] = {}
+        self._decisions_by_memory: Dict[str, List[str]] = {}
+        self._data_dir = data_dir
+        self._audit_file = os.path.join(data_dir, "decisions.jsonl") if data_dir else None
+        if self._audit_file:
+            self._load_decisions()
+
+    def _index_decision(self, event: Dict[str, Any]) -> None:
+        d_id = str(event.get("decision_id") or event.get("id"))
+        self._decisions[d_id] = event
+        t_id = event.get("source_turn_id")
+        if t_id:
+            d_list = self._decisions_by_turn.setdefault(str(t_id), [])
+            if d_id not in d_list:
+                d_list.append(d_id)
+        m_id = event.get("target_memory_id")
+        if m_id:
+            m_list = self._decisions_by_memory.setdefault(str(m_id), [])
+            if d_id not in m_list:
+                m_list.append(d_id)
+
+    def _load_decisions(self) -> None:
+        if self._audit_file and os.path.exists(self._audit_file):
+            try:
+                with open(self._audit_file, "r", encoding="utf-8") as f:
+                    for line in f:
+                        line = line.strip()
+                        if line:
+                            event = json.loads(line)
+                            self._index_decision(event)
+            except Exception:
+                pass
 
     def save_turn(self, turn: Dict[str, Any]) -> None:
         self.turn_repository.save_turn(turn)
@@ -235,7 +270,44 @@ class InMemoryRepository(MemoryRepository):
             if existing["value"] != memory.get("value"):
                 existing["value"] = memory.get("value")
 
+    def record_decision(self, event: Dict[str, Any]) -> None:
+        """Record an append-only decision audit event."""
+        d_id = str(event.get("decision_id") or event.get("id") or uuid.uuid4())
+        event["decision_id"] = d_id
+        if "timestamp" not in event:
+            event["timestamp"] = datetime.now(timezone.utc).isoformat().replace("+00:00", "Z")
+        self._index_decision(event)
+        if self._audit_file:
+            try:
+                os.makedirs(os.path.dirname(self._audit_file), exist_ok=True)
+                with open(self._audit_file, "a", encoding="utf-8") as f:
+                    f.write(json.dumps(event) + "\n")
+            except Exception:
+                pass
+
+    def get_decision(self, decision_id: str) -> Optional[Dict[str, Any]]:
+        return self._decisions.get(str(decision_id))
+
+    def get_decisions_by_turn(self, source_turn_id: str) -> List[Dict[str, Any]]:
+        d_ids = self._decisions_by_turn.get(str(source_turn_id), [])
+        return [self._decisions[did] for did in d_ids if did in self._decisions]
+
+    def get_decisions_by_memory(self, memory_id: str) -> List[Dict[str, Any]]:
+        d_ids = self._decisions_by_memory.get(str(memory_id), [])
+        return [self._decisions[did] for did in d_ids if did in self._decisions]
+
+    def get_all_decisions(self) -> List[Dict[str, Any]]:
+        return list(self._decisions.values())
+
     def clear(self) -> None:
         self._memories.clear()
         self._key_index.clear()
         self.turn_repository.clear()
+        self._decisions.clear()
+        self._decisions_by_turn.clear()
+        self._decisions_by_memory.clear()
+        if self._audit_file and os.path.exists(self._audit_file):
+            try:
+                os.remove(self._audit_file)
+            except Exception:
+                pass

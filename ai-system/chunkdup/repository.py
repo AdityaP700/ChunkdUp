@@ -49,6 +49,26 @@ class MemoryRepository(ABC):
         """Get chronologically ordered history of a memory key."""
         return []
 
+    def record_decision(self, event: Dict[str, Any]) -> None:
+        """Record an append-only policy decision event (STORE, MERGE, UPDATE, IGNORE)."""
+        pass
+
+    def get_decision(self, decision_id: str) -> Optional[Dict[str, Any]]:
+        """Retrieve a decision event by its unique ID."""
+        return None
+
+    def get_decisions_by_turn(self, source_turn_id: str) -> List[Dict[str, Any]]:
+        """Retrieve all decision events originating from a specific source dialogue turn."""
+        return []
+
+    def get_decisions_by_memory(self, memory_id: str) -> List[Dict[str, Any]]:
+        """Retrieve all decision events affecting a specific target memory ID."""
+        return []
+
+    def get_all_decisions(self) -> List[Dict[str, Any]]:
+        """Retrieve all recorded decision events in chronological order."""
+        return []
+
     @abstractmethod
     def clear(self) -> None:
         """Clear all memories."""

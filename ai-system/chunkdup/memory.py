@@ -394,9 +394,25 @@ class MemoryManager:
         self.entity_graph = entity_graph
 
     def process(self, memory: Dict[str, Any]) -> Decision:
+        t_id = memory.get("source_turn_id")
+        key = memory.get("key")
+
         importance = self.scorer.score(memory)
         if importance < self.threshold:
             logger.info(f"Discarded memory: {memory.get('value')} (type: {memory.get('type')}, score: {importance})")
+            if hasattr(self.repository, "record_decision"):
+                self.repository.record_decision({
+                    "decision_type": "IGNORE",
+                    "source_turn_id": t_id,
+                    "target_memory_id": None,
+                    "memory_key": key,
+                    "previous_value": None,
+                    "new_value": memory.get("value"),
+                    "version": 1,
+                    "rationale": "below_importance_threshold",
+                    "confidence": 1.0,
+                    "status": "success",
+                })
             return Decision.IGNORE
 
         memory["importance"] = importance
@@ -406,33 +422,143 @@ class MemoryManager:
             memory["supersedes_id"] = existing.get("id")
 
         decision = self.engine.decide(existing, memory)
+        rationale = getattr(decision, "rationale", None) or "policy_rule"
+        confidence = getattr(decision, "confidence", 1.0)
 
         if decision == Decision.STORE:
-            self.repository.save(memory)
-            if self.entity_graph is not None:
-                try:
-                    self.entity_graph.index_memory(memory)
-                except Exception as e:
-                    logger.warning(f"Entity indexing failed: {e}")
-            logger.info(f"Stored new memory: {memory['key']} = {memory['value']}")
+            try:
+                self.repository.save(memory)
+                if hasattr(self.repository, "record_decision"):
+                    self.repository.record_decision({
+                        "decision_type": "STORE",
+                        "source_turn_id": t_id,
+                        "target_memory_id": memory.get("id"),
+                        "memory_key": key,
+                        "previous_value": None,
+                        "new_value": memory.get("value"),
+                        "version": memory.get("version", 1),
+                        "rationale": rationale,
+                        "confidence": confidence,
+                        "status": "success",
+                    })
+                if self.entity_graph is not None:
+                    try:
+                        self.entity_graph.index_memory(memory)
+                    except Exception as e:
+                        logger.warning(f"Entity indexing failed: {e}")
+                logger.info(f"Stored new memory: {memory['key']} = {memory['value']}")
+            except Exception as exc:
+                if hasattr(self.repository, "record_decision"):
+                    self.repository.record_decision({
+                        "decision_type": "STORE",
+                        "source_turn_id": t_id,
+                        "target_memory_id": memory.get("id"),
+                        "memory_key": key,
+                        "previous_value": None,
+                        "new_value": memory.get("value"),
+                        "version": memory.get("version", 1),
+                        "rationale": rationale,
+                        "confidence": confidence,
+                        "status": "failed",
+                        "error_message": str(exc),
+                    })
+                raise
+
         elif decision == Decision.IGNORE:
+            if hasattr(self.repository, "record_decision"):
+                self.repository.record_decision({
+                    "decision_type": "IGNORE",
+                    "source_turn_id": t_id,
+                    "target_memory_id": existing.get("id") if existing else None,
+                    "memory_key": key,
+                    "previous_value": existing.get("value") if existing else None,
+                    "new_value": memory.get("value"),
+                    "version": existing.get("version", 1) if existing else 1,
+                    "rationale": rationale,
+                    "confidence": confidence,
+                    "status": "success",
+                })
             logger.info(f"Ignored duplicate memory: {memory['key']}")
+
         elif decision == Decision.MERGE:
-            self.repository.merge(memory["key"], memory)
-            if self.entity_graph is not None:
-                try:
-                    self.entity_graph.index_memory(memory)
-                except Exception as e:
-                    logger.warning(f"Entity indexing failed: {e}")
-            logger.info(f"Merged duplicate memory (increased frequency): {memory['key']}")
+            prev_val = existing.get("value") if existing else None
+            try:
+                self.repository.merge(memory["key"], memory)
+                if hasattr(self.repository, "record_decision"):
+                    self.repository.record_decision({
+                        "decision_type": "MERGE",
+                        "source_turn_id": t_id,
+                        "target_memory_id": existing.get("id") if existing else None,
+                        "memory_key": key,
+                        "previous_value": prev_val,
+                        "new_value": memory.get("value"),
+                        "version": existing.get("version", 1) if existing else 1,
+                        "rationale": rationale,
+                        "confidence": confidence,
+                        "status": "success",
+                    })
+                if self.entity_graph is not None:
+                    try:
+                        self.entity_graph.index_memory(memory)
+                    except Exception as e:
+                        logger.warning(f"Entity indexing failed: {e}")
+                logger.info(f"Merged duplicate memory (increased frequency): {memory['key']}")
+            except Exception as exc:
+                if hasattr(self.repository, "record_decision"):
+                    self.repository.record_decision({
+                        "decision_type": "MERGE",
+                        "source_turn_id": t_id,
+                        "target_memory_id": existing.get("id") if existing else None,
+                        "memory_key": key,
+                        "previous_value": prev_val,
+                        "new_value": memory.get("value"),
+                        "version": existing.get("version", 1) if existing else 1,
+                        "rationale": rationale,
+                        "confidence": confidence,
+                        "status": "failed",
+                        "error_message": str(exc),
+                    })
+                raise
+
         elif decision == Decision.UPDATE:
-            self.repository.update(memory)
-            if self.entity_graph is not None:
-                try:
-                    self.entity_graph.index_memory(memory)
-                except Exception as e:
-                    logger.warning(f"Entity indexing failed: {e}")
-            logger.info(f"Updated memory: {memory['key']} = {memory['value']}")
+            prev_val = existing.get("value") if existing else None
+            try:
+                self.repository.update(memory)
+                if hasattr(self.repository, "record_decision"):
+                    self.repository.record_decision({
+                        "decision_type": "UPDATE",
+                        "source_turn_id": t_id,
+                        "target_memory_id": memory.get("id"),
+                        "memory_key": key,
+                        "previous_value": prev_val,
+                        "new_value": memory.get("value"),
+                        "version": memory.get("version", 1),
+                        "rationale": rationale,
+                        "confidence": confidence,
+                        "status": "success",
+                    })
+                if self.entity_graph is not None:
+                    try:
+                        self.entity_graph.index_memory(memory)
+                    except Exception as e:
+                        logger.warning(f"Entity indexing failed: {e}")
+                logger.info(f"Updated memory: {memory['key']} = {memory['value']}")
+            except Exception as exc:
+                if hasattr(self.repository, "record_decision"):
+                    self.repository.record_decision({
+                        "decision_type": "UPDATE",
+                        "source_turn_id": t_id,
+                        "target_memory_id": existing.get("id") if existing else None,
+                        "memory_key": key,
+                        "previous_value": prev_val,
+                        "new_value": memory.get("value"),
+                        "version": existing.get("version", 1) if existing else 1,
+                        "rationale": rationale,
+                        "confidence": confidence,
+                        "status": "failed",
+                        "error_message": str(exc),
+                    })
+                raise
 
         return decision
 
@@ -476,13 +602,22 @@ class Memory:
                 hybrid_ce_abstain pipeline. A planned choice, separate from
                 the automatic failure-driven degradation chain.
         """
+        # Set up paths
+        if data_dir is None:
+            self.base_dir = os.getcwd()
+            data_dir = os.path.join(self.base_dir, "data")
+        else:
+            self.base_dir = os.path.dirname(data_dir) or os.getcwd()
+
+        self.data_dir = data_dir
         self._store_type = store
+        os.makedirs(data_dir, exist_ok=True)
 
         # Initialize repository based on store configuration
         if repository is not None:
             self.repository = repository
         elif store == "memory":
-            self.repository = InMemoryRepository()
+            self.repository = InMemoryRepository(data_dir=self.data_dir)
         elif store == "postgres":
             if not connection_url:
                 raise ValueError("connection_url required for postgres store")
@@ -505,14 +640,6 @@ class Memory:
             self.turn_repository = InMemoryTurnRepository()
 
         self.turn_log = SourceTurnLog(self.turn_repository)
-
-        # Set up paths
-        if data_dir is None:
-            self.base_dir = os.getcwd()
-            data_dir = os.path.join(self.base_dir, "data")
-
-        self.data_dir = data_dir
-        os.makedirs(data_dir, exist_ok=True)
 
         # Find labs directory for LLM imports
         if labs_dir is None:
@@ -759,6 +886,19 @@ class Memory:
             })
 
         if not results:
+            if hasattr(self.repository, "record_decision"):
+                self.repository.record_decision({
+                    "decision_type": "IGNORE",
+                    "source_turn_id": t_id,
+                    "target_memory_id": None,
+                    "memory_key": None,
+                    "previous_value": None,
+                    "new_value": None,
+                    "version": 1,
+                    "rationale": "no_facts_extracted",
+                    "confidence": 1.0,
+                    "status": "success",
+                })
             results.append({
                 "decision": "IGNORE",
                 "key": None,

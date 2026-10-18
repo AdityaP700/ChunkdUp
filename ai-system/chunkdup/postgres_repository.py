@@ -12,9 +12,9 @@ try:
 except ImportError:
     from repository import MemoryRepository
 try:
-    from .models import MemoryModel, MemoryHistoryModel, TurnModel, Base
+    from .models import MemoryModel, MemoryHistoryModel, DecisionModel, TurnModel, Base
 except ImportError:
-    from models import MemoryModel, MemoryHistoryModel, TurnModel, Base
+    from models import MemoryModel, MemoryHistoryModel, DecisionModel, TurnModel, Base
 try:
     from .turn_repository import PostgresTurnRepository
 except ImportError:
@@ -423,11 +423,113 @@ class PostgresRepository(MemoryRepository):
                 session.add(history)
                 session.commit()
 
+    def _decision_to_dict(self, model: DecisionModel) -> Dict[str, Any]:
+        return {
+            "decision_id": str(model.id),
+            "source_turn_id": str(model.source_turn_id) if model.source_turn_id else None,
+            "decision_type": model.decision_type,
+            "target_memory_id": str(model.target_memory_id) if model.target_memory_id else None,
+            "memory_key": model.memory_key,
+            "previous_value": model.previous_value,
+            "new_value": model.new_value,
+            "version": model.version,
+            "rationale": model.rationale,
+            "confidence": model.confidence,
+            "timestamp": model.timestamp.isoformat() if model.timestamp else None,
+            "status": model.status,
+            "error_message": model.error_message,
+            "metadata": model.metadata_ or {},
+        }
+
+    def record_decision(self, event: Dict[str, Any]) -> None:
+        d_id = event.get("decision_id") or event.get("id")
+        if isinstance(d_id, str):
+            try:
+                d_id = uuid.UUID(d_id)
+            except Exception:
+                d_id = uuid.uuid4()
+        elif not d_id:
+            d_id = uuid.uuid4()
+
+        turn_id = event.get("source_turn_id")
+        if isinstance(turn_id, str):
+            try:
+                turn_id = uuid.UUID(turn_id)
+            except Exception:
+                turn_id = None
+
+        target_id = event.get("target_memory_id")
+        if isinstance(target_id, str):
+            try:
+                target_id = uuid.UUID(target_id)
+            except Exception:
+                target_id = None
+
+        ts = event.get("timestamp")
+        if isinstance(ts, str):
+            ts = _parse_dt(ts)
+        elif ts is None:
+            ts = datetime.now(timezone.utc)
+
+        with self.SessionLocal() as session:
+            model = DecisionModel(
+                id=d_id,
+                source_turn_id=turn_id,
+                decision_type=event.get("decision_type", "STORE"),
+                target_memory_id=target_id,
+                memory_key=event.get("memory_key"),
+                previous_value=event.get("previous_value"),
+                new_value=event.get("new_value"),
+                version=event.get("version", 1),
+                rationale=event.get("rationale"),
+                confidence=event.get("confidence", 1.0),
+                timestamp=ts,
+                status=event.get("status", "success"),
+                error_message=event.get("error_message"),
+                metadata_=event.get("metadata", {}),
+            )
+            session.add(model)
+            session.commit()
+            event["decision_id"] = str(model.id)
+
+    def get_decision(self, decision_id: str) -> Optional[Dict[str, Any]]:
+        try:
+            uid = uuid.UUID(decision_id) if isinstance(decision_id, str) else decision_id
+        except Exception:
+            return None
+        with self.SessionLocal() as session:
+            res = session.execute(select(DecisionModel).where(DecisionModel.id == uid)).scalar_one_or_none()
+            return self._decision_to_dict(res) if res else None
+
+    def get_decisions_by_turn(self, source_turn_id: str) -> List[Dict[str, Any]]:
+        try:
+            uid = uuid.UUID(source_turn_id) if isinstance(source_turn_id, str) else source_turn_id
+        except Exception:
+            return []
+        with self.SessionLocal() as session:
+            res = session.execute(select(DecisionModel).where(DecisionModel.source_turn_id == uid).order_by(DecisionModel.timestamp.asc())).scalars().all()
+            return [self._decision_to_dict(r) for r in res]
+
+    def get_decisions_by_memory(self, memory_id: str) -> List[Dict[str, Any]]:
+        try:
+            uid = uuid.UUID(memory_id) if isinstance(memory_id, str) else memory_id
+        except Exception:
+            return []
+        with self.SessionLocal() as session:
+            res = session.execute(select(DecisionModel).where(DecisionModel.target_memory_id == uid).order_by(DecisionModel.timestamp.asc())).scalars().all()
+            return [self._decision_to_dict(r) for r in res]
+
+    def get_all_decisions(self) -> List[Dict[str, Any]]:
+        with self.SessionLocal() as session:
+            res = session.execute(select(DecisionModel).order_by(DecisionModel.timestamp.asc())).scalars().all()
+            return [self._decision_to_dict(r) for r in res]
+
     def clear(self) -> None:
-        """Clear all memories and turns."""
+        """Clear all memories, turns, and decision audit logs."""
         with self.SessionLocal() as session:
             session.execute(delete(MemoryModel))
             session.execute(delete(MemoryHistoryModel))
+            session.execute(delete(DecisionModel))
             session.execute(delete(TurnModel))
             session.commit()
 

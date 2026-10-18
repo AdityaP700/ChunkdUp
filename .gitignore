@@ -10,3 +10,11 @@ models/all-MiniLM-L6-v2/
 wheels/
 data/retrieval_log.jsonl
 
+# Datasets and benchmark repos (never commit benchmark data)
+evaluation/data/longmemeval*
+data/longmemeval*
+*.jsonl
+LongMemEval_repo/
+evaluation/LongMemEval_repo/
+
+

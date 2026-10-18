@@ -73,3 +73,29 @@ class MemoryHistoryModel(Base):
     operation = Column(String(20), nullable=False)  # STORE, UPDATE, MERGE, DELETE
     version = Column(Integer, nullable=False)
     created_at = Column(DateTime(timezone=True), default=lambda: datetime.now(timezone.utc))
+
+
+class DecisionModel(Base):
+    __tablename__ = "decision_events"
+
+    id = Column(UUID(as_uuid=True), primary_key=True, default=uuid.uuid4)
+    source_turn_id = Column(UUID(as_uuid=True), nullable=True)
+    decision_type = Column(String(20), nullable=False)  # STORE, MERGE, UPDATE, IGNORE
+    target_memory_id = Column(UUID(as_uuid=True), nullable=True)
+    memory_key = Column(String(255), nullable=True)
+    previous_value = Column(Text, nullable=True)
+    new_value = Column(Text, nullable=True)
+    version = Column(Integer, default=1)
+    rationale = Column(Text, nullable=True)
+    confidence = Column(Float, default=1.0)
+    timestamp = Column(DateTime(timezone=True), default=lambda: datetime.now(timezone.utc))
+    status = Column(String(20), default="success")  # success, failed
+    error_message = Column(Text, nullable=True)
+    metadata_ = Column("metadata", JSON, default=dict)
+
+    __table_args__ = (
+        Index('idx_decision_turn', 'source_turn_id'),
+        Index('idx_decision_memory', 'target_memory_id'),
+        Index('idx_decision_type', 'decision_type'),
+        Index('idx_decision_timestamp', 'timestamp'),
+    )
