@@ -44,19 +44,23 @@ PRONOUN_MAP = {
     "their": "PLURAL_OR_NEUTRAL",
 }
 
+# Linear bounded word patterns (no catastrophic backtracking across periods/newlines)
+_NP = r"[A-Za-z0-9_\-]+(?:\s+[A-Za-z0-9_\-]+){0,4}"
+_PROPER_NOUN_RE = re.compile(r"\b[A-Z][A-Za-z0-9_-]+(?:\s+[A-Z][A-Za-z0-9_-]+)*\b")
+
 RELATIONAL_PATTERNS = [
     # Employment / Role
-    (re.compile(r"(\b[A-Za-z0-9_\-\.\s]+?)\s+(?:works? at|employed at|works? for)\s+([A-Za-z0-9_\-\.\s]+)", re.IGNORECASE), "works_at"),
-    (re.compile(r"(\b[A-Za-z0-9_\-\.\s]+?)\s+(?:is a|is an|serves as|works as)\s+([A-Za-z0-9_\-\.\s]+)", re.IGNORECASE), "has_role"),
+    (re.compile(rf"(\b{_NP})\s+(?:works? at|employed at|works? for)\s+({_NP})", re.IGNORECASE), "works_at"),
+    (re.compile(rf"(\b{_NP})\s+(?:is a|is an|serves as|works as)\s+({_NP})", re.IGNORECASE), "has_role"),
     # Location / Residence
-    (re.compile(r"(\b[A-Za-z0-9_\-\.\s]+?)\s+(?:lives? in|moved to|relocated to|located in|headquartered in)\s+([A-Za-z0-9_\-\.\s]+)", re.IGNORECASE), "located_in"),
+    (re.compile(rf"(\b{_NP})\s+(?:lives? in|moved to|relocated to|located in|headquartered in)\s+({_NP})", re.IGNORECASE), "located_in"),
     # Tools / Technologies / Migration
-    (re.compile(r"(\b[A-Za-z0-9_\-\.\s]+?)\s+(?:uses?|using|runs? on|deployed on)\s+([A-Za-z0-9_\-\.\s]+)", re.IGNORECASE), "uses"),
-    (re.compile(r"(\b[A-Za-z0-9_\-\.\s]+?)\s+(?:migrated to|switched to|now use|now uses)\s+([A-Za-z0-9_\-\.\s]+)", re.IGNORECASE), "migrated_to"),
-    (re.compile(r"(\b[A-Za-z0-9_\-\.\s]+?)\s+(?:prefers?|likes?|favorites?)\s+([A-Za-z0-9_\-\.\s]+)", re.IGNORECASE), "prefers"),
+    (re.compile(rf"(\b{_NP})\s+(?:uses?|using|runs? on|deployed on)\s+({_NP})", re.IGNORECASE), "uses"),
+    (re.compile(rf"(\b{_NP})\s+(?:migrated to|switched to|now use|now uses)\s+({_NP})", re.IGNORECASE), "migrated_to"),
+    (re.compile(rf"(\b{_NP})\s+(?:prefers?|likes?|favorites?)\s+({_NP})", re.IGNORECASE), "prefers"),
     # Project Creation / Architecture
-    (re.compile(r"(\b[A-Za-z0-9_\-\.\s]+?)\s+(?:built|building|founded|created|developed|started)\s+([A-Za-z0-9_\-\.\s]+)", re.IGNORECASE), "created"),
-    (re.compile(r"(\b[A-Za-z0-9_\-\.\s]+?)\s+(?:requires?|depends? on)\s+([A-Za-z0-9_\-\.\s]+)", re.IGNORECASE), "depends_on"),
+    (re.compile(rf"(\b{_NP})\s+(?:built|building|founded|created|developed|started)\s+({_NP})", re.IGNORECASE), "created"),
+    (re.compile(rf"(\b{_NP})\s+(?:requires?|depends? on)\s+({_NP})", re.IGNORECASE), "depends_on"),
 ]
 
 
@@ -209,21 +213,23 @@ class RelationalExtractor:
         # Collect valid turn IDs in this input window
         valid_turn_ids: Set[str] = {curr_turn_id}
         if context_window:
+            known_turn_ids = {t["turn_id"] for t in self.coref_tracker.entities_by_turn}
             for past in context_window:
-                tid = past.get("turn_id")
+                tid = str(past.get("turn_id") or "")
                 if tid:
-                    valid_turn_ids.add(str(tid))
-                # Update coref tracker with context
-                spk = past.get("speaker", "User")
-                ents = [
-                    e.strip() for e in re.findall(r"\b[A-Z][A-Za-z0-9_-]*(?:\s+[A-Z][A-Za-z0-9_-]*)*\b", past.get("text", ""))
-                    if e.strip().lower() not in PRONOUN_MAP and e.strip().lower() not in {"user", "speaker", "unknown"}
-                ]
-                self.coref_tracker.register_turn(str(tid or ""), spk, ents)
+                    valid_turn_ids.add(tid)
+                    if tid not in known_turn_ids:
+                        spk = past.get("speaker", "User")
+                        ents = [
+                            e.strip() for e in _PROPER_NOUN_RE.findall(past.get("text", ""))
+                            if e.strip().lower() not in PRONOUN_MAP and e.strip().lower() not in {"user", "speaker", "unknown"}
+                        ]
+                        self.coref_tracker.register_turn(tid, spk, ents)
+                        known_turn_ids.add(tid)
 
         # Register current turn entities
         curr_ents = [
-            e.strip() for e in re.findall(r"\b[A-Z][A-Za-z0-9_-]*(?:\s+[A-Z][A-Za-z0-9_-]*)*\b", curr_text)
+            e.strip() for e in _PROPER_NOUN_RE.findall(curr_text)
             if e.strip().lower() not in PRONOUN_MAP and e.strip().lower() not in {"user", "speaker", "unknown"}
         ]
         self.coref_tracker.register_turn(curr_turn_id, curr_speaker, curr_ents)

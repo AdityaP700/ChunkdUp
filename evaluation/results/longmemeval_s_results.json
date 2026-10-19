@@ -1,0 +1,514 @@
+{
+  "benchmark": "LongMemEval-S",
+  "dataset_path": "evaluation/data/longmemeval_s_cleaned.json",
+  "n_samples": 500,
+  "n_answerable": 470,
+  "n_abstention": 30,
+  "device": "cuda",
+  "variants": {
+    "Variant_A_BM25_K5": {
+      "turn_recall_all@5": 0.534,
+      "turn_recall_all@8": 0.534,
+      "turn_recall_all@10": 0.534,
+      "turn_recall_any@5": 0.7766,
+      "turn_recall_any@8": 0.7766,
+      "turn_recall_any@10": 0.7766,
+      "turn_ndcg@5": 0.5879,
+      "turn_ndcg@10": 0.5886,
+      "sess_recall_all@5": 0.734,
+      "sess_recall_all@10": 0.734,
+      "sess_ndcg@5": 0.8273,
+      "answer_coverage": 0.5021,
+      "abstention_accuracy": 1.0,
+      "mean_tokens": 1143.5,
+      "latency_p50_ms": 1.5,
+      "latency_p95_ms": 4.92,
+      "category_breakdown": {
+        "single-session-user": {
+          "n": 64,
+          "turn_recall_all@5": 0.8594,
+          "turn_recall_any@5": 0.8594,
+          "answer_coverage": 0.8906
+        },
+        "multi-session": {
+          "n": 121,
+          "turn_recall_all@5": 0.2231,
+          "turn_recall_any@5": 0.7355,
+          "answer_coverage": 0.3554
+        },
+        "single-session-preference": {
+          "n": 30,
+          "turn_recall_all@5": 0.3,
+          "turn_recall_any@5": 0.4333,
+          "answer_coverage": 0.0
+        },
+        "temporal-reasoning": {
+          "n": 127,
+          "turn_recall_all@5": 0.5276,
+          "turn_recall_any@5": 0.7638,
+          "answer_coverage": 0.3071
+        },
+        "knowledge-update": {
+          "n": 72,
+          "turn_recall_all@5": 0.6389,
+          "turn_recall_any@5": 0.8889,
+          "answer_coverage": 0.8194
+        },
+        "single-session-assistant": {
+          "n": 56,
+          "turn_recall_all@5": 0.8393,
+          "turn_recall_any@5": 0.8393,
+          "answer_coverage": 0.6786
+        }
+      }
+    },
+    "Variant_A_BM25_K10": {
+      "turn_recall_all@5": 0.534,
+      "turn_recall_all@8": 0.634,
+      "turn_recall_all@10": 0.6787,
+      "turn_recall_any@5": 0.7766,
+      "turn_recall_any@8": 0.8234,
+      "turn_recall_any@10": 0.8596,
+      "turn_ndcg@5": 0.5879,
+      "turn_ndcg@10": 0.6295,
+      "sess_recall_all@5": 0.8106,
+      "sess_recall_all@10": 0.8404,
+      "sess_ndcg@5": 0.8592,
+      "answer_coverage": 0.5681,
+      "abstention_accuracy": 0.9667,
+      "mean_tokens": 2469.9,
+      "latency_p50_ms": 1.31,
+      "latency_p95_ms": 4.45,
+      "category_breakdown": {
+        "single-session-user": {
+          "n": 64,
+          "turn_recall_all@5": 0.8594,
+          "turn_recall_any@5": 0.8594,
+          "answer_coverage": 0.9219
+        },
+        "multi-session": {
+          "n": 121,
+          "turn_recall_all@5": 0.2231,
+          "turn_recall_any@5": 0.7355,
+          "answer_coverage": 0.4463
+        },
+        "single-session-preference": {
+          "n": 30,
+          "turn_recall_all@5": 0.3,
+          "turn_recall_any@5": 0.4333,
+          "answer_coverage": 0.0
+        },
+        "temporal-reasoning": {
+          "n": 127,
+          "turn_recall_all@5": 0.5276,
+          "turn_recall_any@5": 0.7638,
+          "answer_coverage": 0.3858
+        },
+        "knowledge-update": {
+          "n": 72,
+          "turn_recall_all@5": 0.6389,
+          "turn_recall_any@5": 0.8889,
+          "answer_coverage": 0.8472
+        },
+        "single-session-assistant": {
+          "n": 56,
+          "turn_recall_all@5": 0.8393,
+          "turn_recall_any@5": 0.8393,
+          "answer_coverage": 0.7857
+        }
+      }
+    },
+    "Variant_B_HybridCE_K5": {
+      "turn_recall_all@5": 0.6404,
+      "turn_recall_all@8": 0.6404,
+      "turn_recall_all@10": 0.6404,
+      "turn_recall_any@5": 0.8745,
+      "turn_recall_any@8": 0.8745,
+      "turn_recall_any@10": 0.8745,
+      "turn_ndcg@5": 0.6787,
+      "turn_ndcg@10": 0.6783,
+      "sess_recall_all@5": 0.8021,
+      "sess_recall_all@10": 0.8021,
+      "sess_ndcg@5": 0.9027,
+      "answer_coverage": 0.5468,
+      "abstention_accuracy": 1.0,
+      "mean_tokens": 1215.4,
+      "latency_p50_ms": 306.29,
+      "latency_p95_ms": 425.09,
+      "category_breakdown": {
+        "single-session-user": {
+          "n": 64,
+          "turn_recall_all@5": 0.9688,
+          "turn_recall_any@5": 0.9688,
+          "answer_coverage": 0.9688
+        },
+        "multi-session": {
+          "n": 121,
+          "turn_recall_all@5": 0.4132,
+          "turn_recall_any@5": 0.9091,
+          "answer_coverage": 0.3884
+        },
+        "single-session-preference": {
+          "n": 30,
+          "turn_recall_all@5": 0.3667,
+          "turn_recall_any@5": 0.5,
+          "answer_coverage": 0.0
+        },
+        "temporal-reasoning": {
+          "n": 127,
+          "turn_recall_all@5": 0.5512,
+          "turn_recall_any@5": 0.8346,
+          "answer_coverage": 0.3622
+        },
+        "knowledge-update": {
+          "n": 72,
+          "turn_recall_all@5": 0.8333,
+          "turn_recall_any@5": 0.9722,
+          "answer_coverage": 0.8611
+        },
+        "single-session-assistant": {
+          "n": 56,
+          "turn_recall_all@5": 0.8571,
+          "turn_recall_any@5": 0.8571,
+          "answer_coverage": 0.7143
+        }
+      }
+    },
+    "Variant_B_HybridCE_K8": {
+      "turn_recall_all@5": 0.6404,
+      "turn_recall_all@8": 0.7511,
+      "turn_recall_all@10": 0.7511,
+      "turn_recall_any@5": 0.8745,
+      "turn_recall_any@8": 0.9149,
+      "turn_recall_any@10": 0.9149,
+      "turn_ndcg@5": 0.6787,
+      "turn_ndcg@10": 0.7085,
+      "sess_recall_all@5": 0.883,
+      "sess_recall_all@10": 0.883,
+      "sess_ndcg@5": 0.9357,
+      "answer_coverage": 0.5787,
+      "abstention_accuracy": 1.0,
+      "mean_tokens": 2044.2,
+      "latency_p50_ms": 223.69,
+      "latency_p95_ms": 290.44,
+      "category_breakdown": {
+        "single-session-user": {
+          "n": 64,
+          "turn_recall_all@5": 0.9688,
+          "turn_recall_any@5": 0.9688,
+          "answer_coverage": 0.9688
+        },
+        "multi-session": {
+          "n": 121,
+          "turn_recall_all@5": 0.4132,
+          "turn_recall_any@5": 0.9091,
+          "answer_coverage": 0.438
+        },
+        "single-session-preference": {
+          "n": 30,
+          "turn_recall_all@5": 0.3667,
+          "turn_recall_any@5": 0.5,
+          "answer_coverage": 0.0
+        },
+        "temporal-reasoning": {
+          "n": 127,
+          "turn_recall_all@5": 0.5512,
+          "turn_recall_any@5": 0.8346,
+          "answer_coverage": 0.3858
+        },
+        "knowledge-update": {
+          "n": 72,
+          "turn_recall_all@5": 0.8333,
+          "turn_recall_any@5": 0.9722,
+          "answer_coverage": 0.9028
+        },
+        "single-session-assistant": {
+          "n": 56,
+          "turn_recall_all@5": 0.8571,
+          "turn_recall_any@5": 0.8571,
+          "answer_coverage": 0.7679
+        }
+      }
+    },
+    "Variant_B_HybridCE_K10": {
+      "turn_recall_all@5": 0.6404,
+      "turn_recall_all@8": 0.7511,
+      "turn_recall_all@10": 0.7915,
+      "turn_recall_any@5": 0.8745,
+      "turn_recall_any@8": 0.9149,
+      "turn_recall_any@10": 0.9319,
+      "turn_ndcg@5": 0.6787,
+      "turn_ndcg@10": 0.7174,
+      "sess_recall_all@5": 0.8957,
+      "sess_recall_all@10": 0.9021,
+      "sess_ndcg@5": 0.9383,
+      "answer_coverage": 0.5894,
+      "abstention_accuracy": 1.0,
+      "mean_tokens": 2551.7,
+      "latency_p50_ms": 237.88,
+      "latency_p95_ms": 289.78,
+      "category_breakdown": {
+        "single-session-user": {
+          "n": 64,
+          "turn_recall_all@5": 0.9688,
+          "turn_recall_any@5": 0.9688,
+          "answer_coverage": 0.9688
+        },
+        "multi-session": {
+          "n": 121,
+          "turn_recall_all@5": 0.4132,
+          "turn_recall_any@5": 0.9091,
+          "answer_coverage": 0.4628
+        },
+        "single-session-preference": {
+          "n": 30,
+          "turn_recall_all@5": 0.3667,
+          "turn_recall_any@5": 0.5,
+          "answer_coverage": 0.0
+        },
+        "temporal-reasoning": {
+          "n": 127,
+          "turn_recall_all@5": 0.5512,
+          "turn_recall_any@5": 0.8346,
+          "answer_coverage": 0.3937
+        },
+        "knowledge-update": {
+          "n": 72,
+          "turn_recall_all@5": 0.8333,
+          "turn_recall_any@5": 0.9722,
+          "answer_coverage": 0.9028
+        },
+        "single-session-assistant": {
+          "n": 56,
+          "turn_recall_all@5": 0.8571,
+          "turn_recall_any@5": 0.8571,
+          "answer_coverage": 0.7857
+        }
+      }
+    },
+    "Variant_C_EntityLinked_K5": {
+      "turn_recall_all@5": 0.6447,
+      "turn_recall_all@8": 0.6447,
+      "turn_recall_all@10": 0.6447,
+      "turn_recall_any@5": 0.8745,
+      "turn_recall_any@8": 0.8745,
+      "turn_recall_any@10": 0.8745,
+      "turn_ndcg@5": 0.6789,
+      "turn_ndcg@10": 0.6788,
+      "sess_recall_all@5": 0.8021,
+      "sess_recall_all@10": 0.8021,
+      "sess_ndcg@5": 0.9039,
+      "answer_coverage": 0.5511,
+      "abstention_accuracy": 1.0,
+      "mean_tokens": 1241.6,
+      "latency_p50_ms": 340.13,
+      "latency_p95_ms": 409.86,
+      "category_breakdown": {
+        "single-session-user": {
+          "n": 64,
+          "turn_recall_all@5": 0.9688,
+          "turn_recall_any@5": 0.9688,
+          "answer_coverage": 0.9688
+        },
+        "multi-session": {
+          "n": 121,
+          "turn_recall_all@5": 0.4215,
+          "turn_recall_any@5": 0.9091,
+          "answer_coverage": 0.405
+        },
+        "single-session-preference": {
+          "n": 30,
+          "turn_recall_all@5": 0.3667,
+          "turn_recall_any@5": 0.5,
+          "answer_coverage": 0.0
+        },
+        "temporal-reasoning": {
+          "n": 127,
+          "turn_recall_all@5": 0.5591,
+          "turn_recall_any@5": 0.8346,
+          "answer_coverage": 0.3622
+        },
+        "knowledge-update": {
+          "n": 72,
+          "turn_recall_all@5": 0.8333,
+          "turn_recall_any@5": 0.9722,
+          "answer_coverage": 0.8611
+        },
+        "single-session-assistant": {
+          "n": 56,
+          "turn_recall_all@5": 0.8571,
+          "turn_recall_any@5": 0.8571,
+          "answer_coverage": 0.7143
+        }
+      }
+    },
+    "Variant_C_EntityLinked_Pool10_K5": {
+      "turn_recall_all@5": 0.6319,
+      "turn_recall_all@8": 0.6319,
+      "turn_recall_all@10": 0.6319,
+      "turn_recall_any@5": 0.8553,
+      "turn_recall_any@8": 0.8553,
+      "turn_recall_any@10": 0.8553,
+      "turn_ndcg@5": 0.6672,
+      "turn_ndcg@10": 0.6674,
+      "sess_recall_all@5": 0.8043,
+      "sess_recall_all@10": 0.8043,
+      "sess_ndcg@5": 0.9009,
+      "answer_coverage": 0.5426,
+      "abstention_accuracy": 1.0,
+      "mean_tokens": 1203.6,
+      "latency_p50_ms": 185.62,
+      "latency_p95_ms": 245.23,
+      "category_breakdown": {
+        "single-session-user": {
+          "n": 64,
+          "turn_recall_all@5": 0.9375,
+          "turn_recall_any@5": 0.9375,
+          "answer_coverage": 0.9531
+        },
+        "multi-session": {
+          "n": 121,
+          "turn_recall_all@5": 0.3967,
+          "turn_recall_any@5": 0.8926,
+          "answer_coverage": 0.3884
+        },
+        "single-session-preference": {
+          "n": 30,
+          "turn_recall_all@5": 0.3667,
+          "turn_recall_any@5": 0.5,
+          "answer_coverage": 0.0
+        },
+        "temporal-reasoning": {
+          "n": 127,
+          "turn_recall_all@5": 0.5827,
+          "turn_recall_any@5": 0.8268,
+          "answer_coverage": 0.3622
+        },
+        "knowledge-update": {
+          "n": 72,
+          "turn_recall_all@5": 0.7917,
+          "turn_recall_any@5": 0.9306,
+          "answer_coverage": 0.8333
+        },
+        "single-session-assistant": {
+          "n": 56,
+          "turn_recall_all@5": 0.8393,
+          "turn_recall_any@5": 0.8393,
+          "answer_coverage": 0.7321
+        }
+      }
+    },
+    "Variant_C_EntityLinked_K10": {
+      "turn_recall_all@5": 0.6447,
+      "turn_recall_all@8": 0.7489,
+      "turn_recall_all@10": 0.7851,
+      "turn_recall_any@5": 0.8745,
+      "turn_recall_any@8": 0.917,
+      "turn_recall_any@10": 0.934,
+      "turn_ndcg@5": 0.6789,
+      "turn_ndcg@10": 0.7166,
+      "sess_recall_all@5": 0.8915,
+      "sess_recall_all@10": 0.9021,
+      "sess_ndcg@5": 0.9375,
+      "answer_coverage": 0.5915,
+      "abstention_accuracy": 1.0,
+      "mean_tokens": 2707.3,
+      "latency_p50_ms": 343.04,
+      "latency_p95_ms": 418.96,
+      "category_breakdown": {
+        "single-session-user": {
+          "n": 64,
+          "turn_recall_all@5": 0.9688,
+          "turn_recall_any@5": 0.9688,
+          "answer_coverage": 0.9688
+        },
+        "multi-session": {
+          "n": 121,
+          "turn_recall_all@5": 0.4215,
+          "turn_recall_any@5": 0.9091,
+          "answer_coverage": 0.4711
+        },
+        "single-session-preference": {
+          "n": 30,
+          "turn_recall_all@5": 0.3667,
+          "turn_recall_any@5": 0.5,
+          "answer_coverage": 0.0
+        },
+        "temporal-reasoning": {
+          "n": 127,
+          "turn_recall_all@5": 0.5591,
+          "turn_recall_any@5": 0.8346,
+          "answer_coverage": 0.3937
+        },
+        "knowledge-update": {
+          "n": 72,
+          "turn_recall_all@5": 0.8333,
+          "turn_recall_any@5": 0.9722,
+          "answer_coverage": 0.9028
+        },
+        "single-session-assistant": {
+          "n": 56,
+          "turn_recall_all@5": 0.8571,
+          "turn_recall_any@5": 0.8571,
+          "answer_coverage": 0.7857
+        }
+      }
+    },
+    "Variant_D_BoundedAssociative_B1_K5": {
+      "turn_recall_all@5": 0.6426,
+      "turn_recall_all@8": 0.6426,
+      "turn_recall_all@10": 0.6426,
+      "turn_recall_any@5": 0.8702,
+      "turn_recall_any@8": 0.8702,
+      "turn_recall_any@10": 0.8702,
+      "turn_ndcg@5": 0.6783,
+      "turn_ndcg@10": 0.678,
+      "sess_recall_all@5": 0.8,
+      "sess_recall_all@10": 0.8,
+      "sess_ndcg@5": 0.8997,
+      "answer_coverage": 0.5489,
+      "abstention_accuracy": 1.0,
+      "mean_tokens": 1245.3,
+      "latency_p50_ms": 2258.48,
+      "latency_p95_ms": 2906.55,
+      "category_breakdown": {
+        "single-session-user": {
+          "n": 64,
+          "turn_recall_all@5": 0.9688,
+          "turn_recall_any@5": 0.9688,
+          "answer_coverage": 0.9688
+        },
+        "multi-session": {
+          "n": 121,
+          "turn_recall_all@5": 0.4132,
+          "turn_recall_any@5": 0.8926,
+          "answer_coverage": 0.3884
+        },
+        "single-session-preference": {
+          "n": 30,
+          "turn_recall_all@5": 0.4,
+          "turn_recall_any@5": 0.5333,
+          "answer_coverage": 0.0
+        },
+        "temporal-reasoning": {
+          "n": 127,
+          "turn_recall_all@5": 0.5512,
+          "turn_recall_any@5": 0.8268,
+          "answer_coverage": 0.3701
+        },
+        "knowledge-update": {
+          "n": 72,
+          "turn_recall_all@5": 0.8333,
+          "turn_recall_any@5": 0.9722,
+          "answer_coverage": 0.8611
+        },
+        "single-session-assistant": {
+          "n": 56,
+          "turn_recall_all@5": 0.8571,
+          "turn_recall_any@5": 0.8571,
+          "answer_coverage": 0.7143
+        }
+      }
+    }
+  }
+}

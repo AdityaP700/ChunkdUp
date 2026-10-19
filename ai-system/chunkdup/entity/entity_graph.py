@@ -172,15 +172,17 @@ class EntityGraph:
         matched: Set[str] = set()
         text_lower = text.lower()
 
-        # Check all registered aliases (longest match first)
-        sorted_aliases = sorted(self.aliases.keys(), key=len, reverse=True)
-        for alias in sorted_aliases:
-            if re.search(r"(?<![\w\-])" + re.escape(alias) + r"(?![\w\-])", text_lower):
-                canonical = self.aliases[alias]
-                matched.add(canonical)
+        # Check registered aliases via fast token n-grams (up to 4 words)
+        words = re.findall(r"[a-z0-9_+\.\-]+", text_lower)
+        n = len(words)
+        for i in range(n):
+            for k in range(1, min(5, n - i + 1)):
+                phrase = " ".join(words[i : i + k])
+                if phrase in self.aliases:
+                    matched.add(self.aliases[phrase])
 
         # Extract capitalized multi-word or single-word proper nouns (including CamelCase/PascalCase)
-        capitalized_tokens = re.findall(r"\b[A-Z][A-Za-z0-9_-]*(?:\s+[A-Z][A-Za-z0-9_-]*)*\b", text)
+        capitalized_tokens = re.findall(r"\b[A-Z][A-Za-z0-9_-]+(?:\s+[A-Z][A-Za-z0-9_-]+)*\b", text)
         for cap in capitalized_tokens:
             cap_clean = cap.strip().rstrip(".,;:!?")
             if not cap_clean:
@@ -234,11 +236,12 @@ class EntityGraph:
                 if c1 in self.entities and c2 in self.entities and c1 != c2:
                     self.add_relation(c1, rel_type, c2, memory_id=mid, confidence=0.9)
 
-        # Co-occurrence relations if >= 2 entities found in same memory
+        # Co-occurrence relations bounded to top 6 entities to prevent O(M^2) graph blowup
         if len(found_entities) >= 2:
-            for i in range(len(found_entities)):
-                for j in range(i + 1, len(found_entities)):
-                    e1, e2 = found_entities[i], found_entities[j]
+            top_ents = found_entities[:6]
+            for i in range(len(top_ents)):
+                for j in range(i + 1, len(top_ents)):
+                    e1, e2 = top_ents[i], top_ents[j]
                     self.add_relation(e1, "co_occurs_with", e2, memory_id=mid, confidence=0.7)
 
         return found_entities
